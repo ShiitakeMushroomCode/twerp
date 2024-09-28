@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node server.mjs"
+    "node dev": "node server.mjs",
+    "build": "next build",
+    "start": "next start",
+    "dev": "next dev"
   },
   "author": "",
   "license": "ISC",
