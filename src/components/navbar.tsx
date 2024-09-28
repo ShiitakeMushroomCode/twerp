@@ -1,11 +1,12 @@
 'use client';
+import styles from '@/styles/navbar.module.css';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 export function NavBar() {
   const path = usePathname();
   return (
-    <nav>
+    <nav className={styles.nav}>
       <ul>
         <li>
           <Link href={'/'}>Home</Link>
