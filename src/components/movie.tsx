@@ -16,7 +16,7 @@ export default function Movie({ id, poster_path, title }: IMP) {
   // <img src={poster_path} alt={title} />
   return (
     <div className={styles.movie}>
-      <Link href={`/movies/${id}`}>
+      <Link prefetch href={`/movies/${id}`}>
         <img src={poster_path} alt={title} /> <br /> <br />
         {title}
       </Link>
