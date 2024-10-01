@@ -1,4 +1,5 @@
-import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import Header from '@/components/Header/Header';
 import '@/styles/global.css';
 import { Metadata } from 'next';
 
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <Header />
         <div className="content">{children}</div>
+        <Footer />
       </body>
     </html>
   );
