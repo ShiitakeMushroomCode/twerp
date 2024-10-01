@@ -1,6 +1,6 @@
 export const metadata = {
-  title: 'SignUp',
+  title: '회원가입',
 };
-export default async function Page() {
+export default async function SignUpPage() {
   return <div></div>;
 }

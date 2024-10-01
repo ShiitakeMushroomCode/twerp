@@ -8,6 +8,9 @@ export const metadata: Metadata = {
     default: 'WERP',
   },
   description: '웹 ERP입니다.',
+  icons: {
+    icon: '/logo.ico',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -15,7 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko">
       <body>
         <Header />
-        {children}
+        <div className="content">{children}</div>
       </body>
     </html>
   );

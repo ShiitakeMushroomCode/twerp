@@ -21,7 +21,6 @@
     "paths": {
       "@/styles/*": ["styles/*"],
       "@/util/*": ["util/*"],
-      "@/serverActions/*": ["serverActions/*"],
       "@/lib/*": ["lib/*"],
       "@/auth": ["auth.ts"],
       "@/components/*": ["components/*"]
