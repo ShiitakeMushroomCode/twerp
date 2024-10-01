@@ -1,22 +1,18 @@
 import styles from '@/styles/NavBar.module.css';
 import Link from 'next/link';
+import AS from './AfterSIgnIn';
+import BS from './BeforeSIgnIn';
 
 export default function NavBar() {
+  const session = { profile: '' };
   return (
     <div className={styles.navWrapper}>
       <nav className={styles.nav}>
-        <Link href="/" className={styles.logo}>
+        <Link href="/" className={styles.logo} title="홈으로 이동">
           WERP
         </Link>
 
-        <div className={styles.rightLinks}>
-          <Link href="/signin" className={styles.link}>
-            로그인
-          </Link>
-          <Link href="/signup" className={styles.link}>
-            회원가입
-          </Link>
-        </div>
+        <div className={styles.rightLinks}>{session ? <AS /> : <BS />}</div>
       </nav>
     </div>
   );
