@@ -12,7 +12,7 @@ export default function NavBar() {
           WERP
         </Link>
 
-        <div className={styles.rightLinks}>{getSession() ? <AS /> : <BS />}</div>
+        <div className={styles.rightLinks}>{!getSession() ? <AS /> : <BS />}</div>
       </nav>
     </div>
   );
