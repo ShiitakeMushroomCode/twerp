@@ -12,6 +12,7 @@ export default async function CheckBusinessInfo() {
         },
       ],
     };
+    console.log(businesses);
     try {
       const response = await fetch(
         `https://api.odcloud.kr/api/nts-businessman/v1/validate?serviceKey=${process.env.BUSINESS_INFO_API_KEY}`,
@@ -33,7 +34,7 @@ export default async function CheckBusinessInfo() {
 
       const jsonResponse = await response.json();
       const validValue = jsonResponse.data[0].valid;
-      console.log(validValue === '1' ? true : false);
+      console.log(validValue === '01' ? true : false);
     } catch (error) {
       console.error('Error:', error);
     }
@@ -42,9 +43,10 @@ export default async function CheckBusinessInfo() {
     const b_nos = {
       b_no: [formData.get('b_no')],
     };
+    console.log(b_nos);
     try {
       const response = await fetch(
-        `https://api.odcloud.kr/api/nts-businessman/v1/validate?serviceKey=${process.env.BUSINESS_INFO_API_KEY}`,
+        `https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey=${process.env.BUSINESS_INFO_API_KEY}`,
         {
           method: 'POST',
           headers: {
@@ -106,8 +108,8 @@ export default async function CheckBusinessInfo() {
           name="start_dt"
           required
           placeholder="예시) 20000101"
-          pattern="[A-Za-z가-힣 ]+"
-          title="영어 또는 한글만 입력해주세요."
+          pattern="\d{8}"
+          title="8자리 숫자만 입력해주세요."
           autoComplete="off"
         />
       </div>
