@@ -26,6 +26,6 @@
       "@/components/*": ["components/*"]
     }
   },
-  "include": ["temp/Session.ts", "next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["temp/Session.ts", "next-auth.d.ts", "next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
 }
