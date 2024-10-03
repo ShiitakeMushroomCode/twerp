@@ -15,7 +15,7 @@ export async function getConnection() {
 export async function executeQuery(query: string, params?: any[]) {
   const conn = await getConnection();
   try {
-    const [results] = await conn.query(query, params);
+    const results = await conn.query(query, params);
     return results;
   } catch (err) {
     throw new Error('Query execution failed');
