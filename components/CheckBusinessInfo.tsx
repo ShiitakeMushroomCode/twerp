@@ -1,5 +1,4 @@
 import styles from '@/styles/BusinessForm.module.css';
-import { fetchBusinessInfo } from '@/util/getBusinessInfo';
 
 export default async function CheckBusinessInfo() {
   async function fet(formData: FormData) {
@@ -13,7 +12,60 @@ export default async function CheckBusinessInfo() {
         },
       ],
     };
-    console.log(await fetchBusinessInfo({ businesses }));
+    try {
+      const response = await fetch(
+        `https://api.odcloud.kr/api/nts-businessman/v1/validate?serviceKey=${process.env.BUSINESS_INFO_API_KEY}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify(businesses),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('API Error:', errorData);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const jsonResponse = await response.json();
+      const validValue = jsonResponse.data[0].valid;
+      console.log(validValue === '1' ? true : false);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+
+    // 사업자 상태 확인
+    const b_nos = {
+      b_no: [formData.get('b_no')],
+    };
+    try {
+      const response = await fetch(
+        `https://api.odcloud.kr/api/nts-businessman/v1/validate?serviceKey=${process.env.BUSINESS_INFO_API_KEY}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify(b_nos),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('API Error:', errorData);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const jsonResponse = await response.json();
+      console.log(jsonResponse);
+    } catch (error) {
+      console.error('Error:', error);
+    }
   }
   return (
     <form action={fet} className={styles.form}>
