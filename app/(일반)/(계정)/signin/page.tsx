@@ -25,6 +25,7 @@ export default async function SignInPage() {
           className={styles.input}
           pattern="\d{11}"
           title="전화번호는 11자리 숫자여야 합니다. (010####-####)"
+          autoComplete="off"
         />
       </div>
       <div className={styles.formGroup}>
@@ -40,6 +41,7 @@ export default async function SignInPage() {
           placeholder="비밀번호 입력 (영문, 숫자, 특수문자 선택)"
           pattern="(?=.*\d)(?=.*[a-zA-Z])[A-Za-z\d@$!%*?&]{8,}"
           title="비밀번호는 최소 8자 이상이어야 하며, 영문 대문자 또는 소문자와 숫자를 포함해야 합니다. 특수문자는 선택 사항입니다."
+          autoComplete="off"
         />
       </div>
       <button type="submit" className={styles.button}>
