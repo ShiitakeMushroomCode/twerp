@@ -13,7 +13,7 @@ export async function hashPassword(password: string) {
 }
 
 // 비밀번호 검증 함수
-export async function verifyPassword(password: string | Buffer, hash: string) {
+export async function verifyPassword(password: string, hash: string) {
   try {
     const match = await bcrypt.compare(password, hash);
     return match;
