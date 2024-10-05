@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   },
   description: '웹 ERP입니다.',
   icons: {
-    icon: '/logo.ico',
+    icon: '/favicon.ico',
   },
 };
 

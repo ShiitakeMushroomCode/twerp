@@ -8,8 +8,12 @@ const pool = mariadb.createPool({
 });
 
 export async function getConnection() {
-  const conn = await pool.getConnection();
-  return conn;
+  try {
+    const conn = await pool.getConnection();
+    return conn;
+  } catch (err) {
+    throw new Error('DB 연결이 안된다니까?');
+  }
 }
 
 export async function executeQuery(query: string, params?: any[]) {
@@ -18,7 +22,7 @@ export async function executeQuery(query: string, params?: any[]) {
     const results = await conn.query(query, params);
     return results;
   } catch (err) {
-    throw new Error('Query execution failed');
+    throw new Error('쿼리좀 똑바로 써라!');
   } finally {
     conn.end();
   }

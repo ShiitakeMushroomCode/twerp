@@ -1,11 +1,10 @@
+import { executeQuery } from '@/lib/db';
 import bcrypt from 'bcrypt';
-
-const saltRounds = 12; // salt rounds 설정
 
 // 비밀번호 해시 함수
 export async function hashPassword(password: string) {
   try {
-    const hash = await bcrypt.hash(password, saltRounds);
+    const hash = await bcrypt.hash(password, parseInt(process.env.SALTROUNDS));
     return hash;
   } catch (error) {
     throw new Error('Error hashing password');
@@ -15,9 +14,17 @@ export async function hashPassword(password: string) {
 // 비밀번호 검증 함수
 export async function verifyPassword(password: string, hash: string) {
   try {
-    const match = await bcrypt.compare(password, hash);
-    return match;
+    return await bcrypt.compare(password, hash);
   } catch (error) {
     throw new Error('Error verifying password');
   }
+}
+
+export async function isAuthenticated(id: string, password: string) {
+  return await bcrypt.compare(
+    password,
+    (
+      await executeQuery('SELECT password FROM employee WHERE phone_number=?;', [id])
+    )[0].password
+  );
 }

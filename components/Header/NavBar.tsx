@@ -1,6 +1,5 @@
 import styles from '@/styles/NavBar.module.css';
 import Link from 'next/link';
-import getSession from 'temp/Session';
 import AS from './AfterSIgnIn';
 import BS from './BeforeSIgnIn';
 
@@ -12,7 +11,7 @@ export default function NavBar() {
           WERP
         </Link>
 
-        <div className={styles.rightLinks}>{!getSession() ? <AS /> : <BS />}</div>
+        <div className={styles.rightLinks}>{true ? <BS /> : <AS />}</div>
       </nav>
     </div>
   );

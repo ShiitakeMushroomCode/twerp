@@ -6,7 +6,7 @@ const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 async function verifyRefreshToken(refreshToken: string) {
   try {
     const { payload } = await jwtVerify(refreshToken, secret);
-    return payload.userId;
+    return payload.userId.toString();
   } catch (e) {
     return null;
   }
