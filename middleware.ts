@@ -1,4 +1,5 @@
-import { jwtVerify, SignJWT } from 'jose';
+import { error } from 'console';
+import { jwtVerify } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
 import { DEFAULT_REDIRECT, PUBLIC_ROUTES } from './lib/routes';
 
@@ -52,7 +53,7 @@ export async function middleware(request: NextRequest) {
 
   // 로그아웃
   if (request.nextUrl.pathname === '/signout') {
-    const response = NextResponse.redirect(new URL('/signin', request.url));
+    const response = NextResponse.next();
     clearCookie('accessToken', response);
     clearCookie('refreshToken', response);
     return response;
@@ -69,25 +70,38 @@ export async function middleware(request: NextRequest) {
       if (accessPayload.userId !== refreshPayload.userId) {
         return NextResponse.redirect(new URL('/signin', request.url));
       }
-      if (accessPayload.exp <= Math.floor(Date.now() / 1000)) {
-        const userId = accessPayload.userId.toString();
-        const role = 'user';
-        // 함수 있는데 작동 안함 진짜모름
-        const newAccessToken = new SignJWT({ userId, role })
-          .setProtectedHeader({ alg: 'HS256' })
-          .setIssuedAt()
-          .setExpirationTime(process.env.JWT_EXPIRATION) // Access token은 15분동안 지속
-          .sign(secret);
 
-        const response = NextResponse.next();
-        response.cookies.set('accessToken', await newAccessToken, {
-          maxAge: 30 * 60, // 30분
-          path: '/',
-          httpOnly: true,
-          sameSite: 'strict',
-          secure: true,
+      if (accessPayload.exp <= Math.floor(Date.now() / 1000)) {
+        // 여기서 POST요청 API로 보내면 거기서 처리해야할 듯
+        const res = await fetch(`${process.env.API_URL}/auth/refresh`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify({ refreshToken: refreshToken }),
         });
-        return response;
+
+        if (res.ok) {
+          const newAccessToken = (await res.json()).accessToken;
+          const response = NextResponse.next();
+          clearCookie('accessToken', response);
+          response.cookies.set('accessToken', await newAccessToken, {
+            maxAge: 30 * 60, // 30분
+            path: '/',
+            httpOnly: true,
+            sameSite: 'strict',
+            secure: true,
+          });
+          return response;
+        } else {
+          throw new error('이건 망했어!');
+        }
+        // const newAccessToken = new SignJWT({ userId: accessPayload.userId.toString(), role: 'user' })
+        //   .setProtectedHeader({ alg: 'HS256' })
+        //   .setIssuedAt()
+        //   .setExpirationTime(process.env.JWT_EXPIRATION) // Access token은 15분동안 지속
+        //   .sign(secret);
       }
       return NextResponse.next();
     } catch (error) {
@@ -95,6 +109,7 @@ export async function middleware(request: NextRequest) {
       console.error('Token validation error:', error);
       const response = NextResponse.redirect(new URL('/signin', request.url));
       clearCookie('accessToken', response);
+      clearCookie('refreshToken', response);
       return response;
     }
   }

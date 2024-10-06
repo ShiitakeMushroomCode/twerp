@@ -36,7 +36,10 @@ export async function generateRefreshToken(userId: any) {
 }
 
 export async function checkRefreshTokenInDB(userId: any, refreshToken: any) {
-  return true;
+  return await executeQuery('SELECT ref_token FROM employee WHERE phone_number=? AND ref_token=?;', [
+    userId,
+    refreshToken,
+  ]);
 }
 
 export async function removeRefreshTokenFromDB(refreshToken: any) {

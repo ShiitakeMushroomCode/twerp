@@ -1,6 +1,51 @@
 import styles from '@/styles/SignInPage.module.css';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+export default function SinginForm() {
+  async function signin(formData: FormData) {
+    'use server';
+    try {
+      const data = {
+        id: formData.get('phone_number'),
+        password: formData.get('password'),
+      };
+      const response = await fetch(`${process.env.API_URL}/auth/signin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(data),
+        credentials: 'same-origin',
+      });
+      if (response.ok) {
+        const data = await response.json();
+        cookies().set({
+          name: 'accessToken',
+          value: data.accessToken,
+          httpOnly: true,
+          maxAge: 30 * 60,
+          path: '/',
+          sameSite: 'strict',
+          secure: true,
+        });
+        cookies().set({
+          name: 'refreshToken',
+          value: data.refreshToken,
+          httpOnly: true,
+          maxAge: 60 * 60 * 24 * 30,
+          path: '/',
+          sameSite: 'strict',
+          secure: true,
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      redirect('/mypage');
+    }
+  }
 
-export default function SinginCom({ signin }) {
   return (
     <form action={signin} className={styles.formContainer}>
       <div className={styles.formGroup}>
@@ -30,7 +75,7 @@ export default function SinginCom({ signin }) {
           required
           className={styles.input}
           placeholder="비밀번호 입력 (영문, 숫자, 특수문자 선택)"
-          pattern="(?=.*\d)(?=.*[a-zA-Z])[A-Za-z\d@$!%*?&]{8,}"
+          // pattern="(?=.*\d)(?=.*[a-zA-Z])[A-Za-z\d@$!%*?&]{8,}"
           title="비밀번호는 최소 8자 이상이어야 하며, 영문 대문자 또는 소문자와 숫자를 포함해야 합니다. 특수문자는 선택 사항입니다."
           autoComplete="off"
         />
