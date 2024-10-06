@@ -1,6 +1,13 @@
+import { redirect } from 'next/navigation';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
-  const response = NextResponse.json({ message: 'Logged out' });
-  return response;
+  const data = await request.json();
+  const refreshToken = await data?.refreshToken?.value;
+  if (!refreshToken) {
+    NextResponse.json({ message: '로그아웃 할 리프레시 토큰이 없음' });
+  } else {
+    NextResponse.json({ message: '리프레시 토큰 삭제 함 ㅇㅇ' });
+  }
+  redirect(`${process.env.SITE_URL}/signin`);
 }

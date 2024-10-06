@@ -1,24 +1,21 @@
+import { ACT } from 'auth';
 import { error } from 'console';
 import { jwtVerify } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
 import { DEFAULT_REDIRECT, PUBLIC_ROUTES } from './lib/routes';
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-
-async function postData(url = '', data = {}) {
-  const response = await fetch(url, {
+async function signout(refreshToken, res) {
+  clearCookie('accessToken', res);
+  clearCookie('refreshToken', res);
+  await fetch(`${process.env.API_URL}/auth/signout`, {
     method: 'POST',
-    mode: 'cors',
-    cache: 'no-cache',
-    credentials: 'same-origin',
     headers: {
       'Content-Type': 'application/json',
+      Accept: 'application/json',
     },
-    redirect: 'follow',
-    referrerPolicy: 'no-referrer',
-    body: JSON.stringify(data),
+    body: JSON.stringify({ refreshToken: refreshToken }),
   });
-  return response.json();
 }
 
 function clearCookie(name: string, response: NextResponse) {
@@ -39,6 +36,7 @@ export async function middleware(request: NextRequest) {
   if (!PUBLIC_ROUTES.includes(request.nextUrl.pathname) && !accessToken) {
     return NextResponse.redirect(new URL('/signin', request.url));
   }
+
   // 로그인 했으면서 또 하거나 회원가입 하는거 막기
   if (PUBLIC_ROUTES.includes(request.nextUrl.pathname) && accessToken) {
     return NextResponse.redirect(new URL(DEFAULT_REDIRECT, request.url));
@@ -47,15 +45,14 @@ export async function middleware(request: NextRequest) {
   // 갱신을 30분동안 안하면 로그아웃한걸로
   if (!accessToken && refreshToken) {
     const response = NextResponse.redirect(new URL('/signin', request.url));
-    clearCookie('refreshToken', response);
+    signout(refreshToken, response);
     return response;
   }
 
   // 로그아웃
   if (request.nextUrl.pathname === '/signout') {
-    const response = NextResponse.next();
-    clearCookie('accessToken', response);
-    clearCookie('refreshToken', response);
+    const response = NextResponse.redirect(new URL('/signin', request.url));
+    signout(refreshToken, response);
     return response;
   }
 
@@ -66,8 +63,9 @@ export async function middleware(request: NextRequest) {
         (await jwtVerify(accessToken.value, secret)).payload,
         (await jwtVerify(refreshToken.value, secret)).payload,
       ]);
+      const accessPayloadData = accessPayload.data as ACT;
 
-      if (accessPayload.userId !== refreshPayload.userId) {
+      if (accessPayloadData.userId !== refreshPayload.userId) {
         return NextResponse.redirect(new URL('/signin', request.url));
       }
 
@@ -97,19 +95,13 @@ export async function middleware(request: NextRequest) {
         } else {
           throw new error('이건 망했어!');
         }
-        // const newAccessToken = new SignJWT({ userId: accessPayload.userId.toString(), role: 'user' })
-        //   .setProtectedHeader({ alg: 'HS256' })
-        //   .setIssuedAt()
-        //   .setExpirationTime(process.env.JWT_EXPIRATION) // Access token은 15분동안 지속
-        //   .sign(secret);
       }
       return NextResponse.next();
     } catch (error) {
       // 토큰 검증 실패 시 처리
-      console.error('Token validation error:', error);
+      console.error('토큰 검증 실패함:', error);
       const response = NextResponse.redirect(new URL('/signin', request.url));
-      clearCookie('accessToken', response);
-      clearCookie('refreshToken', response);
+      signout(refreshToken, response);
       return response;
     }
   }

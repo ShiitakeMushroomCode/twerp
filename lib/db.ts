@@ -10,7 +10,7 @@ const pool = mariadb.createPool({
 export async function executeQuery(query: string, params?: any[]) {
   let conn;
   try {
-    console.log('연결');
+    // console.log('연결');
     conn = await pool.getConnection();
     const results = await conn.query(query, params);
     return results;
@@ -18,7 +18,7 @@ export async function executeQuery(query: string, params?: any[]) {
     throw new Error('쿼리 좀 똑바로 써라!');
   } finally {
     if (conn) {
-      console.log('연결 반환');
+      // console.log('연결 반환');
       conn.release(); // 연결을 풀에 반환
     }
   }
