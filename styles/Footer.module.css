@@ -19,7 +19,7 @@
 
 .rightLinks {
   display: flex;
-  gap: 1.5rem;
+  margin-right: 1.5rem;
 }
 
 .footerItem {

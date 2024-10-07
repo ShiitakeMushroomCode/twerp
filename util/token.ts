@@ -1,6 +1,6 @@
 import { executeQuery } from '@/lib/db';
 import { ACT } from 'auth';
-import { SignJWT } from 'jose';
+import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
 
 export async function StoreRefreshToken(userId: any, refreshToken: any) {
@@ -17,13 +17,17 @@ export async function getAccessToken() {
   return cookies().get('accessToken');
 }
 
+export async function getTokenUserData() {
+  return (await jwtVerify(cookies().get('accessToken').value, secret)).payload.data;
+}
+
 const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function generateAccessToken(data: ACT) {
   return new SignJWT({ data })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime(process.env.JWT_EXPIRATION) // Access token은 15분동안 지속
+    .setExpirationTime(process.env.JWT_EXPIRATION) // Access token은 15분동안 지속 process.env.JWT_EXPIRATION
     .sign(secret);
 }
 

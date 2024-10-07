@@ -1,5 +1,4 @@
 import { ACT } from 'auth';
-import { error } from 'console';
 import { jwtVerify } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
 import { DEFAULT_REDIRECT, PUBLIC_ROUTES } from './lib/routes';
@@ -42,7 +41,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(DEFAULT_REDIRECT, request.url));
   }
 
-  // 갱신을 30분동안 안하면 로그아웃한걸로
+  // 갱신을 1시간 동안 안하면 로그아웃한걸로
   if (!accessToken && refreshToken) {
     const response = NextResponse.redirect(new URL('/signin', request.url));
     signout(refreshToken, response);
@@ -55,7 +54,6 @@ export async function middleware(request: NextRequest) {
     signout(refreshToken, response);
     return response;
   }
-
   // accessToken 검증 시간 보고
   if (accessToken) {
     try {
@@ -63,14 +61,19 @@ export async function middleware(request: NextRequest) {
         (await jwtVerify(accessToken.value, secret)).payload,
         (await jwtVerify(refreshToken.value, secret)).payload,
       ]);
+
       const accessPayloadData = accessPayload.data as ACT;
 
       if (accessPayloadData.userId !== refreshPayload.userId) {
         return NextResponse.redirect(new URL('/signin', request.url));
       }
 
-      if (accessPayload.exp <= Math.floor(Date.now() / 1000)) {
-        // 여기서 POST요청 API로 보내면 거기서 처리해야할 듯
+      // 액세스 토큰이 유효한 경우
+      return NextResponse.next();
+    } catch (error) {
+      // 액세스 토큰 검증 실패시 처리
+      try {
+        // 액세스 토큰이 만료된 경우 리프레시 토큰으로 새 액세스 토큰 요청
         const res = await fetch(`${process.env.API_URL}/auth/refresh`, {
           method: 'POST',
           headers: {
@@ -83,9 +86,8 @@ export async function middleware(request: NextRequest) {
         if (res.ok) {
           const newAccessToken = (await res.json()).accessToken;
           const response = NextResponse.next();
-          clearCookie('accessToken', response);
-          response.cookies.set('accessToken', await newAccessToken, {
-            maxAge: 30 * 60, // 30분
+          response.cookies.set('accessToken', newAccessToken, {
+            maxAge: 60 * 60, // 1시간
             path: '/',
             httpOnly: true,
             sameSite: 'strict',
@@ -93,18 +95,21 @@ export async function middleware(request: NextRequest) {
           });
           return response;
         } else {
-          throw new error('이건 망했어!');
+          console.error('미들웨어에서 토큰 갱신이 안된답니다');
+          const response = NextResponse.redirect(new URL('/signin', request.url));
+          signout(refreshToken, response);
+          return response;
         }
+      } catch (error) {
+        // 다른 오류 처리
+        console.error('토큰 검증 실패함:', error);
+        const response = NextResponse.redirect(new URL('/signin', request.url));
+        signout(refreshToken, response);
+        return response;
       }
-      return NextResponse.next();
-    } catch (error) {
-      // 토큰 검증 실패 시 처리
-      console.error('토큰 검증 실패함:', error);
-      const response = NextResponse.redirect(new URL('/signin', request.url));
-      signout(refreshToken, response);
-      return response;
     }
   }
+
   return NextResponse.next();
 }
 
