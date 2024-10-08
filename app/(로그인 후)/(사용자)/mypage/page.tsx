@@ -1,6 +1,9 @@
+import ReForm from '@/components/MyPage/reForm';
 import styles from '@/styles/MyPage.module.css';
 import { getTokenUserData } from '@/util/token';
+import { getCNumberHtml } from 'app/api/sendEmail/route';
 import { ACT } from 'auth';
+import { randomInt } from 'crypto';
 
 export const metadata = {
   title: '마이페이지',
@@ -11,6 +14,24 @@ async function getUserData() {
 }
 async function reformPhoneNumber(formData) {
   'use server';
+  const data = (await getTokenUserData()) as ACT;
+  const cn = String(randomInt(0, 1000000)).padStart(6, '0');
+  const response = await fetch(`${process.env.API_URL}/sendEmail`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      to: data.email,
+      subject: 'WERP 인증번호입니다.',
+      html: getCNumberHtml(cn),
+      cn: String(randomInt(0, 1000000)).padStart(6, '0'),
+      type: 'reFormEmail',
+    }),
+  });
+  if (response.ok) {
+    console.log('인증 메일 보냈다.');
+  }
 }
 async function reformEmail(formData) {
   'use server';
@@ -45,18 +66,8 @@ export default async function MyPage() {
         </div>
         <hr />
         <h1 className={styles.title}>개인정보 변경</h1>
-        <div className={styles.reFormContent}>
-          <form action={reformPhoneNumber} className={styles.info}>
-            <label className={styles.flabel}>전화번호</label>
-            <input type="text" className={styles.input} />
-            <button className={styles.button}>전화번호 변경</button>
-          </form>
-          <form action={reformEmail} className={styles.info}>
-            <label className={styles.flabel}>이메일</label>
-            <input type="text" className={styles.input} />
-            <button className={styles.button}>이메일 변경</button>
-          </form>
-        </div>
+
+        <ReForm reformPhoneNumber={reformPhoneNumber} reformEmail={reformEmail} />
       </div>
     </div>
   );

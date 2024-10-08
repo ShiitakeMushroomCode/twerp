@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
   const data = await request.json();
   const refreshToken = await data?.refreshToken?.value;
-  removeRefreshTokenFromDB(await data?.refreshToken);
+  removeRefreshTokenFromDB(await refreshToken);
   cookies().delete('accessToken');
   cookies().delete('refreshToken');
   if (!refreshToken) {

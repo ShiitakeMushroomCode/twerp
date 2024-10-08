@@ -1,6 +1,5 @@
-import { executeQuery } from '@/lib/db';
 import { isAuthenticated } from '@/util/password';
-import { generateAccessToken, generateRefreshToken, getInnerData, StoreRefreshToken } from '@/util/token';
+import { generateAccessToken, generateRefreshToken, getInnerData, StoreAndGetUserData } from '@/util/token';
 import { ACT } from 'auth';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -12,9 +11,7 @@ export async function POST(request: NextRequest) {
   if (await isAuthenticated(id, password)) {
     const refreshToken = await generateRefreshToken(id);
 
-    await StoreRefreshToken(id, refreshToken);
-
-    const data = (await executeQuery('SELECT * FROM employee WHERE phone_number=?;', [id]))[0];
+    const data = (await StoreAndGetUserData(id, refreshToken))[0];
 
     const innerData: ACT = await getInnerData(data);
     // {

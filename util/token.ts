@@ -3,6 +3,7 @@ import { ACT } from 'auth';
 import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
 
+// 구버전
 export async function StoreRefreshToken(userId: any, refreshToken: any) {
   try {
     await executeQuery('UPDATE employee SET ref_token = ? WHERE phone_number = ?;', [refreshToken, userId]);
@@ -10,6 +11,22 @@ export async function StoreRefreshToken(userId: any, refreshToken: any) {
   } catch (error) {
     console.log('토큰 저장에 오류남');
     return false;
+  }
+}
+
+export async function StoreAndGetUserData(userId: any, refreshToken: any) {
+  let user;
+  try {
+    // 한번에 필요한 데이터 조회
+    user = await executeQuery('SELECT * FROM employee WHERE phone_number = ?', [userId]);
+    if (user) {
+      // 리프레시 토큰 업데이트
+      await executeQuery('UPDATE employee SET ref_token = ? WHERE phone_number = ?', [refreshToken, userId]);
+    }
+    return user;
+  } catch (error) {
+    console.log('사용자 데이터 저장 또는 조회에 오류남');
+    return null;
   }
 }
 
@@ -61,6 +78,20 @@ export async function getInnerData(data) {
   return innerData;
 }
 
-export async function removeRefreshTokenFromDB(refreshToken: any) {
-  const log = await executeQuery('UPDATE employee SET ref_token = ? WHERE ref_token = ?;', [null, refreshToken]);
+// export async function removeRefreshTokenFromDB(refreshToken: any) {
+//   const log = await executeQuery('UPDATE employee SET ref_token = NULL WHERE ref_token = ?;', refreshToken);
+// }
+
+export async function removeRefreshTokenFromDB(refreshToken: string) {
+  if (!refreshToken) {
+    console.error('리프레시 토큰이 유효하지 않음:', refreshToken);
+    throw new Error('유효하지 않은 리프레시 토큰입니다.');
+  }
+
+  try {
+    await executeQuery('UPDATE employee SET ref_token = NULL WHERE ref_token = ?', [refreshToken]);
+  } catch (error) {
+    console.error('리프레시 토큰 삭제 실패:', error.message);
+    throw error;
+  }
 }
