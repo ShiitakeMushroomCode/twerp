@@ -10,3 +10,12 @@
 2024. 10. 9. 오전 4:21:18 [INFO]: 쿼리 실행 시작: UPDATE employee SET ref_token = NULL WHERE ref_token = ?, 파라미터: ["eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiIwMTA3NTM5NjkyOSIsImlhdCI6MTcyODQxNTI2MCwiZXhwIjoxNzMxMDA3MjYwfQ.vO4iNzxilAYBfNfhJh3JP2Fbka58jVAMvwZx7_ICJkU"]
 2024. 10. 9. 오전 4:21:18 [INFO]: 쿼리 실행 완료: UPDATE employee SET ref_token = NULL WHERE ref_token = ?, 실행 시간: 0초 5.9036ms
 2024. 10. 9. 오전 4:21:18 [INFO]: 연결 반환
+2024. 10. 10. 오전 12:16:27 [INFO]: 쿼리 실행 시작: SELECT password FROM employee WHERE phone_number=?;, 파라미터: ["01075396929"]
+2024. 10. 10. 오전 12:16:27 [INFO]: 쿼리 실행 완료: SELECT password FROM employee WHERE phone_number=?;, 실행 시간: 0초 3.2063ms
+2024. 10. 10. 오전 12:16:27 [INFO]: 연결 반환
+2024. 10. 10. 오전 12:16:27 [INFO]: 쿼리 실행 시작: SELECT * FROM employee WHERE phone_number = ?, 파라미터: ["01075396929"]
+2024. 10. 10. 오전 12:16:27 [INFO]: 쿼리 실행 완료: SELECT * FROM employee WHERE phone_number = ?, 실행 시간: 0초 1.7586ms
+2024. 10. 10. 오전 12:16:27 [INFO]: 연결 반환
+2024. 10. 10. 오전 12:16:27 [INFO]: 쿼리 실행 시작: UPDATE employee SET ref_token = ? WHERE phone_number = ?, 파라미터: ["eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiIwMTA3NTM5NjkyOSIsImlhdCI6MTcyODQ4Njk4NywiZXhwIjoxNzMxMDc4OTg3fQ.DsKASLmfS7JYIeoQD5aScDYcV9Y_1d1-Ftrj0dB_KTI","01075396929"]
+2024. 10. 10. 오전 12:16:27 [INFO]: 쿼리 실행 완료: UPDATE employee SET ref_token = ? WHERE phone_number = ?, 실행 시간: 0초 17.8838ms
+2024. 10. 10. 오전 12:16:27 [INFO]: 연결 반환

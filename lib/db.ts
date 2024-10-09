@@ -32,7 +32,8 @@ const pool = createPool({
 export async function executeQuery(query: string, params?: any) {
   let conn;
   try {
-    logger.info(`쿼리 실행 시작: ${query}, 파라미터: ${JSON.stringify(params)}`);
+    // logger.info(`쿼리 실행 시작: ${query}, 파라미터: ${JSON.stringify(params)}`);
+    logger.info(`쿼리 실행 시작`);
     conn = await pool.getConnection();
     const start = process.hrtime();
 
