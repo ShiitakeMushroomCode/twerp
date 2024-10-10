@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     'Unknown IP';
   ip = ip.replace(/^::ffff:/, '');
 
-  logger.info(`${ip}에서 ${pathname} 경로에 접근 시도`);
+  logger.info(`${ip}에서 ${decodeURI(pathname)} 경로에 접근 시도`);
 
   return NextResponse.json({ message: 'Logged' });
 }
