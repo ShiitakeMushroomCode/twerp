@@ -1,3 +1,5 @@
+import { generateCertificationToken, saveVerificationToken } from '@/util/token';
+import { randomInt } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
@@ -10,18 +12,19 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function POST(request: NextRequest) {
-  const { to, subject, text, html, cn, type } = await request.json();
+  const { userId, to, subject, type } = await request.json();
+  // 인증 코드 생성
+  const cn = String(randomInt(0, 1000000)).padStart(6, '0');
   const mailOptions = {
     from: process.env.GMAIL_USER,
     to,
     subject,
-    text: text || undefined,
-    html: html || undefined,
+    html: getCNumberHtml(cn) || undefined,
   };
 
   try {
     await transporter.sendMail(mailOptions);
-    // 타입 구분해서 cn값 저장 후 원래 페이지에서 모달창 띄워 입력받기
+    await saveVerificationToken(userId, await generateCertificationToken({ userId: userId, cn: cn }));
     return NextResponse.json({ message: '이메일 전송 성공적' }, { status: 200 });
   } catch (error) {
     console.error(error);

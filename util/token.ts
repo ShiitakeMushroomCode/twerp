@@ -4,15 +4,17 @@ import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
 
 // 구버전
-export async function StoreRefreshToken(userId: any, refreshToken: any) {
-  try {
-    await executeQuery('UPDATE employee SET ref_token = ? WHERE phone_number = ?;', [refreshToken, userId]);
-    return true;
-  } catch (error) {
-    console.log('토큰 저장에 오류남');
-    return false;
-  }
-}
+// export async function StoreRefreshToken(userId: any, refreshToken: any) {
+//   try {
+//     await executeQuery('UPDATE employee SET ref_token = ? WHERE phone_number = ?;', [refreshToken, userId]);
+//     return true;
+//   } catch (error) {
+//     console.log('토큰 저장에 오류남');
+//     return false;
+//   }
+// }
+
+const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function StoreAndGetUserData(userId: any, refreshToken: any) {
   let user;
@@ -38,8 +40,6 @@ export async function getTokenUserData() {
   return (await jwtVerify(cookies().get('accessToken').value, secret)).payload.data;
 }
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-
 export async function generateAccessToken(data: ACT) {
   return new SignJWT({ data })
     .setProtectedHeader({ alg: 'HS256' })
@@ -57,12 +57,12 @@ export async function generateRefreshToken(userId: any) {
 }
 
 //안씀
-export async function checkRefreshTokenInDB(userId: any, refreshToken: any) {
-  return await executeQuery('SELECT ref_token FROM employee WHERE phone_number=? AND ref_token=?;', [
-    userId,
-    refreshToken,
-  ]);
-}
+// export async function checkRefreshTokenInDB(userId: any, refreshToken: any) {
+//   return await executeQuery('SELECT ref_token FROM employee WHERE phone_number=? AND ref_token=?;', [
+//     userId,
+//     refreshToken,
+//   ]);
+// }
 
 export async function getInnerData(data) {
   const innerData: ACT = {
@@ -94,4 +94,34 @@ export async function removeRefreshTokenFromDB(refreshToken: string) {
     console.error('리프레시 토큰 삭제 실패:', error.message);
     throw error;
   }
+}
+
+export async function generateCertificationToken({ userId, cn }) {
+  return new SignJWT({ userId, cn })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('5m')
+    .sign(secret);
+}
+
+export async function saveVerificationToken(userId: string, token: string): Promise<void> {
+  // 데이터베이스에 토큰 저장 로직 구현
+  // 예시: await db.user.update({ where: { id: userId }, data: { verificationToken: token } });
+}
+
+export async function getVerificationToken(userId: string): Promise<string | null> {
+  // 데이터베이스에서 토큰 가져오기
+  // 예시: const user = await db.user.findUnique({ where: { id: userId } });
+  // return user?.verificationToken || null;
+  return null;
+}
+
+export async function deleteVerificationToken(userId: string): Promise<void> {
+  // 데이터베이스에서 토큰 삭제
+  // 예시: await db.user.update({ where: { id: userId }, data: { verificationToken: null } });
+}
+
+export async function updatePhoneNumber(userId: string, newPhoneNumber: string): Promise<void> {
+  // 전화번호 업데이트 로직 구현
+  // 예시: await db.user.update({ where: { id: userId }, data: { phoneNumber: newPhoneNumber } });
 }
