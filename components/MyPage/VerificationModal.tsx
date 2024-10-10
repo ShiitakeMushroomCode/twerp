@@ -1,15 +1,18 @@
 'use client';
 import styles from '@/styles/VerificationModal.module.css';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 interface VerificationModalProps {
   isOpen: boolean;
   onClose: () => void;
+  newPhoneNumber: string | undefined;
 }
 
-const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose }) => {
+const VerificationModal: React.FC<VerificationModalProps> = ({ newPhoneNumber, isOpen, onClose }) => {
   const [timeLeft, setTimeLeft] = useState<number>(300);
   const [verificationCode, setVerificationCode] = useState<string>('');
+  const router = useRouter();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -35,15 +38,16 @@ const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose }
   const seconds = timeLeft % 60;
 
   const handleSubmit = async () => {
-    const response = await fetch(`/api/verifyCode`, {
+    const response = await fetch(`/api/verifyCodePhone`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ inputCode: verificationCode }),
+      body: JSON.stringify({ inputCode: verificationCode, newPhoneNumber: newPhoneNumber }),
     });
 
     const result = await response.json();
     if (response.ok) {
       alert(result.message);
+      router.push('/signout');
       onClose();
     } else {
       alert(result.error);

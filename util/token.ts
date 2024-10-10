@@ -1,6 +1,7 @@
 import { executeQuery } from '@/lib/db';
 import { ACT } from 'auth';
 import { jwtVerify, SignJWT } from 'jose';
+import _ from 'lodash';
 import { cookies } from 'next/headers';
 
 // 구버전
@@ -85,14 +86,16 @@ export async function getInnerData(data) {
 export async function removeRefreshTokenFromDB(refreshToken: string) {
   if (!refreshToken) {
     console.error('리프레시 토큰이 유효하지 않음:', refreshToken);
-    throw new Error('유효하지 않은 리프레시 토큰입니다.');
+    // throw new Error('유효하지 않은 리프레시 토큰입니다.');
+    return false;
   }
 
   try {
     await executeQuery('UPDATE employee SET ref_token = NULL WHERE ref_token = ?', [refreshToken]);
   } catch (error) {
     console.error('리프레시 토큰 삭제 실패:', error.message);
-    throw error;
+    // throw error;
+    return false;
   }
 }
 
@@ -104,27 +107,75 @@ export async function generateCertificationToken({ userId, cn }) {
     .sign(secret);
 }
 
-export async function saveVerificationToken(userId: string, token: string): Promise<boolean> {
-  // 데이터베이스에 토큰 저장 로직 구현
-  // 예시: await db.user.update({ where: { id: userId }, data: { verificationToken: token } });
-  return false;
-}
-
-export async function getVerificationToken(userId: string): Promise<string | null> {
-  // 데이터베이스에서 토큰 가져오기
-  // 예시: const user = await db.user.findUnique({ where: { id: userId } });
-  // return user?.verificationToken || null;
-  return null;
-}
-
-export async function deleteVerificationToken(userId: string): Promise<boolean> {
-  // 데이터베이스에서 토큰 삭제
-  // 예시: await db.user.update({ where: { id: userId }, data: { verificationToken: null } });
-  return false;
-}
-
+// 전화번호 업데이트 함수
 export async function updatePhoneNumber(userId: string, newPhoneNumber: string): Promise<boolean> {
-  // 전화번호 업데이트 로직 구현
-  // 예시: await db.user.update({ where: { id: userId }, data: { phoneNumber: newPhoneNumber } });
-  return false;
+  // 값 검증
+  if (_.isEmpty(userId) || _.isEmpty(newPhoneNumber)) {
+    console.error('유효하지 않은 userId 또는 newPhoneNumber 값입니다.');
+    return false;
+  }
+
+  try {
+    // 전화번호 업데이트
+    await executeQuery('UPDATE employee SET phone_number = ? WHERE phone_number = ?;', [newPhoneNumber, userId]);
+    return true;
+  } catch (error) {
+    console.error(error.message);
+    return false;
+  }
+}
+
+// 인증 토큰 저장 함수
+export async function saveVerificationToken(userId: string, token: string): Promise<boolean> {
+  // 값 검증
+  if (_.isEmpty(userId) || _.isEmpty(token)) {
+    console.error('유효하지 않은 userId 또는 token 값입니다.');
+    return false;
+  }
+
+  try {
+    // 데이터베이스에 토큰 저장
+    await executeQuery('UPDATE employee SET cer_code = ? WHERE phone_number = ?;', [token, userId]);
+    return true;
+  } catch (error) {
+    console.error(error.message);
+    return false;
+  }
+}
+
+// 인증 토큰 가져오기 함수
+export async function getVerificationToken(userId: string): Promise<string | null> {
+  // 값 검증
+  if (_.isEmpty(userId)) {
+    console.error('유효하지 않은 userId 값입니다.');
+    return null;
+  }
+
+  try {
+    // 데이터베이스에서 토큰 가져오기
+    const result = await executeQuery('SELECT cer_code FROM employee WHERE phone_number = ?', [userId]);
+    const token = result[0]?.cer_code || null;
+    return token;
+  } catch (error) {
+    console.error(error.message);
+    return null;
+  }
+}
+
+// 인증 토큰 삭제 함수
+export async function deleteVerificationToken(userId: string): Promise<boolean> {
+  // 값 검증
+  if (_.isEmpty(userId)) {
+    console.error('유효하지 않은 userId 값입니다.');
+    return false;
+  }
+
+  try {
+    // 데이터베이스에서 토큰 삭제
+    await executeQuery('UPDATE employee SET cer_code = NULL WHERE phone_number = ?', [userId]);
+    return true;
+  } catch (error) {
+    console.error(error.message);
+    return false;
+  }
 }
