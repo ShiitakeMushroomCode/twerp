@@ -104,9 +104,10 @@ export async function generateCertificationToken({ userId, cn }) {
     .sign(secret);
 }
 
-export async function saveVerificationToken(userId: string, token: string): Promise<void> {
+export async function saveVerificationToken(userId: string, token: string): Promise<boolean> {
   // 데이터베이스에 토큰 저장 로직 구현
   // 예시: await db.user.update({ where: { id: userId }, data: { verificationToken: token } });
+  return false;
 }
 
 export async function getVerificationToken(userId: string): Promise<string | null> {
@@ -116,12 +117,14 @@ export async function getVerificationToken(userId: string): Promise<string | nul
   return null;
 }
 
-export async function deleteVerificationToken(userId: string): Promise<void> {
+export async function deleteVerificationToken(userId: string): Promise<boolean> {
   // 데이터베이스에서 토큰 삭제
   // 예시: await db.user.update({ where: { id: userId }, data: { verificationToken: null } });
+  return false;
 }
 
-export async function updatePhoneNumber(userId: string, newPhoneNumber: string): Promise<void> {
+export async function updatePhoneNumber(userId: string, newPhoneNumber: string): Promise<boolean> {
   // 전화번호 업데이트 로직 구현
   // 예시: await db.user.update({ where: { id: userId }, data: { phoneNumber: newPhoneNumber } });
+  return false;
 }

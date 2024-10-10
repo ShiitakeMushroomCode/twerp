@@ -1,14 +1,13 @@
 'use client';
+import styles from '@/styles/VerificationModal.module.css';
 import React, { useEffect, useState } from 'react';
 
 interface VerificationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  userId: string;
-  newPhoneNumber: string;
 }
 
-const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose, userId, newPhoneNumber }) => {
+const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose }) => {
   const [timeLeft, setTimeLeft] = useState<number>(300);
   const [verificationCode, setVerificationCode] = useState<string>('');
 
@@ -36,10 +35,10 @@ const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose, 
   const seconds = timeLeft % 60;
 
   const handleSubmit = async () => {
-    const response = await fetch(`${process.env.API_URL}/verifyCode`, {
+    const response = await fetch(`/api/verifyCode`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, inputCode: verificationCode, newPhoneNumber }),
+      body: JSON.stringify({ inputCode: verificationCode }),
     });
 
     const result = await response.json();
@@ -52,22 +51,27 @@ const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose, 
   };
 
   return (
-    isOpen && (
-      <div className="modal">
-        <h2>인증 코드 입력</h2>
+    <div className={styles.modalOverlay}>
+      <div className={styles.modal}>
+        <h2 className={styles.h2}>인증 코드 입력</h2>
         <input
           type="text"
           placeholder="인증 코드를 입력하세요"
           value={verificationCode}
           onChange={(e) => setVerificationCode(e.target.value)}
+          className={styles.input}
         />
-        <button onClick={handleSubmit}>확인</button>
-        <div className="timer">
+        <button onClick={handleSubmit} className={styles.submitButton}>
+          확인
+        </button>
+        <div className={styles.timer}>
           남은 시간: {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
         </div>
+        <button onClick={onClose} className={styles.closeButton}>
+          닫기
+        </button>
       </div>
-    )
+    </div>
   );
 };
-
 export default VerificationModal;

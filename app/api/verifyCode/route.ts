@@ -7,7 +7,7 @@ const secretKey = new TextEncoder().encode(process.env.JWT_SECRET!);
 export async function POST(request: NextRequest) {
   try {
     const { userId, inputCode, newPhoneNumber } = await request.json();
-
+    console.log(userId, inputCode, newPhoneNumber);
     // 데이터베이스에서 JWT 가져오기
     const token = await getVerificationToken(userId);
 

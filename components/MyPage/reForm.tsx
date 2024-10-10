@@ -1,7 +1,17 @@
 'use client';
 import styles from '@/styles/MyPage.module.css';
+import { useState } from 'react';
+import VerificationModal from './VerificationModal';
 
 export default function ReForm({ reformPhoneNumber, reformEmail }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const handleOpenModal = () => {
+    setIsModalOpen(true); // 모달 열기
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false); // 모달 닫기
+  };
   return (
     <div className={styles.reFormContent}>
       <form action={reformPhoneNumber} className={styles.info}>
@@ -10,6 +20,7 @@ export default function ReForm({ reformPhoneNumber, reformEmail }) {
         <button
           onClick={() => {
             alert('인증 메일이 발송되었습니다.');
+            handleOpenModal();
           }}
           className={styles.button}
         >
@@ -21,6 +32,7 @@ export default function ReForm({ reformPhoneNumber, reformEmail }) {
         <input type="text" className={styles.input} />
         <button className={styles.button}>이메일 변경</button>
       </form>
+      {isModalOpen && <VerificationModal isOpen={isModalOpen} onClose={handleCloseModal} />}
     </div>
   );
 }
