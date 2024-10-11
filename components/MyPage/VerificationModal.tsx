@@ -37,7 +37,7 @@ const VerificationModal: React.FC<VerificationModalProps> = ({ newPhoneNumber, i
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
 
-  const handleSubmit = async () => {
+  async function handleSubmit() {
     const response = await fetch(`/api/verifyCodePhone`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -52,7 +52,7 @@ const VerificationModal: React.FC<VerificationModalProps> = ({ newPhoneNumber, i
     } else {
       alert(result.error);
     }
-  };
+  }
 
   return (
     <div className={styles.modalOverlay}>

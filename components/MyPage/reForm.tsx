@@ -8,12 +8,12 @@ export default function ReForm({ reformPhoneNumber, reformEmail }) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [newPhoneNumber, setNewPhoneNumber] = useState('');
   const phoneFormRef = useRef(null);
-  const handleOpenModal = () => {
+  function handleOpenModal() {
     if (newPhoneNumber.length >= 10 && newPhoneNumber.length < 12) {
       setIsModalOpen(true);
     }
-  };
-  const handlePChange = (e) => {
+  }
+  function handlePChange(e) {
     let value = e.target.value.replace(/\D/g, '');
 
     if (value.length < 12) {
@@ -27,15 +27,15 @@ export default function ReForm({ reformPhoneNumber, reformEmail }) {
       }
       setPhoneNumber(value);
     }
-  };
+  }
 
-  const handleCloseModal = () => {
+  function handleCloseModal() {
     setPhoneNumber('');
     setNewPhoneNumber('');
     setIsModalOpen(false);
-  };
+  }
 
-  const handleSubmit = (e) => {
+  function handleSubmit(e) {
     e.preventDefault();
     if (newPhoneNumber.length >= 10 && newPhoneNumber.length < 12) {
       alert('인증 메일이 발송되었습니다.');
@@ -44,7 +44,7 @@ export default function ReForm({ reformPhoneNumber, reformEmail }) {
     } else {
       alert('전화번호는 10~11자리여야 합니다.');
     }
-  };
+  }
 
   return (
     <div className={styles.reFormContent}>
