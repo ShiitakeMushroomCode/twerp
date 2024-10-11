@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function POST(request: NextRequest) {
-  const { userId, to, subject, newId, type } = await request.json();
+  const { userId, to, subject } = await request.json();
   // 인증 코드 생성
   const cn = String(randomInt(0, 1000000)).padStart(6, '0');
   const mailOptions = {

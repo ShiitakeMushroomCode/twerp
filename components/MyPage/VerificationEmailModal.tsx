@@ -1,15 +1,15 @@
 'use client';
 import styles from '@/styles/VerificationModal.module.css';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-interface VerificationModalProps {
+interface VerificationEmailModalProps {
   isOpen: boolean;
   onClose: () => void;
-  newPhoneNumber: string | undefined;
+  newEmail: string | undefined;
 }
 
-const VerificationModal: React.FC<VerificationModalProps> = ({ newPhoneNumber, isOpen, onClose }) => {
+export default function VerificationEmailModal({ newEmail, isOpen, onClose }: VerificationEmailModalProps) {
   const [timeLeft, setTimeLeft] = useState<number>(300);
   const [verificationCode, setVerificationCode] = useState<string>('');
   const router = useRouter();
@@ -38,10 +38,10 @@ const VerificationModal: React.FC<VerificationModalProps> = ({ newPhoneNumber, i
   const seconds = timeLeft % 60;
 
   async function handleSubmit() {
-    const response = await fetch(`/api/verifyCodePhone`, {
+    const response = await fetch(`/api/verifyCodeEmail`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ inputCode: verificationCode, newPhoneNumber: newPhoneNumber }),
+      body: JSON.stringify({ inputCode: verificationCode, newEmail: newEmail }),
     });
 
     const result = await response.json();
@@ -77,5 +77,4 @@ const VerificationModal: React.FC<VerificationModalProps> = ({ newPhoneNumber, i
       </div>
     </div>
   );
-};
-export default VerificationModal;
+}

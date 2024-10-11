@@ -42,7 +42,9 @@ export default function SinginForm() {
     } catch (error) {
       console.error('Error:', error);
     } finally {
-      redirect('/mypage');
+      if (cookies().has('accessToken') && cookies().has('refreshToken')) {
+        redirect('/mypage');
+      }
     }
   }
 

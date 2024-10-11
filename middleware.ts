@@ -1,4 +1,3 @@
-import { ACT } from 'auth';
 import { jwtVerify } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
 import { DEFAULT_REDIRECT, PUBLIC_ROUTES } from './lib/routes';
@@ -79,10 +78,8 @@ export async function middleware(request: NextRequest) {
   // accessToken 검증
   if (accessToken) {
     try {
-      const accessPayload = (await jwtVerify(accessToken.value, secret)).payload;
-      const accessPayloadData = accessPayload.data as ACT;
-
       // 액세스 토큰이 유효한 경우
+      await jwtVerify(accessToken.value, secret);
       return NextResponse.next();
     } catch (error) {
       // 액세스 토큰이 만료된 경우 리프레시 토큰을 통해 갱신 시도

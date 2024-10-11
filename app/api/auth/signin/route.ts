@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
     const innerData: ACT = await getInnerData(data);
 
     const accessToken = await generateAccessToken(innerData);
+
     const response = NextResponse.json({
       accessToken: accessToken,
       refreshToken: refreshToken,

@@ -10,7 +10,7 @@ async function getUserData() {
   'use server';
   return await getTokenUserData();
 }
-async function reformPhoneNumber(formData) {
+async function sendMail(formData) {
   'use server';
   const data = (await getTokenUserData()) as ACT;
   const response = await fetch(`${process.env.API_URL}/sendEmail`, {
@@ -28,9 +28,6 @@ async function reformPhoneNumber(formData) {
   if (response.ok) {
     console.log('인증 메일 보냈다.');
   }
-}
-async function reformEmail(formData) {
-  'use server';
 }
 
 export default async function MyPage() {
@@ -63,7 +60,7 @@ export default async function MyPage() {
         <hr />
         <h1 className={styles.title}>개인정보 변경</h1>
 
-        <ReForm reformPhoneNumber={reformPhoneNumber} reformEmail={reformEmail} />
+        <ReForm sendMail={sendMail} />
       </div>
     </div>
   );

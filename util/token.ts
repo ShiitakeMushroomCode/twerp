@@ -125,6 +125,24 @@ export async function updatePhoneNumber(userId: string, newPhoneNumber: string):
   }
 }
 
+// 전화번호 업데이트 함수
+export async function updateEmail(userId: string, newEmail: string): Promise<boolean> {
+  // 값 검증
+  if (_.isEmpty(userId) || _.isEmpty(newEmail)) {
+    console.error('유효하지 않은 userId 또는 newPhoneNumber 값입니다.');
+    return false;
+  }
+
+  try {
+    // 전화번호 업데이트
+    await executeQuery('UPDATE employee SET email = ? WHERE phone_number = ?;', [newEmail, userId]);
+    return true;
+  } catch (error) {
+    console.error(error.message);
+    return false;
+  }
+}
+
 // 인증 토큰 저장 함수
 export async function saveVerificationToken(userId: string, token: string): Promise<boolean> {
   // 값 검증

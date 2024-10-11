@@ -23,7 +23,7 @@ export async function verifyPassword(password: string, hash: string) {
 export async function isAuthenticated(id: string, password: string) {
   const hP = (await executeQuery('SELECT password FROM employee WHERE phone_number=?;', [id]))[0];
   if (hP?.password) {
-    return await bcrypt.compare(password, hP.password);
+    return await bcrypt.compare(password, await hP.password);
   }
   return false;
 }
