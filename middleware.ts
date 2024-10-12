@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { DEFAULT_REDIRECT, PUBLIC_ROUTES } from './lib/routes';
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+
 async function signout(refreshToken, res: NextResponse) {
   if (!refreshToken) {
     console.warn('로그아웃 시 리프레시 토큰이 유효하지 않음:', refreshToken);
@@ -118,7 +119,7 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// 설정: 특정 경로에만 미들웨어 적용
+// 설정: `/api/auth`를 제외한 모든 경로에 미들웨어 적용
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!api/auth|_next/static|_next/image|favicon.ico).*)'],
 };
