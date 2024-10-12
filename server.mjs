@@ -26,6 +26,16 @@ const sslOptions = {
 // Express 앱 설정
 const server = express();
 
+// URI 유효성 검사 미들웨어 추가
+server.use((req, res, next) => {
+  try {
+    decodeURIComponent(req.path); // 요청된 URI를 디코딩하여 확인
+    next(); // 디코딩에 성공하면 다음 미들웨어로 넘어감
+  } catch (e) {
+    res.status(400).send('Invalid request'); // 디코딩 오류 시 잘못된 요청으로 처리
+  }
+});
+
 // 사용자별 Rate Limiting 설정
 const limiter = rateLimit({
   windowMs: 60 * 1000, // 1분
@@ -52,35 +62,3 @@ app.prepare().then(() => {
     console.log(`서버가 https://localhost:${port} 에서 실행 중입니다.`);
   });
 });
-
-// import dotenv from 'dotenv';
-// import fs from 'fs';
-// import { createServer } from 'https';
-// import next from 'next';
-// import path from 'path';
-// import { fileURLToPath } from 'url';
-
-// dotenv.config({ path: '.env.local' });
-
-// const dev = process.env.NODE_ENV !== 'production';
-// const app = next({ dev });
-// const handle = app.getRequestHandler();
-// const port = process.env.SERVER_PORT;
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
-
-// const sslPath = path.join(__dirname, process.env.SSL);
-// const sslOptions = {
-//   key: fs.readFileSync(path.join(sslPath, process.env.KEY)),
-//   cert: fs.readFileSync(path.join(sslPath, process.env.CERT)),
-//   ca: fs.readFileSync(path.join(sslPath, process.env.CA)),
-// };
-
-// app.prepare().then(() => {
-//   createServer(sslOptions, (req, res) => {
-//     return handle(req, res);
-//   }).listen(port, (err) => {
-//     if (err) throw err;
-//     console.log(`서버가 https://localhost:${port} 에서 실행 중입니다.`);
-//   });
-// });
