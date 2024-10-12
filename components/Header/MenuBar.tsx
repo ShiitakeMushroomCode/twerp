@@ -24,6 +24,13 @@ const erpMenuItems = [
     ],
   },
   {
+    title: '제품',
+    links: [
+      { href: '/items-list', label: '제품 확인' },
+      { href: '/items-add', label: '제품 추가' },
+    ],
+  },
+  {
     title: '재고',
     links: [
       { href: '/inventory-list', label: '재고 확인' },

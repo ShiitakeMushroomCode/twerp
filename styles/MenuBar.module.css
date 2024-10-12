@@ -12,6 +12,8 @@
   display: flex;
   justify-content: flex-start;
   gap: 15px;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 .menuItem {

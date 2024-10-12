@@ -1,7 +1,7 @@
 import styles from '@/styles/NavBar.module.css';
 import { getLoggedin } from '@/util/getLoggedin';
 import Link from 'next/link';
-import AS from './AfterSignIn';
+import AS from './AfterSIgnIn';
 import BS from './BeforeSignIn';
 
 export default async function NavBar() {
