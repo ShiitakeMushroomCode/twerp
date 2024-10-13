@@ -12,16 +12,25 @@ dotenv.config({ path: '.env.local' });
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
-const port = process.env.SERVER_PORT;
+const port = process.env.SERVER_PORT || 3000; // 기본 포트 3000
+
+// 현재 파일 경로 계산
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// SSL 파일 경로 설정
 const sslPath = path.join(__dirname, process.env.SSL);
 const sslOptions = {
   key: fs.readFileSync(path.join(sslPath, process.env.KEY)),
   cert: fs.readFileSync(path.join(sslPath, process.env.CERT)),
   ca: fs.readFileSync(path.join(sslPath, process.env.CA)),
 };
+
+// SSL 파일이 제대로 로드되었는지 확인 로그
+// console.log('SSL 경로:', sslPath);
+// console.log('SSL 키 파일:', process.env.KEY);
+// console.log('SSL 인증서 파일:', process.env.CERT);
+// console.log('SSL CA 파일:', process.env.CA);
 
 // Express 앱 설정
 const server = express();
@@ -56,9 +65,14 @@ server.all('*', (req, res) => {
 });
 
 // HTTPS 서버 설정
-app.prepare().then(() => {
-  createServer(sslOptions, server).listen(port, (err) => {
-    if (err) throw err;
-    console.log(`서버가 https://localhost:${port} 에서 실행 중입니다.`);
+app
+  .prepare()
+  .then(() => {
+    createServer(sslOptions, server).listen(port, (err) => {
+      if (err) throw err;
+      console.log(`서버가 https://localhost:${port} 에서 실행 중입니다.`);
+    });
+  })
+  .catch((err) => {
+    console.error('서버 준비 중 오류 발생:', err);
   });
-});
