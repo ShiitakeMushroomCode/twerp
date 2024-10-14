@@ -26,6 +26,8 @@ export async function POST(request: NextRequest) {
     let selectQuery: string;
     let params: any[] = [];
     let formattedSearchTerm: string;
+    let countParams: any[] = [];
+    let selectParams: any[] = [];
 
     if (searchTerm.trim() === '') {
       // 검색어가 비어있는 경우: 전체 데이터 조회
@@ -34,26 +36,28 @@ export async function POST(request: NextRequest) {
                      FROM company 
                      ORDER BY company_name ASC 
                      LIMIT ? OFFSET ?`;
-      params = [limit, offset];
+      countParams = [];
+      selectParams = [limit, offset];
     } else {
-      // 검색어가 있는 경우: Full-Text 검색 사용
-      formattedSearchTerm = `${searchTerm.trim()}*`; // 접두사 매칭을 위한 '*' 추가
+      // 검색어가 있는 경우: LIKE 검색 사용
+      formattedSearchTerm = `%${searchTerm.trim()}%`; // 부분 매칭을 위한 '%' 추가
 
-      countQuery = `SELECT COUNT(*) as total FROM company WHERE MATCH(company_name) AGAINST(? IN BOOLEAN MODE)`;
+      countQuery = `SELECT COUNT(*) as total FROM company WHERE company_name LIKE ? OR business_number LIKE ?`;
       selectQuery = `SELECT business_number, HEX(company_id) as company_id, company_name, is_registered 
                      FROM company 
-                     WHERE MATCH(company_name) AGAINST(? IN BOOLEAN MODE) 
+                     WHERE company_name LIKE ? OR business_number LIKE ? 
                      ORDER BY company_name ASC 
                      LIMIT ? OFFSET ?`;
-      params = [formattedSearchTerm, limit, offset];
+      countParams = [formattedSearchTerm, formattedSearchTerm];
+      selectParams = [formattedSearchTerm, formattedSearchTerm, limit, offset];
     }
 
     // 총 데이터 수 조회
-    const countResult = await executeQuery(countQuery, searchTerm.trim() === '' ? [] : [formattedSearchTerm]);
+    const countResult = await executeQuery(countQuery, countParams);
     const total: number = countResult[0]?.total || 0;
 
     // 페이징된 데이터 조회
-    const data: Company[] = await executeQuery(selectQuery, params);
+    const data: Company[] = await executeQuery(selectQuery, selectParams);
 
     return NextResponse.json({ data, total }, { status: 200 });
   } catch (error) {

@@ -1,6 +1,7 @@
 'use client';
 
 import styles from '@/styles/ListItem.module.css';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 interface Company {
@@ -22,6 +23,11 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
   const [total, setTotal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const pageSize = 15;
+  const router = useRouter();
+
+  function editRoute(company_id) {
+    router.push(`https://werp.p-e.kr/client-edit/${company_id}`);
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,7 +79,13 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
               <tbody>
                 {data.length > 0 ? (
                   data.map((item) => (
-                    <tr key={item.company_id} className={styles.tableRow}>
+                    <tr
+                      key={item.company_id}
+                      className={styles.tableRow}
+                      onClick={() => {
+                        editRoute(item.company_id);
+                      }}
+                    >
                       <td className={styles.centerAlign}>
                         {item.business_number.replace(/(\d{3})(\d{2})(\d{5})/, '$1-$2-$3')}
                       </td>
