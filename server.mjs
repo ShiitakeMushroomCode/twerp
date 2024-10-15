@@ -71,6 +71,7 @@ app
     createServer(sslOptions, server).listen(port, (err) => {
       if (err) throw err;
       console.log(`서버가 https://localhost:${port} 에서 실행 중입니다.`);
+      console.log(`서버가 ${process.env.SITE_URL} 에서 실행 중입니다.`);
     });
   })
   .catch((err) => {

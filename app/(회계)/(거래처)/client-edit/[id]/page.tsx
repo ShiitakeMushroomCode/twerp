@@ -6,7 +6,9 @@ interface PageProps {
     id: string;
   };
 }
-async function Check(id: string) {}
+async function Check(id: string) {
+  'use server';
+}
 export default async function Page({ params }: PageProps) {
   const data = await Check(params.id);
   return (

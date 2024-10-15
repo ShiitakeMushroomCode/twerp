@@ -65,15 +65,13 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
           <div className={styles.tableContainer}>
             <table className={styles.table}>
               <colgroup>
-                <col style={{ width: '23%' }} />
-                <col style={{ width: '61%' }} />
-                <col style={{ width: '15%' }} />
+                <col style={{ width: '31%' }} />
+                <col style={{ width: '69%' }} />
               </colgroup>
               <thead className={styles.tableHeader}>
                 <tr>
                   <th>사업자번호</th>
                   <th>기업명</th>
-                  <th>등록정보</th>
                 </tr>
               </thead>
               <tbody>
@@ -92,7 +90,6 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
                       <td>
                         <span className={styles.company_name}>{item.company_name}</span>
                       </td>
-                      <td className={styles.centerAlign}>{item.is_registered ? '등록' : '미등록'}</td>
                     </tr>
                   ))
                 ) : (

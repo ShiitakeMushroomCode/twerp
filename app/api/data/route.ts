@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     if (searchTerm.trim() === '') {
       // 검색어가 비어있는 경우: 전체 데이터 조회
       countQuery = `SELECT COUNT(*) as total FROM company`;
-      selectQuery = `SELECT business_number, HEX(company_id) as company_id, company_name, is_registered 
+      selectQuery = `SELECT business_number, HEX(company_id) as company_id, company_name 
                      FROM company 
                      ORDER BY company_name ASC 
                      LIMIT ? OFFSET ?`;
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
       formattedSearchTerm = `%${searchTerm.trim()}%`; // 부분 매칭을 위한 '%' 추가
 
       countQuery = `SELECT COUNT(*) as total FROM company WHERE company_name LIKE ? OR business_number LIKE ?`;
-      selectQuery = `SELECT business_number, HEX(company_id) as company_id, company_name, is_registered 
+      selectQuery = `SELECT business_number, HEX(company_id) as company_id, company_name 
                      FROM company 
                      WHERE company_name LIKE ? OR business_number LIKE ? 
                      ORDER BY company_name ASC 

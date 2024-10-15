@@ -72,7 +72,7 @@ export default async function CheckBusinessInfo() {
   return (
     <form action={fet} className={styles.form}>
       <div className={styles.formGroup}>
-        <label htmlFor="b_no">사업자등록번호 (10자리 숫자 입력):</label>
+        <label htmlFor="b_no">사업자등록번호 (10자리 숫자 입력) </label>
         <input
           type="text"
           id="b_no"
@@ -88,7 +88,7 @@ export default async function CheckBusinessInfo() {
       </div>
 
       <div className={styles.formGroup}>
-        <label htmlFor="p_nm">대표자성명 (외국인은 영어로 입력):</label>
+        <label htmlFor="p_nm">대표자성명 </label>
         <input
           type="text"
           id="p_nm"
@@ -101,7 +101,7 @@ export default async function CheckBusinessInfo() {
       </div>
 
       <div className={styles.formGroup}>
-        <label htmlFor="start_dt">개업일자 (필수):</label>
+        <label htmlFor="start_dt">개업일자 </label>
         <input
           type="text"
           id="start_dt"
