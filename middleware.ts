@@ -42,11 +42,11 @@ export async function middleware(request: NextRequest) {
   const refreshToken = request.cookies.get('refreshToken');
 
   // 로그아웃을 위한 함수 통합
-  const handleSignout = async () => {
+  async function handleSignout() {
     const response = NextResponse.redirect(new URL('/signin', request.url));
     await signout(refreshToken, response);
     return response;
-  };
+  }
 
   // 로그인도 안하고 엄한데 들어가는 거 막기
   if (!PUBLIC_ROUTES.includes(request.nextUrl.pathname) && !accessToken) {

@@ -21,13 +21,13 @@
   align-items: center;
   margin-bottom: 15px;
 }
-
 .label {
-  width: 100px;
+  width: 150px;
   text-align: left;
   margin-right: 10px;
   font-weight: bold;
   font-size: large;
+  white-space: nowrap;
 }
 
 .input {
@@ -36,6 +36,9 @@
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: large;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .button {
@@ -59,4 +62,26 @@
   color: red;
   margin: 0 auto;
   text-align: center;
+}
+.datePicker {
+  flex: 1;
+  font-size: large;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.navButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.headerTitle {
+  margin: 0 10px;
+  font-size: 16px;
+  font-weight: bold;
 }

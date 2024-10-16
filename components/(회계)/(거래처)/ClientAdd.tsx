@@ -1,6 +1,11 @@
 'use client';
 import styles from '@/styles/client-add.module.css';
+import { format } from 'date-fns';
+import { ko } from 'date-fns/locale/ko';
 import { ChangeEvent, FormEvent, useState } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import Address from './Address';
 
 interface FormData {
   business_number: string;
@@ -20,6 +25,10 @@ interface FormErrors {
 }
 
 export default function ClientAdd({ AddClient }) {
+  const [addrNum, setAddrNum] = useState('');
+  const [addr, setAddr] = useState('');
+  const [detailAddr, setDetailAddr] = useState('');
+  const [isSearch, setIsSearch] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     business_number: '',
     company_name: '',
@@ -34,6 +43,23 @@ export default function ClientAdd({ AddClient }) {
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
+  const [startDate, setStartDate] = useState<Date | null>(null);
+
+  function handleDateChange(date: Date | null) {
+    if (date.getTime() > new Date().getTime()) {
+      setStartDate(new Date());
+    } else {
+      setStartDate(date);
+    }
+    // setStartDate(date);
+    if (date) {
+      const formattedDate = format(date, 'yyyy-MM-dd');
+      setFormData((prev) => ({
+        ...prev,
+        start_date: formattedDate,
+      }));
+    }
+  }
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -71,25 +97,24 @@ export default function ClientAdd({ AddClient }) {
     }
 
     AddClient(formData);
-    setFormData({
-      business_number: '',
-      company_name: '',
-      representative_name: '',
-      start_date: '',
-      business_status: '',
-      main_item_name: '',
-      business_address: '',
-      tell_number: '',
-      fax_number: '',
-      billing_email: '',
-    });
+    // setFormData({
+    //   business_number: '',
+    //   company_name: '',
+    //   representative_name: '',
+    //   start_date: '',
+    //   business_status: '',
+    //   main_item_name: '',
+    //   business_address: '',
+    //   tell_number: '',
+    //   fax_number: '',
+    //   billing_email: '',
+    // });
     setErrors({});
   }
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.title}>거래처 추가하기</div>
-
       <div className={styles['form-row']}>
         <label htmlFor="business_number" className={styles.label}>
           사업자번호
@@ -103,8 +128,8 @@ export default function ClientAdd({ AddClient }) {
           autoComplete="off"
           value={formData.business_number}
           onChange={handleChange}
+          disabled={isSearch}
         />
-        {errors.business_number && <span className={styles.error}>{errors.business_number}</span>}
       </div>
 
       <div className={styles['form-row']}>
@@ -120,8 +145,8 @@ export default function ClientAdd({ AddClient }) {
           autoComplete="off"
           value={formData.company_name}
           onChange={handleChange}
+          disabled={isSearch}
         />
-        {errors.company_name && <span className={styles.error}>{errors.company_name}</span>}
       </div>
 
       <div className={styles['form-row']}>
@@ -137,6 +162,7 @@ export default function ClientAdd({ AddClient }) {
           autoComplete="off"
           value={formData.representative_name}
           onChange={handleChange}
+          disabled={isSearch}
         />
       </div>
 
@@ -144,15 +170,44 @@ export default function ClientAdd({ AddClient }) {
         <label htmlFor="start_date" className={styles.label}>
           개업일자
         </label>
-        <input
+        <DatePicker
           id="start_date"
-          name="start_date"
-          type="date"
-          className={styles.input}
+          selected={startDate}
+          onChange={handleDateChange}
+          dateFormat="yyyy년 MM월 dd일"
+          className={`${styles.input} ${styles.datePicker}`}
+          locale={ko}
           required
-          autoComplete="off"
-          value={formData.start_date}
-          onChange={handleChange}
+          disabled={isSearch}
+          renderCustomHeader={({
+            date,
+            decreaseMonth,
+            increaseMonth,
+            prevMonthButtonDisabled,
+            nextMonthButtonDisabled,
+          }) => (
+            <div className={styles.datePickerHeader}>
+              <button
+                type="button"
+                onClick={decreaseMonth}
+                disabled={prevMonthButtonDisabled}
+                className={styles.navButton}
+              >
+                {'<'}
+              </button>
+              <span className={styles.headerTitle}>
+                {date.getFullYear()}년 {date.getMonth() + 1}월
+              </span>
+              <button
+                type="button"
+                onClick={increaseMonth}
+                disabled={nextMonthButtonDisabled}
+                className={styles.navButton}
+              >
+                {'>'}
+              </button>
+            </div>
+          )}
         />
       </div>
 
@@ -167,6 +222,7 @@ export default function ClientAdd({ AddClient }) {
           className={styles.input}
           autoComplete="off"
           value={formData.business_status}
+          disabled={isSearch}
           onChange={handleChange}
         />
       </div>
@@ -183,6 +239,7 @@ export default function ClientAdd({ AddClient }) {
           autoComplete="off"
           value={formData.main_item_name}
           onChange={handleChange}
+          disabled={isSearch}
         />
       </div>
 
@@ -197,8 +254,27 @@ export default function ClientAdd({ AddClient }) {
           className={styles.input}
           autoComplete="off"
           value={formData.business_address}
+          disabled={isSearch}
           onChange={handleChange}
+          title={formData.business_address}
+          onClick={() => {
+            setIsSearch(true);
+          }}
         />
+        {isSearch && (
+          <Address
+            isSearch={isSearch}
+            setIsSearch={setIsSearch}
+            addrNum={addrNum}
+            setAddrNum={setAddrNum}
+            addr={addr}
+            setAddr={setAddr}
+            detailAddr={detailAddr}
+            setDetailAddr={setDetailAddr}
+            formData={formData}
+            setFormData={setFormData}
+          />
+        )}
       </div>
 
       <div className={styles['form-row']}>
@@ -212,6 +288,7 @@ export default function ClientAdd({ AddClient }) {
           className={styles.input}
           autoComplete="off"
           value={formData.tell_number}
+          disabled={isSearch}
           onChange={handleChange}
         />
       </div>
@@ -228,6 +305,7 @@ export default function ClientAdd({ AddClient }) {
           autoComplete="off"
           value={formData.fax_number}
           onChange={handleChange}
+          disabled={isSearch}
         />
       </div>
 
@@ -242,13 +320,16 @@ export default function ClientAdd({ AddClient }) {
           className={styles.input}
           autoComplete="off"
           value={formData.billing_email}
+          disabled={isSearch}
           onChange={handleChange}
         />
       </div>
       <div className={styles['form-row']}>
+        {errors.business_number && <span className={styles.error}>{errors.business_number}</span>}
+        {errors.company_name && <span className={styles.error}>{errors.company_name}</span>}
         {errors.billing_email && <span className={styles.error}>{errors.billing_email}</span>}
       </div>
-      <button type="submit" className={styles.button}>
+      <button type="submit" className={styles.button} disabled={isSearch}>
         등록
       </button>
     </form>

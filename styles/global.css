@@ -131,3 +131,23 @@ body {
   padding: 1rem;
   padding-bottom: 80px;
 }
+.react-datepicker-wrapper {
+  flex: 1;
+}
+
+.react-datepicker__input-container {
+  width: 100%;
+}
+
+.react-datepicker-wrapper input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: large;
+  box-sizing: border-box;
+}
+.react-datepicker__day--outside-month {
+  background-color: #f0f0f0;
+  color: #888888;
+}
