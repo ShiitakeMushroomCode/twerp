@@ -1,6 +1,7 @@
 import styles from '@/styles/SignInPage.module.css';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import Logging from '../Logging';
 export default function SinginForm() {
   async function signin(formData: FormData) {
     'use server';
@@ -50,6 +51,7 @@ export default function SinginForm() {
 
   return (
     <form action={signin} className={styles.formContainer}>
+      <Logging />
       <div className={styles.formGroup}>
         <label htmlFor="phone_number" className={styles.label}>
           전화번호:

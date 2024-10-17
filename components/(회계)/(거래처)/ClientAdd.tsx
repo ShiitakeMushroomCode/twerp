@@ -51,7 +51,6 @@ export default function ClientAdd({ AddClient }) {
     } else {
       setStartDate(date);
     }
-    // setStartDate(date);
     if (date) {
       const formattedDate = format(date, 'yyyy-MM-dd');
       setFormData((prev) => ({
@@ -179,6 +178,7 @@ export default function ClientAdd({ AddClient }) {
           locale={ko}
           required
           disabled={isSearch}
+          autoComplete="off"
           renderCustomHeader={({
             date,
             decreaseMonth,
