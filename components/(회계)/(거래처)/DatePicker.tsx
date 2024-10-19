@@ -8,6 +8,7 @@ interface DatePickerProps {
   onDateChange: (date: Date) => void;
   disabled?: boolean;
   className?: string;
+  inputId?: string;
 }
 
 const currentYear = new Date().getFullYear();
@@ -114,11 +115,7 @@ export default function DatePicker(props: DatePickerProps) {
       );
     }
 
-    return (
-      <div id="start_date" className={styles.calendarBody}>
-        {dates}
-      </div>
-    );
+    return <div className={styles.calendarBody}>{dates}</div>;
   }
 
   // 다음 달 버튼 비활성화 여부 결정
@@ -139,12 +136,20 @@ export default function DatePicker(props: DatePickerProps) {
   })();
 
   return (
-    <div id="start_date" className={`${styles.datePicker} ${className || ''}`}>
-      <div onClick={handleInputClick} className={styles.selectedDate}>
-        {selectedDate
-          ? `${selectedDate.getFullYear()}년 ${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일`
-          : '\u00A0'}
-      </div>
+    <div className={`${styles.datePicker} ${className || ''}`}>
+      <input
+        type="text"
+        id={props.inputId}
+        value={
+          selectedDate
+            ? `${selectedDate.getFullYear()}년 ${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일`
+            : ''
+        }
+        readOnly
+        onClick={handleInputClick}
+        className={`${styles.selectedDate} ${styles.hover}`}
+        disabled={disabled}
+      />
       {showCalendar && (
         <div className={styles.calendar} ref={calendarRef}>
           <div className={styles.calendarHeader}>

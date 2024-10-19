@@ -4,6 +4,16 @@
   width: 100%;
 }
 
+.selectedDate {
+  padding: 8px;
+  border: none;
+  border-radius: 4px;
+  font-size: large;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
 .calendar {
   position: absolute;
   top: 100%;
@@ -73,4 +83,8 @@
 .button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.hover {
+  cursor: pointer;
 }

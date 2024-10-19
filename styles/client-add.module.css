@@ -21,6 +21,7 @@
   align-items: center;
   margin-bottom: 15px;
 }
+
 .label {
   width: 150px;
   text-align: left;
@@ -33,6 +34,17 @@
 .input {
   flex: 1;
   padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: large;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.dateInput {
+  flex: 1;
+  padding: 0;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: large;
@@ -58,25 +70,12 @@
   background-color: #0080ff;
 }
 
+.hover {
+  cursor: pointer;
+}
+
 .error {
   color: red;
   margin: 0 auto;
   text-align: center;
-}
-
-.datePicker {
-  width: 100%;
-}
-
-.navButton {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.headerTitle {
-  margin: 0 10px;
-  font-size: 16px;
-  font-weight: bold;
 }

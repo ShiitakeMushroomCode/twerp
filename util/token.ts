@@ -67,6 +67,7 @@ export async function generateRefreshToken(userId: any) {
 
 export async function getInnerData(data) {
   const innerData: ACT = {
+    companyId: await data?.company_id, // 회사 ID
     userId: await data?.phone_number, // 휴대전화 번호
     department: await data?.department, // 부서명
     name: await data?.name, // 이름

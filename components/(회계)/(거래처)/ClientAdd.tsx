@@ -1,5 +1,3 @@
-// ClientAdd.tsx
-
 'use client';
 import styles from '@/styles/client-add.module.css';
 import { format } from 'date-fns';
@@ -22,6 +20,24 @@ interface FormData {
 
 interface FormErrors {
   [key: string]: string;
+}
+
+export function formatPhoneNumber(value: string) {
+  const cleanValue = value.replace(/[^0-9]/g, '');
+  const length = cleanValue.length;
+  if (length < 4) {
+    return cleanValue;
+  } else if (length < 7) {
+    return `${cleanValue.slice(0, 3)}-${cleanValue.slice(3)}`;
+  } else if (length <= 10) {
+    return `${cleanValue.slice(0, 3)}-${cleanValue.slice(3, 6)}-${cleanValue.slice(6)}`;
+  } else if (length === 11) {
+    return `${cleanValue.slice(0, 3)}-${cleanValue.slice(3, 7)}-${cleanValue.slice(7)}`;
+  } else if (length === 12) {
+    return `${cleanValue.slice(0, 4)}-${cleanValue.slice(4, 8)}-${cleanValue.slice(8)}`;
+  } else {
+    return cleanValue;
+  }
 }
 
 export default function ClientAdd({ AddClient }) {
@@ -75,24 +91,6 @@ export default function ClientAdd({ AddClient }) {
       parts.push(cleanValue.substring(5, 10));
     }
     return parts.join('-');
-  }
-
-  function formatPhoneNumber(value: string) {
-    const cleanValue = value.replace(/[^0-9]/g, '');
-    const length = cleanValue.length;
-    if (length < 4) {
-      return cleanValue;
-    } else if (length < 7) {
-      return `${cleanValue.slice(0, 3)}-${cleanValue.slice(3)}`;
-    } else if (length <= 10) {
-      return `${cleanValue.slice(0, 3)}-${cleanValue.slice(3, 6)}-${cleanValue.slice(6)}`;
-    } else if (length === 11) {
-      return `${cleanValue.slice(0, 3)}-${cleanValue.slice(3, 7)}-${cleanValue.slice(7)}`;
-    } else if (length === 12) {
-      return `${cleanValue.slice(0, 4)}-${cleanValue.slice(4, 8)}-${cleanValue.slice(8)}`;
-    } else {
-      return cleanValue;
-    }
   }
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
@@ -157,6 +155,7 @@ export default function ClientAdd({ AddClient }) {
     //   fax_number: '',
     //   billing_email: '',
     // });
+    // setStartDate(null);
     setErrors({});
   }
 
@@ -220,8 +219,13 @@ export default function ClientAdd({ AddClient }) {
         <label htmlFor="start_date" className={styles.label}>
           개업일자
         </label>
-        <div className={`${styles.input} ${styles.datePicker}`}>
-          <DatePicker selectedDate={startDate} onDateChange={handleDateChange} disabled={isSearch} />
+        <div className={styles.dateInput}>
+          <DatePicker
+            selectedDate={startDate}
+            onDateChange={handleDateChange}
+            disabled={isSearch}
+            inputId="start_date"
+          />
         </div>
       </div>
 
@@ -265,16 +269,12 @@ export default function ClientAdd({ AddClient }) {
           id="business_address"
           name="business_address"
           type="text"
-          className={styles.input}
+          className={`${styles.input} ${styles.hover}`}
           autoComplete="off"
           value={formData.business_address}
           disabled={isSearch}
           readOnly
-          onChange={handleChange}
-          title={formData.business_address}
-          onClick={() => {
-            setIsSearch(true);
-          }}
+          onClick={() => setIsSearch(true)}
         />
         {isSearch && (
           <Address

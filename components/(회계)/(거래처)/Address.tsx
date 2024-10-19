@@ -65,7 +65,6 @@ export default function Address({
     let extraAddress = '';
 
     const { addressType, bname, buildingName, zonecode } = data;
-    console.log('data', data);
 
     if (addressType === 'R') {
       if (bname !== '') {

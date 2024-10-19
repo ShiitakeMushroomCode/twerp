@@ -33,7 +33,7 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch('/api/data', {
+        const response = await fetch('/api/clientListData', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ searchTerm, page, pageSize }),
