@@ -5,22 +5,17 @@ export const metadata = {
 };
 async function AddClient(formData: FormData) {
   'use server';
+
   // 값 필터링 필요함
-  const [b_no, start_dt, p_nm] = [
-    formData.get('business_number'),
-    formData.get('start_date'),
-    formData.get('representative_name'),
-  ];
   const businesses = {
     businesses: [
       {
-        b_no: b_no, // 사업자등록번호
-        start_dt: start_dt, // 개업일자
-        p_nm: p_nm, // 대표자성명
+        b_no: formData['business_number'], // 사업자등록번호
+        start_dt: formData['start_date'], // 개업일자
+        p_nm: formData['representative_name'], // 대표자성명
       },
     ],
   };
-  console.log(businesses);
 
   // 제대로된 사업자인지 확인
   try {
@@ -42,9 +37,9 @@ async function AddClient(formData: FormData) {
       throw new Error(`HTTP 에러: ${response.status}`);
     }
 
-    const jsonResponse = await response.json();
-    const validValue = jsonResponse.data[0].valid;
-    console.log(validValue === '01' ? true : false);
+    // const jsonResponse = await response.json();
+    // const validValue = jsonResponse.data[0].valid;
+    // console.log(validValue === '01' ? true : false);
   } catch (error) {
     console.error('에러:', error);
   }

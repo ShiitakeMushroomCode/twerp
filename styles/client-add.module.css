@@ -63,14 +63,9 @@
   margin: 0 auto;
   text-align: center;
 }
+
 .datePicker {
-  flex: 1;
-  font-size: large;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
   width: 100%;
-  box-sizing: border-box;
 }
 
 .navButton {

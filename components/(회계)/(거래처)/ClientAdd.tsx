@@ -1,11 +1,11 @@
+// ClientAdd.tsx
+
 'use client';
 import styles from '@/styles/client-add.module.css';
 import { format } from 'date-fns';
-import { ko } from 'date-fns/locale/ko';
 import { ChangeEvent, FormEvent, useState } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import Address from './Address';
+import DatePicker from './DatePicker';
 
 interface FormData {
   business_number: string;
@@ -46,17 +46,52 @@ export default function ClientAdd({ AddClient }) {
   const [startDate, setStartDate] = useState<Date | null>(null);
 
   function handleDateChange(date: Date | null) {
-    if (date.getTime() > new Date().getTime()) {
-      setStartDate(new Date());
-    } else {
-      setStartDate(date);
+    try {
+      if (date && date.getTime() > new Date().getTime()) {
+        setStartDate(new Date());
+      } else {
+        setStartDate(date);
+      }
+      if (date) {
+        const formattedDate = format(date, 'yyyy-MM-dd');
+        setFormData((prev) => ({
+          ...prev,
+          start_date: formattedDate,
+        }));
+      }
+    } catch {}
+  }
+
+  function formatBusinessNumber(value: string) {
+    const cleanValue = value.replace(/[^0-9]/g, '').slice(0, 10);
+    const parts = [];
+    if (cleanValue.length > 0) {
+      parts.push(cleanValue.substring(0, 3));
     }
-    if (date) {
-      const formattedDate = format(date, 'yyyy-MM-dd');
-      setFormData((prev) => ({
-        ...prev,
-        start_date: formattedDate,
-      }));
+    if (cleanValue.length > 3) {
+      parts.push(cleanValue.substring(3, 5));
+    }
+    if (cleanValue.length > 5) {
+      parts.push(cleanValue.substring(5, 10));
+    }
+    return parts.join('-');
+  }
+
+  function formatPhoneNumber(value: string) {
+    const cleanValue = value.replace(/[^0-9]/g, '');
+    const length = cleanValue.length;
+    if (length < 4) {
+      return cleanValue;
+    } else if (length < 7) {
+      return `${cleanValue.slice(0, 3)}-${cleanValue.slice(3)}`;
+    } else if (length <= 10) {
+      return `${cleanValue.slice(0, 3)}-${cleanValue.slice(3, 6)}-${cleanValue.slice(6)}`;
+    } else if (length === 11) {
+      return `${cleanValue.slice(0, 3)}-${cleanValue.slice(3, 7)}-${cleanValue.slice(7)}`;
+    } else if (length === 12) {
+      return `${cleanValue.slice(0, 4)}-${cleanValue.slice(4, 8)}-${cleanValue.slice(8)}`;
+    } else {
+      return cleanValue;
     }
   }
 
@@ -65,7 +100,13 @@ export default function ClientAdd({ AddClient }) {
     let filteredValue = value;
 
     if (['business_number', 'tell_number', 'fax_number'].includes(name)) {
-      filteredValue = value.replace(/[^0-9]/g, '');
+      const numericValue = value.replace(/[^0-9]/g, '');
+
+      if (name === 'business_number') {
+        filteredValue = formatBusinessNumber(numericValue);
+      } else {
+        filteredValue = formatPhoneNumber(numericValue);
+      }
     }
 
     if (name === 'billing_email') {
@@ -95,7 +136,15 @@ export default function ClientAdd({ AddClient }) {
       return;
     }
 
-    AddClient(formData);
+    const submitData = {
+      ...formData,
+      business_number: formData.business_number.replace(/-/g, ''),
+      tell_number: formData.tell_number.replace(/-/g, ''),
+      fax_number: formData.fax_number.replace(/-/g, ''),
+      start_date: formData.start_date.replace(/-/g, ''),
+    };
+
+    AddClient(submitData);
     // setFormData({
     //   business_number: '',
     //   company_name: '',
@@ -114,6 +163,7 @@ export default function ClientAdd({ AddClient }) {
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.title}>거래처 추가하기</div>
+
       <div className={styles['form-row']}>
         <label htmlFor="business_number" className={styles.label}>
           사업자번호
@@ -128,6 +178,7 @@ export default function ClientAdd({ AddClient }) {
           value={formData.business_number}
           onChange={handleChange}
           disabled={isSearch}
+          maxLength={12}
         />
       </div>
 
@@ -169,46 +220,9 @@ export default function ClientAdd({ AddClient }) {
         <label htmlFor="start_date" className={styles.label}>
           개업일자
         </label>
-        <DatePicker
-          id="start_date"
-          selected={startDate}
-          onChange={handleDateChange}
-          dateFormat="yyyy년 MM월 dd일"
-          className={`${styles.input} ${styles.datePicker}`}
-          locale={ko}
-          required
-          disabled={isSearch}
-          autoComplete="off"
-          renderCustomHeader={({
-            date,
-            decreaseMonth,
-            increaseMonth,
-            prevMonthButtonDisabled,
-            nextMonthButtonDisabled,
-          }) => (
-            <div className={styles.datePickerHeader}>
-              <button
-                type="button"
-                onClick={decreaseMonth}
-                disabled={prevMonthButtonDisabled}
-                className={styles.navButton}
-              >
-                {'<'}
-              </button>
-              <span className={styles.headerTitle}>
-                {date.getFullYear()}년 {date.getMonth() + 1}월
-              </span>
-              <button
-                type="button"
-                onClick={increaseMonth}
-                disabled={nextMonthButtonDisabled}
-                className={styles.navButton}
-              >
-                {'>'}
-              </button>
-            </div>
-          )}
-        />
+        <div className={`${styles.input} ${styles.datePicker}`}>
+          <DatePicker selectedDate={startDate} onDateChange={handleDateChange} disabled={isSearch} />
+        </div>
       </div>
 
       <div className={styles['form-row']}>
@@ -255,6 +269,7 @@ export default function ClientAdd({ AddClient }) {
           autoComplete="off"
           value={formData.business_address}
           disabled={isSearch}
+          readOnly
           onChange={handleChange}
           title={formData.business_address}
           onClick={() => {
@@ -290,6 +305,7 @@ export default function ClientAdd({ AddClient }) {
           value={formData.tell_number}
           disabled={isSearch}
           onChange={handleChange}
+          maxLength={14}
         />
       </div>
 
@@ -306,6 +322,7 @@ export default function ClientAdd({ AddClient }) {
           value={formData.fax_number}
           onChange={handleChange}
           disabled={isSearch}
+          maxLength={14}
         />
       </div>
 
@@ -324,6 +341,7 @@ export default function ClientAdd({ AddClient }) {
           onChange={handleChange}
         />
       </div>
+
       <div className={styles['form-row']}>
         {errors.business_number && <span className={styles.error}>{errors.business_number}</span>}
         {errors.company_name && <span className={styles.error}>{errors.company_name}</span>}
