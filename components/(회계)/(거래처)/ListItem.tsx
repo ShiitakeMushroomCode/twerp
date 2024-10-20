@@ -9,6 +9,7 @@ interface Company {
   company_id: string;
   company_name: string;
   is_registered: boolean;
+  clients_id: string;
 }
 
 interface ListItemProps {
@@ -25,8 +26,8 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
   const pageSize = 15;
   const router = useRouter();
 
-  function editRoute(company_id) {
-    router.push(`https://werp.p-e.kr/client-edit/${company_id}`);
+  function editRoute(clients_id) {
+    router.push(`https://werp.p-e.kr/client-edit/${clients_id}`);
   }
 
   useEffect(() => {
@@ -65,8 +66,8 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
           <div className={styles.tableContainer}>
             <table className={styles.table}>
               <colgroup>
-                <col style={{ width: '31%' }} />
-                <col style={{ width: '69%' }} />
+                <col style={{ width: '30%' }} />
+                <col style={{ width: '70%' }} />
               </colgroup>
               <thead className={styles.tableHeader}>
                 <tr>
@@ -78,10 +79,10 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
                 {data.length > 0 ? (
                   data.map((item) => (
                     <tr
-                      key={item.company_id}
+                      key={item.clients_id}
                       className={styles.tableRow}
                       onClick={() => {
-                        editRoute(item.company_id);
+                        editRoute(item.clients_id);
                       }}
                     >
                       <td className={styles.centerAlign}>

@@ -1,4 +1,5 @@
 import { executeQuery } from '@/lib/db';
+import { getTokenUserData } from '@/util/token';
 import { NextRequest, NextResponse } from 'next/server';
 
 interface DataRequestBody {
@@ -7,58 +8,77 @@ interface DataRequestBody {
   pageSize?: number;
 }
 
-interface Company {
+interface Client {
   business_number: string;
-  company_id: string;
+  clients_id: string;
   company_name: string;
-  is_registered: boolean;
 }
 
+// 클라이언트 데이터를 페이징 및 검색하여 반환하는 API
 export async function POST(request: NextRequest) {
   try {
+    // 요청 본문에서 검색어와 페이징 정보를 추출
     const { searchTerm = '', page = 1, pageSize = 15 }: DataRequestBody = await request.json();
 
     const parsedPage = parseInt(page.toString(), 10) || 1;
     const limit = parseInt(pageSize.toString(), 10) || 15;
     const offset = (parsedPage - 1) * limit;
 
+    // 토큰에서 companyId를 가져와서 Buffer로 변환
+    const tokenUserData = await getTokenUserData();
+    const companyId = tokenUserData['companyId'];
+    const companyIdBuffer = Buffer.from(companyId['data']);
+
     let countQuery: string;
     let selectQuery: string;
-    let params: any[] = [];
-    let formattedSearchTerm: string;
     let countParams: any[] = [];
     let selectParams: any[] = [];
+    const formattedSearchTerm = `%${searchTerm.trim()}%`;
 
     if (searchTerm.trim() === '') {
-      // 검색어가 비어있는 경우: 전체 데이터 조회
-      countQuery = `SELECT COUNT(*) as total FROM company`;
-      selectQuery = `SELECT business_number, HEX(company_id) as company_id, company_name 
-                     FROM company 
-                     ORDER BY company_name ASC 
-                     LIMIT ? OFFSET ?`;
-      countParams = [];
-      selectParams = [limit, offset];
+      // 전체 클라이언트 수와 데이터를 조회하는 쿼리
+      countQuery = `SELECT COUNT(*) as total FROM clients WHERE company_id = ?`;
+      selectQuery = `
+        SELECT
+          business_number,
+          HEX(clients_id) as clients_id,
+          company_name
+        FROM clients
+        WHERE company_id = ?
+        ORDER BY company_name ASC
+        LIMIT ? OFFSET ?
+      `;
+      countParams = [companyIdBuffer];
+      selectParams = [companyIdBuffer, limit, offset];
     } else {
-      // 검색어가 있는 경우: LIKE 검색 사용
-      formattedSearchTerm = `%${searchTerm.trim()}%`; // 부분 매칭을 위한 '%' 추가
-
-      countQuery = `SELECT COUNT(*) as total FROM company WHERE company_name LIKE ? OR business_number LIKE ?`;
-      selectQuery = `SELECT business_number, HEX(company_id) as company_id, company_name 
-                     FROM company 
-                     WHERE company_name LIKE ? OR business_number LIKE ? 
-                     ORDER BY company_name ASC 
-                     LIMIT ? OFFSET ?`;
-      countParams = [formattedSearchTerm, formattedSearchTerm];
-      selectParams = [formattedSearchTerm, formattedSearchTerm, limit, offset];
+      // 검색 조건에 맞는 클라이언트 수와 데이터를 조회하는 쿼리
+      countQuery = `
+        SELECT COUNT(*) as total
+        FROM clients
+        WHERE company_id = ? AND (company_name LIKE ? OR business_number LIKE ?)
+      `;
+      selectQuery = `
+        SELECT
+          business_number,
+          HEX(clients_id) as clients_id,
+          company_name
+        FROM clients
+        WHERE company_id = ? AND (company_name LIKE ? OR business_number LIKE ?)
+        ORDER BY company_name ASC
+        LIMIT ? OFFSET ?
+      `;
+      countParams = [companyIdBuffer, formattedSearchTerm, formattedSearchTerm];
+      selectParams = [companyIdBuffer, formattedSearchTerm, formattedSearchTerm, limit, offset];
     }
 
-    // 총 데이터 수 조회
+    // 총 클라이언트 수를 조회
     const countResult = await executeQuery(countQuery, countParams);
     const total: number = countResult[0]?.total || 0;
 
-    // 페이징된 데이터 조회
-    const data: Company[] = await executeQuery(selectQuery, selectParams);
+    // 클라이언트 데이터를 조회
+    const data: Client[] = await executeQuery(selectQuery, selectParams);
 
+    // 조회된 데이터와 총 개수를 반환
     return NextResponse.json({ data, total }, { status: 200 });
   } catch (error) {
     console.error('API 오류:', error);
