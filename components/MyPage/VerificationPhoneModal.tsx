@@ -58,6 +58,7 @@ export default function VerificationPhoneModal({ newPhoneNumber, isOpen, onClose
     <div className={styles.modalOverlay}>
       <div className={styles.modal}>
         <h2 className={styles.h2}>인증 코드 입력</h2>
+        <br />
         <input
           type="text"
           placeholder="인증 코드를 입력하세요"

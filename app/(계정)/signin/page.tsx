@@ -47,7 +47,7 @@ async function signin(formData: FormData) {
     console.error('Error:', error);
   } finally {
     if (cookies().has('accessToken') && cookies().has('refreshToken')) {
-      redirect('/mypage');
+      redirect('/');
     }
   }
 }

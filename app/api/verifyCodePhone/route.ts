@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
   try {
     const { inputCode, newPhoneNumber } = await request.json();
     const userId = ((await getTokenUserData()) as ACT).userId;
-    console.log(userId, inputCode, newPhoneNumber);
+    // console.log(userId, inputCode, newPhoneNumber);
 
     if (_.isEmpty(inputCode)) {
       return NextResponse.json({ error: '인증 토큰이 유효하지 않거나 만료되었습니다.' }, { status: 400 });

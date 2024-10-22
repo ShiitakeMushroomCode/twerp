@@ -47,7 +47,7 @@ export function getCNumberHtml(code) {
               <td align="center">
                   <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
                       <tr>
-                          <td style="padding: 20px; text-align: center;">
+                          <td style="padding: 20px; text-align: center; box-sizing: border-box;">
                               <h1 style="color: #333;">인증번호 발송</h1>
                               <p style="color: #555;">안녕하세요!</p>
                               <p style="color: #555;">귀하의 인증번호는 다음과 같습니다:</p>

@@ -2,6 +2,7 @@ import ReForm from '@/components/MyPage/reForm';
 import styles from '@/styles/MyPage.module.css';
 import { getTokenUserData } from '@/util/token';
 import { ACT } from 'auth';
+import { cookies } from 'next/headers';
 
 export const metadata = {
   title: '마이페이지',
@@ -17,6 +18,7 @@ async function sendMail(formData) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Cookie: cookies().toString(),
     },
     body: JSON.stringify({
       userId: data.userId,
