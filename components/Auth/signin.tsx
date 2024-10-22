@@ -1,7 +1,7 @@
 'use client';
 import styles from '@/styles/SignInPage.module.css';
+import { formatPhoneNumber } from '@/util/reform';
 import { ChangeEvent, useState } from 'react';
-import { formatPhoneNumber } from '../(회계)/(거래처)/ClientAdd';
 import Logging from '../Logging';
 
 export default function SigninForm({ signin }) {
@@ -10,8 +10,11 @@ export default function SigninForm({ signin }) {
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     const { value } = e.target;
     const numericValue = value.replace(/[^0-9]/g, '');
-    const formattedPhoneNumber = formatPhoneNumber(numericValue);
-    setPhoneNumber(formattedPhoneNumber);
+
+    if (numericValue.length <= 12) {
+      const formattedPhoneNumber = formatPhoneNumber(numericValue);
+      setPhoneNumber(formattedPhoneNumber);
+    }
   }
 
   return (

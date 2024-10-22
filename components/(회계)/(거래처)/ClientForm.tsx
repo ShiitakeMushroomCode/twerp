@@ -1,5 +1,6 @@
 'use client';
-import styles from '@/styles/client-add.module.css';
+import styles from '@/styles/ClientForm.module.css';
+import { formatPhoneNumber } from '@/util/reform';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useState } from 'react';
@@ -7,7 +8,7 @@ import Address from './Address';
 import DatePicker from './DatePicker';
 import Modal from './Modal';
 
-interface FormData {
+export interface ClientFormData {
   business_number: string;
   company_name: string;
   representative_name: string;
@@ -24,78 +25,62 @@ interface FormErrors {
   [key: string]: string;
 }
 
-export function formatPhoneNumber(value: string) {
-  const cleanValue = value.replace(/[^0-9]/g, '');
-  const length = cleanValue.length;
-  if (length < 4) {
-    return cleanValue;
-  } else if (length < 7) {
-    return `${cleanValue.slice(0, 3)}-${cleanValue.slice(3)}`;
-  } else if (length <= 10) {
-    return `${cleanValue.slice(0, 3)}-${cleanValue.slice(3, 6)}-${cleanValue.slice(6)}`;
-  } else if (length === 11) {
-    return `${cleanValue.slice(0, 3)}-${cleanValue.slice(3, 7)}-${cleanValue.slice(7)}`;
-  } else if (length === 12) {
-    return `${cleanValue.slice(0, 4)}-${cleanValue.slice(4, 8)}-${cleanValue.slice(8)}`;
-  } else {
-    return cleanValue;
+function formatBusinessNumber(value: string): string {
+  const cleanValue = value.replace(/[^0-9]/g, '').slice(0, 10);
+  const parts = [];
+  if (cleanValue.length > 0) {
+    parts.push(cleanValue.substring(0, 3));
   }
+  if (cleanValue.length > 3) {
+    parts.push(cleanValue.substring(3, 5));
+  }
+  if (cleanValue.length > 5) {
+    parts.push(cleanValue.substring(5, 10));
+  }
+  return parts.join('-');
 }
 
-export default function ClientAdd({ AddClient }) {
+interface ClientFormProps {
+  initialData?: ClientFormData;
+  onSubmit: (formData: ClientFormData) => Promise<{ status: string; message: string }>;
+  isEditMode?: boolean;
+}
+
+export default function ClientForm({ initialData, onSubmit, isEditMode = false }: ClientFormProps) {
+  const [formData, setFormData] = useState<ClientFormData>(() => ({
+    business_number: initialData?.business_number ? formatBusinessNumber(initialData.business_number) : '',
+    company_name: initialData?.company_name || '',
+    representative_name: initialData?.representative_name || '',
+    start_date: initialData?.start_date || '',
+    business_status: initialData?.business_status || '',
+    main_item_name: initialData?.main_item_name || '',
+    business_address: initialData?.business_address || '',
+    tell_number: initialData?.tell_number ? formatPhoneNumber(initialData.tell_number) : '',
+    fax_number: initialData?.fax_number ? formatPhoneNumber(initialData.fax_number) : '',
+    billing_email: initialData?.billing_email || '',
+  }));
+
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [startDate, setStartDate] = useState<Date | null>(
+    initialData?.start_date ? new Date(initialData.start_date) : null
+  );
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [isSearch, setIsSearch] = useState(false);
   const [addrNum, setAddrNum] = useState('');
   const [addr, setAddr] = useState('');
   const [detailAddr, setDetailAddr] = useState('');
-  const [isSearch, setIsSearch] = useState(false);
   const router = useRouter();
-  const [formData, setFormData] = useState<FormData>({
-    business_number: '',
-    company_name: '',
-    representative_name: '',
-    start_date: '',
-    business_status: '',
-    main_item_name: '',
-    business_address: '',
-    tell_number: '',
-    fax_number: '',
-    billing_email: '',
-  });
-
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
 
   function handleDateChange(date: Date | null) {
-    try {
-      if (date && date.getTime() > new Date().getTime()) {
-        setStartDate(new Date());
-      } else {
-        setStartDate(date);
-      }
-      if (date) {
-        const formattedDate = format(date, 'yyyy-MM-dd');
-        setFormData((prev) => ({
-          ...prev,
-          start_date: formattedDate,
-        }));
-      }
-    } catch {}
-  }
-
-  function formatBusinessNumber(value: string) {
-    const cleanValue = value.replace(/[^0-9]/g, '').slice(0, 10);
-    const parts = [];
-    if (cleanValue.length > 0) {
-      parts.push(cleanValue.substring(0, 3));
+    if (date) {
+      setStartDate(date);
+      const formattedDate = format(date, 'yyyy-MM-dd');
+      setFormData((prev) => ({
+        ...prev,
+        start_date: formattedDate,
+      }));
     }
-    if (cleanValue.length > 3) {
-      parts.push(cleanValue.substring(3, 5));
-    }
-    if (cleanValue.length > 5) {
-      parts.push(cleanValue.substring(5, 10));
-    }
-    return parts.join('-');
   }
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
@@ -139,22 +124,26 @@ export default function ClientAdd({ AddClient }) {
       return;
     }
 
-    const submitData = {
+    const formattedStartDate = formData.start_date ? format(new Date(formData.start_date), 'yyyyMMdd') : '';
+
+    const submitData: ClientFormData = {
       ...formData,
       business_number: formData.business_number.replace(/-/g, ''),
       tell_number: formData.tell_number.replace(/-/g, ''),
       fax_number: formData.fax_number.replace(/-/g, ''),
-      start_date: formData.start_date.replace(/-/g, ''),
+      start_date: formattedStartDate,
     };
 
-    const response = await AddClient(submitData);
+    const response = await onSubmit(submitData);
 
     if (response.status === 'error') {
       setModalMessage(response.message);
     } else if (response.status === 'success') {
       setIsModalOpen(true);
       setModalMessage(response.message);
-      clear();
+      if (!isEditMode) {
+        clear();
+      }
       setTimeout(() => {
         setIsModalOpen(false);
         router.push('/client-list');
@@ -183,7 +172,7 @@ export default function ClientAdd({ AddClient }) {
   return (
     <div>
       <form onSubmit={handleSubmit} className={styles.form}>
-        <div className={styles.title}>거래처 추가하기</div>
+        <div className={styles.title}>{isEditMode ? '거래처 수정하기' : '거래처 추가하기'}</div>
 
         <div className={styles['form-row']}>
           <label htmlFor="business_number" className={styles.label}>
@@ -197,6 +186,7 @@ export default function ClientAdd({ AddClient }) {
             required
             autoComplete="off"
             value={formData.business_number}
+            title={formData.business_number}
             onChange={handleChange}
             disabled={isSearch}
             maxLength={12}
@@ -215,6 +205,7 @@ export default function ClientAdd({ AddClient }) {
             required
             autoComplete="off"
             value={formData.company_name}
+            title={formData.company_name}
             onChange={handleChange}
             disabled={isSearch}
           />
@@ -232,6 +223,7 @@ export default function ClientAdd({ AddClient }) {
             required
             autoComplete="off"
             value={formData.representative_name}
+            title={formData.representative_name}
             onChange={handleChange}
             disabled={isSearch}
           />
@@ -262,6 +254,7 @@ export default function ClientAdd({ AddClient }) {
             className={styles.input}
             autoComplete="off"
             value={formData.business_status}
+            title={formData.business_status}
             disabled={isSearch}
             onChange={handleChange}
           />
@@ -278,6 +271,7 @@ export default function ClientAdd({ AddClient }) {
             className={styles.input}
             autoComplete="off"
             value={formData.main_item_name}
+            title={formData.main_item_name}
             onChange={handleChange}
             disabled={isSearch}
           />
@@ -294,6 +288,7 @@ export default function ClientAdd({ AddClient }) {
             className={`${styles.input} ${styles.hover}`}
             autoComplete="off"
             value={formData.business_address}
+            title={formData.business_address}
             disabled={isSearch}
             readOnly
             onClick={() => setIsSearch(true)}
@@ -325,6 +320,7 @@ export default function ClientAdd({ AddClient }) {
             className={styles.input}
             autoComplete="off"
             value={formData.tell_number}
+            title={formData.tell_number}
             disabled={isSearch}
             onChange={handleChange}
             maxLength={14}
@@ -342,6 +338,7 @@ export default function ClientAdd({ AddClient }) {
             className={styles.input}
             autoComplete="off"
             value={formData.fax_number}
+            title={formData.fax_number}
             onChange={handleChange}
             disabled={isSearch}
             maxLength={14}
@@ -359,6 +356,7 @@ export default function ClientAdd({ AddClient }) {
             className={styles.input}
             autoComplete="off"
             value={formData.billing_email}
+            title={formData.billing_email}
             disabled={isSearch}
             onChange={handleChange}
           />
@@ -369,8 +367,9 @@ export default function ClientAdd({ AddClient }) {
           {errors.company_name && <span className={styles.error}>{errors.company_name}</span>}
           {errors.billing_email && <span className={styles.error}>{errors.billing_email}</span>}
         </div>
+
         <button type="submit" className={styles.button} disabled={isSearch}>
-          등록
+          {isEditMode ? '수정' : '등록'}
         </button>
       </form>
       {isModalOpen && <Modal message={modalMessage} onClose={() => setIsModalOpen(false)} />}

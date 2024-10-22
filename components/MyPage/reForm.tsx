@@ -1,5 +1,6 @@
 'use client';
 import styles from '@/styles/MyPage.module.css';
+import { formatPhoneNumber } from '@/util/reform';
 import { useRef, useState } from 'react';
 import VerificationEmailModal from './VerificationEmailModal';
 import VerificationPhoneModal from './VerificationPhoneModal';
@@ -17,24 +18,16 @@ export default function ReForm({ sendMail }) {
   const emailFormRef = useRef(null);
 
   function handleOpenPhoneModal() {
-    if (newPhoneNumber.length >= 10 && newPhoneNumber.length <= 11) {
+    if (newPhoneNumber.length >= 10 && newPhoneNumber.length <= 12) {
       setIsPhoneModalOpen(true);
     }
   }
 
   function handlePhoneChange(e) {
     let value = e.target.value.replace(/\D/g, '');
-
-    if (value.length <= 11) {
+    if (value.length <= 12) {
       setNewPhoneNumber(value);
-      if (value.length > 3 && value.length <= 6) {
-        value = value.replace(/(\d{3})(\d{1,3})/, '$1-$2');
-      } else if (value.length > 6 && value.length <= 10) {
-        value = value.replace(/(\d{3})(\d{3})(\d{1,4})/, '$1-$2-$3');
-      } else if (value.length > 10) {
-        value = value.replace(/(\d{3})(\d{4})(\d{1,4})/, '$1-$2-$3');
-      }
-      setPhoneNumber(value);
+      setPhoneNumber(formatPhoneNumber(value));
     }
   }
 
@@ -48,13 +41,13 @@ export default function ReForm({ sendMail }) {
   function handlePhoneSubmit(e) {
     e.preventDefault();
     if (!isSendMail) {
-      if (newPhoneNumber.length >= 10 && newPhoneNumber.length <= 11) {
+      if (newPhoneNumber.length >= 10 && newPhoneNumber.length <= 12) {
         setIsSendMail(true);
         alert('인증번호가 이메일로 발송되었습니다.');
         handleOpenPhoneModal();
         phoneFormRef.current.requestSubmit();
       } else {
-        alert('전화번호는 10~11자리여야 합니다.');
+        alert('전화번호는 10~12자리여야 합니다.');
       }
     }
   }

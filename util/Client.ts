@@ -84,3 +84,53 @@ export async function insertClient(clientData: ClientData): Promise<boolean> {
     return false;
   }
 }
+
+export async function updateClient(clientData: ClientData): Promise<boolean> {
+  try {
+    const companyId = (await getTokenUserData())['companyId'];
+
+    // 클라이언트가 존재하는지 확인
+    if (await hasClient(Buffer.from(companyId['data']), clientData.business_number)) {
+      const sql = `
+        UPDATE clients
+        SET
+          company_name = ?,
+          representative_name = ?,
+          business_address = ?,
+          billing_email = ?,
+          tell_number = ?,
+          fax_number = ?,
+          start_date = ?,
+          business_status = ?,
+          main_item_name = ?
+        WHERE
+          company_id = ? AND business_number = ?
+      `;
+
+      const params = [
+        clientData.company_name,
+        clientData.representative_name || null,
+        clientData.business_address || null,
+        clientData.billing_email || null,
+        clientData.tell_number || null,
+        clientData.fax_number || null,
+        clientData.start_date || null,
+        clientData.business_status || null,
+        clientData.main_item_name || null,
+        Buffer.from(companyId['data']),
+        clientData.business_number,
+      ];
+
+      await executeQuery(sql, params);
+
+      console.log('클라이언트 정보가 성공적으로 업데이트되었습니다.');
+      return true;
+    } else {
+      console.log('업데이트할 클라이언트가 존재하지 않습니다.');
+      return false;
+    }
+  } catch (error) {
+    console.error('클라이언트 정보 업데이트 중 오류 발생:', error);
+    return false;
+  }
+}
