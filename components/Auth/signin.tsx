@@ -29,7 +29,7 @@ export default function SigninForm({ signin }) {
     if (response === null) {
       setError('로그인에 실패했습니다. 다시 시도하세요.');
     } else {
-      router.push('/mypage');
+      router.refresh();
     }
   }
 
