@@ -56,7 +56,10 @@ export default async function MyPage() {
             <span className={styles.label}>전화번호:</span> {user.userId.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3')}
           </p>
           <p className={styles.info}>
-            <span className={styles.label}>입사일:</span> {user.hireDate.toString()}
+            <span className={styles.label}>입사일:</span>{' '}
+            {new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }).format(
+              new Date(user.hireDate)
+            )}
           </p>
         </div>
         <hr />

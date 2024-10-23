@@ -1,11 +1,14 @@
 'use client';
 import styles from '@/styles/SignInPage.module.css';
 import { formatPhoneNumber } from '@/util/reform';
+import { useRouter } from 'next/navigation';
 import { ChangeEvent, useState } from 'react';
 import Logging from '../Logging';
 
 export default function SigninForm({ signin }) {
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [error, setError] = useState('');
+  const router = useRouter();
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     const { value } = e.target;
@@ -17,8 +20,21 @@ export default function SigninForm({ signin }) {
     }
   }
 
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError('');
+    const formData = new FormData(e.currentTarget);
+    const response = await signin(formData);
+
+    if (response === null) {
+      setError('로그인에 실패했습니다. 다시 시도하세요.');
+    } else {
+      router.push('/mypage');
+    }
+  }
+
   return (
-    <form action={signin} className={styles.formContainer}>
+    <form onSubmit={handleSubmit} className={styles.formContainer}>
       <Logging />
       <div className={styles.formGroup}>
         <label htmlFor="phone_number" className={styles.label}>
@@ -56,6 +72,7 @@ export default function SigninForm({ signin }) {
       <button type="submit" className={styles.button}>
         로그인
       </button>
+      {error && <p className={styles.errorMessage}>{error}</p>}
     </form>
   );
 }

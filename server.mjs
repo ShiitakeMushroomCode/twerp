@@ -7,7 +7,8 @@ import next from 'next';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-dotenv.config({ path: '.env.local' });
+const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.local';
+dotenv.config({ path: envFile });
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });

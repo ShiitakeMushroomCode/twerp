@@ -41,3 +41,10 @@
 .button:hover {
   background-color: #005bb5;
 }
+
+.errorMessage {
+  text-align: center;
+  color: red;
+  font-size: 14px;
+  padding-top: 2rem;
+}

@@ -32,8 +32,9 @@ function clearCookie(name: string, response: NextResponse) {
     expires: new Date(0),
     path: '/',
     httpOnly: true,
-    sameSite: 'strict',
+    sameSite: 'lax',
     secure: true,
+    domain: 'werp.p-e.kr',
   });
 }
 

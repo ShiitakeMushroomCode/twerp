@@ -4,9 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "node dev": "node server.mjs",
+    "start": "node server.mjs",
     "build": "next build",
-    "start": "next start",
     "dev": "next dev"
   },
   "author": "",
@@ -31,6 +30,7 @@
     "react-datepicker": "^7.4.0",
     "react-daum-postcode": "^3.1.3",
     "react-dom": "^18.3.1",
+    "sharp": "^0.33.5",
     "winston": "^3.15.0"
   },
   "devDependencies": {
