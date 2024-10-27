@@ -40,6 +40,10 @@ export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get('accessToken');
   const refreshToken = request.cookies.get('refreshToken');
 
+  console.log(
+    `${request.url}: accessToken = ${accessToken ? true : false}, refreshToken = ${refreshToken ? true : false}`
+  );
+
   // 로그아웃을 위한 함수 통합
   async function handleSignout() {
     const response = NextResponse.redirect(new URL('/signin', request.url));
@@ -64,15 +68,14 @@ export async function middleware(request: NextRequest) {
       const response = NextResponse.redirect(new URL('/signin', request.url));
       return response; // 로그아웃 처리 없이 바로 리다이렉트
     }
-
-    const response = NextResponse.redirect(new URL('/signin', request.url));
-    await signout(refreshToken.value, response);
-    return response;
+    console.log('갱신을 1시간 동안 안 하면 로그아웃한 걸로 간주');
+    return await handleSignout();
   }
 
   // 로그아웃 요청 처리
   if (request.nextUrl.pathname === '/signout') {
-    return handleSignout();
+    console.log('로그아웃 요청 처리');
+    return await handleSignout();
   }
 
   // accessToken 검증
@@ -111,7 +114,8 @@ export async function middleware(request: NextRequest) {
         }
       }
       // 리프레시 토큰도 만료되거나 오류 발생 시 로그아웃 처리
-      return handleSignout();
+      console.log('리프레시 토큰도 만료되거나 오류 발생 시 로그아웃 처리');
+      return await handleSignout();
     }
   }
 
