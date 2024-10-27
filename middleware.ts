@@ -4,7 +4,22 @@ import { DEFAULT_REDIRECT, PUBLIC_ROUTES } from './lib/routes';
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
-async function signout(res: NextResponse) {
+async function signout(refreshToken, res: NextResponse) {
+  if (refreshToken) {
+    try {
+      await fetch(`${process.env.API_URL}/auth/signout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({ refreshToken: refreshToken }),
+      });
+    } catch (error) {
+      console.error('서버에서 로그아웃 처리 중 오류 발생:', error);
+    }
+  }
+
   clearCookie('accessToken', res);
   clearCookie('refreshToken', res);
 }
@@ -27,7 +42,7 @@ export async function middleware(request: NextRequest) {
   // 로그아웃을 위한 함수 통합
   async function handleSignout() {
     const response = NextResponse.redirect(new URL('/signin', request.url));
-    await signout(response);
+    await signout(refreshToken, response);
     return response;
   }
 
