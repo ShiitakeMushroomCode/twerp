@@ -19,7 +19,7 @@ async function signin(formData: FormData) {
         Accept: 'application/json',
       },
       body: JSON.stringify(data),
-      credentials: 'same-origin',
+      credentials: 'include',
     });
     if (response.ok) {
       const data = await response.json();
@@ -31,7 +31,6 @@ async function signin(formData: FormData) {
         path: '/',
         sameSite: 'lax',
         secure: true,
-        domain: 'werp.p-e.kr',
       });
       cookies().set({
         name: 'refreshToken',
@@ -41,7 +40,6 @@ async function signin(formData: FormData) {
         path: '/',
         sameSite: 'lax',
         secure: true,
-        domain: 'werp.p-e.kr',
       });
       return await data;
     } else {

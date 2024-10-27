@@ -72,7 +72,7 @@ async function updateClient(formData: ClientFormData): Promise<{ status: string;
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Cookie: cookies().toString() },
         body: JSON.stringify(formData),
-        credentials: 'same-origin',
+        credentials: 'include',
       });
 
       if (res.ok) {

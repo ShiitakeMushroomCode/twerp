@@ -10,9 +10,6 @@ async function signout(refreshToken, res: NextResponse) {
     return; // 유효하지 않다면 아무 작업도 하지 않음
   }
 
-  clearCookie('accessToken', res);
-  clearCookie('refreshToken', res);
-
   try {
     await fetch(`${process.env.API_URL}/auth/signout`, {
       method: 'POST',
@@ -22,6 +19,8 @@ async function signout(refreshToken, res: NextResponse) {
       },
       body: JSON.stringify({ refreshToken: refreshToken }),
     });
+    clearCookie('accessToken', res);
+    clearCookie('refreshToken', res);
   } catch (error) {
     console.error('서버에서 로그아웃 처리 중 오류 발생:', error);
   }
@@ -34,7 +33,6 @@ function clearCookie(name: string, response: NextResponse) {
     httpOnly: true,
     sameSite: 'lax',
     secure: true,
-    domain: 'werp.p-e.kr',
   });
 }
 
@@ -103,7 +101,7 @@ export async function middleware(request: NextRequest) {
               maxAge: 60 * 60, // 1시간
               path: '/',
               httpOnly: true,
-              sameSite: 'strict',
+              sameSite: 'lax',
               secure: true,
             });
             return response;
