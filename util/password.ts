@@ -1,5 +1,5 @@
 import { executeQuery } from '@/lib/db';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 // 비밀번호 해시 함수
 export async function hashPassword(password: string) {
