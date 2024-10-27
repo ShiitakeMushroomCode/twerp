@@ -1,14 +1,14 @@
 import { isAuthenticated } from '@/util/password';
-import { generateAccessToken, generateRefreshToken, getInnerData, StoreAndGetUserData } from '@/util/token';
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  getCookieDomain,
+  getInnerData,
+  StoreAndGetUserData,
+} from '@/util/token';
 import { ACT } from 'auth';
 import { NextRequest, NextResponse } from 'next/server';
-export function getCookieDomain() {
-  if (process.env.NODE_ENV === 'production') {
-    return process.env.DOMAIN_URL;
-  }
-  return undefined; // 개발 환경에서는 도메인 설정 생략
-}
-
+export const runtime = 'nodejs';
 export async function POST(request: NextRequest) {
   const { id, password } = await request.json();
   const domain = getCookieDomain();

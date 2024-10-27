@@ -1,13 +1,8 @@
+import { getCookieDomain } from '@/util/token';
 import { jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-
-export function getCookieDomain() {
-  if (process.env.NODE_ENV === 'production') {
-    return process.env.DOMAIN_URL;
-  }
-  return undefined; // 개발 환경에서는 도메인 설정 생략
-}
+export const runtime = 'nodejs';
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 export async function POST(request: NextRequest) {

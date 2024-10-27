@@ -1,7 +1,7 @@
 import { executeQuery } from '@/lib/db';
+import { isEmpty } from '@/util/lo';
 import { ACT } from 'auth';
 import { jwtVerify, SignJWT } from 'jose';
-import { isEmpty } from 'lodash';
 import { cookies } from 'next/headers';
 
 // 구버전
@@ -16,6 +16,13 @@ import { cookies } from 'next/headers';
 // }
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+
+export function getCookieDomain(): string {
+  if (process.env.NODE_ENV === 'production') {
+    return process.env.DOMAIN_URL;
+  }
+  return undefined; // 개발 환경에서는 도메인 설정 생략
+}
 
 export async function StoreAndGetUserData(userId: any, refreshToken: any) {
   let user;

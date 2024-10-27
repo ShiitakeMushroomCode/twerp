@@ -2,7 +2,7 @@ import { generateCertificationToken, saveVerificationToken } from '@/util/token'
 import { randomInt } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
-
+export const runtime = 'nodejs';
 const transporter = nodemailer.createTransport({
   service: process.env.EMAIL_SERVICE,
   auth: {

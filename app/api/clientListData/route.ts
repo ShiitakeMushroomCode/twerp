@@ -1,7 +1,7 @@
 import { executeQuery } from '@/lib/db';
 import { getTokenUserData } from '@/util/token';
 import { NextRequest, NextResponse } from 'next/server';
-
+export const runtime = 'nodejs';
 interface DataRequestBody {
   searchTerm?: string;
   page?: number;

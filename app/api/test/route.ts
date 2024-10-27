@@ -1,6 +1,6 @@
 import { executeQuery } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
-
+export const runtime = 'nodejs';
 export async function GET(req: NextRequest, res: NextResponse) {
   const page = parseInt('1') || 1; // 기본값은 1
   const limit = 10;

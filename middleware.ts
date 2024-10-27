@@ -1,7 +1,8 @@
-import { getCookieDomain } from 'app/api/auth/signin/route';
+import { getCookieDomain } from '@/util/token';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { DEFAULT_REDIRECT, PUBLIC_ROUTES } from './lib/routes';
+export const runtime = 'nodejs';
 
 const domain = getCookieDomain();
 async function signout(refreshToken, res: NextResponse) {

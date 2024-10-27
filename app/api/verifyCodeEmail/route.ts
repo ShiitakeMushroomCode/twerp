@@ -1,9 +1,9 @@
+import { isEmpty } from '@/util/lo';
 import { deleteVerificationToken, getTokenUserData, getVerificationToken, updateEmail } from '@/util/token';
 import { ACT } from 'auth';
 import { jwtVerify } from 'jose';
-import { isEmpty } from 'lodash-es';
 import { NextRequest, NextResponse } from 'next/server';
-
+export const runtime = 'nodejs';
 const secretKey = new TextEncoder().encode(process.env.JWT_SECRET!);
 
 export async function POST(request: NextRequest) {
