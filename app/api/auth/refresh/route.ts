@@ -16,7 +16,7 @@ async function verifyRefreshToken(refreshToken: string) {
 
 export async function POST(request: NextRequest) {
   const d = await request.json();
-  const refreshToken = await d?.refreshToken?.value;
+  const refreshToken = await d?.refreshToken;
   // 리프레시 토큰 있어야함
   if (!refreshToken) {
     return NextResponse.json({ error: '리프레시 토큰 없는듯' }, { status: 401 });

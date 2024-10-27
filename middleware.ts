@@ -1,9 +1,8 @@
 import { getCookieDomain } from 'app/api/auth/signin/route';
-import { jwtVerify } from 'jose';
+import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { DEFAULT_REDIRECT, PUBLIC_ROUTES } from './lib/routes';
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 const domain = getCookieDomain();
 async function signout(refreshToken, res: NextResponse) {
   if (refreshToken) {
@@ -62,8 +61,8 @@ export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get('accessToken');
   const refreshToken = request.cookies.get('refreshToken');
 
-  console.log(`AccessToken: ${accessToken?.value}`);
-  console.log(`RefreshToken: ${refreshToken?.value}`);
+  // console.log(`AccessToken: ${accessToken?.value}`);
+  // console.log(`RefreshToken: ${refreshToken?.value}`);
 
   // 로그아웃을 위한 함수 통합
   async function handleSignout() {
@@ -107,47 +106,21 @@ export async function middleware(request: NextRequest) {
 
   // 액세스 토큰 검증
   if (accessToken) {
-    await logging('accessToken 검증');
-
+    await logging('액세스 토큰이 유효한 경우');
     try {
-      // 액세스 토큰이 유효한 경우
-      await logging('액세스 토큰이 유효한 경우');
-      await jwtVerify(accessToken.value, secret);
-      return NextResponse.next();
-    } catch (error) {
-      // 액세스 토큰이 만료된 경우 리프레시 토큰을 통해 갱신 시도
-      await logging('액세스 토큰이 만료된 경우 리프레시 토큰을 통해 갱신 시도');
-      if (refreshToken) {
-        try {
-          const res = await fetch(`${process.env.API_URL}/auth/refresh`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
-            },
-            body: JSON.stringify({ refreshToken: refreshToken }),
-          });
-
-          if (res.ok) {
-            const newAccessToken = (await res.json()).accessToken;
-            const response = NextResponse.next();
-            response.cookies.set('accessToken', newAccessToken, {
-              maxAge: 60 * 60, // 1시간
-              path: '/',
-              httpOnly: true,
-              sameSite: 'strict', // 일관성 유지
-              secure: process.env.NODE_ENV === 'production', // 환경에 따라 설정
-              domain: domain,
-            });
-            await logging('액세스 토큰 갱신 완료');
-            return response;
-          }
-        } catch (refreshError) {
-          console.error('리프레시 토큰으로 갱신 중 오류 발생:', refreshError);
-          return handleSignout();
-        }
+      await logging('accessToken 검증');
+      const res = await fetch(`${process.env.API_URL}/auth/checkAccessToken`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Cookie: cookies().toString(),
+        },
+      });
+      if (res.ok) {
+        return NextResponse.next();
       }
-      // 리프레시 토큰도 없거나 오류 발생 시 로그아웃 처리
+    } catch (refreshError) {
       return handleSignout();
     }
   }

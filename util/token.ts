@@ -1,7 +1,7 @@
 import { executeQuery } from '@/lib/db';
 import { ACT } from 'auth';
 import { jwtVerify, SignJWT } from 'jose';
-import _ from 'lodash';
+import { isEmpty } from 'lodash';
 import { cookies } from 'next/headers';
 
 // 구버전
@@ -111,7 +111,7 @@ export async function generateCertificationToken({ userId, cn }) {
 // 전화번호 업데이트 함수
 export async function updatePhoneNumber(userId: string, newPhoneNumber: string): Promise<boolean> {
   // 값 검증
-  if (_.isEmpty(userId) || _.isEmpty(newPhoneNumber)) {
+  if (isEmpty(userId) || isEmpty(newPhoneNumber)) {
     console.error('유효하지 않은 userId 또는 newPhoneNumber 값입니다.');
     return false;
   }
@@ -129,7 +129,7 @@ export async function updatePhoneNumber(userId: string, newPhoneNumber: string):
 // 전화번호 업데이트 함수
 export async function updateEmail(userId: string, newEmail: string): Promise<boolean> {
   // 값 검증
-  if (_.isEmpty(userId) || _.isEmpty(newEmail)) {
+  if (isEmpty(userId) || isEmpty(newEmail)) {
     console.error('유효하지 않은 userId 또는 newPhoneNumber 값입니다.');
     return false;
   }
@@ -147,7 +147,7 @@ export async function updateEmail(userId: string, newEmail: string): Promise<boo
 // 인증 토큰 저장 함수
 export async function saveVerificationToken(userId: string, token: string): Promise<boolean> {
   // 값 검증
-  if (_.isEmpty(userId) || _.isEmpty(token)) {
+  if (isEmpty(userId) || isEmpty(token)) {
     console.error('유효하지 않은 userId 또는 token 값입니다.');
     return false;
   }
@@ -165,7 +165,7 @@ export async function saveVerificationToken(userId: string, token: string): Prom
 // 인증 토큰 가져오기 함수
 export async function getVerificationToken(userId: string): Promise<string | null> {
   // 값 검증
-  if (_.isEmpty(userId)) {
+  if (isEmpty(userId)) {
     console.error('유효하지 않은 userId 값입니다.');
     return null;
   }
@@ -184,7 +184,7 @@ export async function getVerificationToken(userId: string): Promise<string | nul
 // 인증 토큰 삭제 함수
 export async function deleteVerificationToken(userId: string): Promise<boolean> {
   // 값 검증
-  if (_.isEmpty(userId)) {
+  if (isEmpty(userId)) {
     console.error('유효하지 않은 userId 값입니다.');
     return false;
   }
