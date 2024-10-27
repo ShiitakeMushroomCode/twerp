@@ -4,27 +4,9 @@ import { DEFAULT_REDIRECT, PUBLIC_ROUTES } from './lib/routes';
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
-async function signout(refreshToken, res: NextResponse) {
-  if (!refreshToken) {
-    console.warn('로그아웃 시 리프레시 토큰이 유효하지 않음:', refreshToken);
-    return; // 유효하지 않다면 아무 작업도 하지 않음
-  }
-
+async function signout(res: NextResponse) {
   clearCookie('accessToken', res);
   clearCookie('refreshToken', res);
-
-  try {
-    await fetch(`${process.env.API_URL}/auth/signout`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify({ refreshToken: refreshToken }),
-    });
-  } catch (error) {
-    console.error('서버에서 로그아웃 처리 중 오류 발생:', error);
-  }
 }
 
 function clearCookie(name: string, response: NextResponse) {
@@ -45,7 +27,7 @@ export async function middleware(request: NextRequest) {
   // 로그아웃을 위한 함수 통합
   async function handleSignout() {
     const response = NextResponse.redirect(new URL('/signin', request.url));
-    await signout(refreshToken, response);
+    await signout(response);
     return response;
   }
 
@@ -66,10 +48,7 @@ export async function middleware(request: NextRequest) {
       const response = NextResponse.redirect(new URL('/signin', request.url));
       return response; // 로그아웃 처리 없이 바로 리다이렉트
     }
-
-    const response = NextResponse.redirect(new URL('/signin', request.url));
-    await signout(refreshToken.value, response);
-    return response;
+    await handleSignout();
   }
 
   // 로그아웃 요청 처리
@@ -110,6 +89,7 @@ export async function middleware(request: NextRequest) {
           }
         } catch (refreshError) {
           console.error('리프레시 토큰으로 갱신 실패:', refreshError);
+          return handleSignout();
         }
       }
       // 리프레시 토큰도 만료되거나 오류 발생 시 로그아웃 처리
