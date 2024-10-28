@@ -81,7 +81,7 @@ async function updateClient(formData: ClientFormData): Promise<{ status: string;
         return { status: 'error', message: (await res.json()).message };
       }
     } else {
-      return { status: 'error', message: '등록되지 않은 사업자입니다. \n\n입력 정보 확인이 필요합니다.' };
+      return { status: 'error', message: '등록되지 않은 사업자입니다. <br/>입력 정보 확인이 필요합니다.' };
     }
   } catch (error) {
     return { status: 'error', message: 'API 요청 중 에러가 발생했습니다.' };

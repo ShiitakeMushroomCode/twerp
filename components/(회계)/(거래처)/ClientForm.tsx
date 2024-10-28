@@ -135,14 +135,14 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
     if (response.status === 'error') {
       await Swal.fire({
         title: '오류',
-        text: response.message,
+        html: response.message,
         icon: 'error',
         confirmButtonText: '확인',
       });
     } else if (response.status === 'success') {
       await Swal.fire({
         title: '성공',
-        text: response.message,
+        html: response.message,
         icon: 'success',
         confirmButtonText: '확인',
       });
