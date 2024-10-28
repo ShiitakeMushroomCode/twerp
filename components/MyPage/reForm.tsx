@@ -1,7 +1,7 @@
 'use client';
+import styles from '@/styles/MyPage.module.css';
 import { formatPhoneNumber } from '@/util/reform';
 import { useRef, useState } from 'react';
-import styles from './MyPage.module.css';
 import VerificationEmailModal from './VerificationEmailModal';
 import VerificationPhoneModal from './VerificationPhoneModal';
 

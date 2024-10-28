@@ -4,37 +4,38 @@ import { DEFAULT_REDIRECT, PUBLIC_ROUTES } from './lib/routes';
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
-async function signout(refreshToken, res: NextResponse) {
-  if (!refreshToken) {
-    console.warn('로그아웃 시 리프레시 토큰이 유효하지 않음:', refreshToken);
-    return; // 유효하지 않다면 아무 작업도 하지 않음
-  }
+// 이제 안씀
+// async function signout(refreshToken, res: NextResponse) {
+//   if (!refreshToken) {
+//     console.warn('로그아웃 시 리프레시 토큰이 유효하지 않음:', refreshToken);
+//     return; // 유효하지 않다면 아무 작업도 하지 않음
+//   }
 
-  try {
-    await fetch(`${process.env.API_URL}/auth/signout`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify({ refreshToken: refreshToken }),
-    });
-    clearCookie('accessToken', res);
-    clearCookie('refreshToken', res);
-  } catch (error) {
-    console.error('서버에서 로그아웃 처리 중 오류 발생:', error);
-  }
-}
+//   try {
+//     await fetch(`${process.env.API_URL}/auth/signout`, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Accept: 'application/json',
+//       },
+//       body: JSON.stringify({ refreshToken: refreshToken }),
+//     });
+//     clearCookie('accessToken', res);
+//     clearCookie('refreshToken', res);
+//   } catch (error) {
+//     console.error('서버에서 로그아웃 처리 중 오류 발생:', error);
+//   }
+// }
 
-function clearCookie(name: string, response: NextResponse) {
-  response.cookies.set(name, '', {
-    expires: new Date(0),
-    path: '/',
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: true,
-  });
-}
+// function clearCookie(name: string, response: NextResponse) {
+//   response.cookies.set(name, '', {
+//     expires: new Date(0),
+//     path: '/',
+//     httpOnly: true,
+//     sameSite: 'lax',
+//     secure: true,
+//   });
+// }
 
 export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get('accessToken');
@@ -74,10 +75,10 @@ export async function middleware(request: NextRequest) {
   }
 
   // 로그아웃 요청 처리
-  if (request.nextUrl.pathname === '/signout') {
-    console.log('로그아웃 요청 처리');
-    return await handleSignout();
-  }
+  // if (request.nextUrl.pathname === '/signout') {
+  //   console.log('로그아웃 요청 처리');
+  //   return await handleSignout();
+  // }
 
   // accessToken 검증
   if (accessToken) {
