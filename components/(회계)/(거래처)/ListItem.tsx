@@ -81,7 +81,7 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
                   <th>사업자번호</th>
                   <th>기업명</th>
                   <th>대표자명</th>
-                  <th>전화번호</th>
+                  <th>대표번호</th>
                   <th>팩스번호</th>
                 </tr>
               </thead>

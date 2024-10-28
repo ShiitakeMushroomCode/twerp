@@ -58,8 +58,16 @@ export async function POST(request: NextRequest) {
       countQuery = `
         SELECT COUNT(*) as total
         FROM clients
-        WHERE company_id = ? AND (company_name LIKE ? OR business_number LIKE ?)
+        WHERE company_id = ? 
+        AND (
+          company_name LIKE ? 
+          OR business_number LIKE ? 
+          OR representative_name LIKE ? 
+          OR tell_number LIKE ? 
+          OR fax_number LIKE ?
+        )
       `;
+
       selectQuery = `
         SELECT
           business_number,
@@ -69,12 +77,36 @@ export async function POST(request: NextRequest) {
           tell_number,
           fax_number 
         FROM clients
-        WHERE company_id = ? AND (company_name LIKE ? OR business_number LIKE ?)
+        WHERE company_id = ? 
+        AND (
+          company_name LIKE ? 
+          OR business_number LIKE ? 
+          OR representative_name LIKE ?
+          OR tell_number LIKE ?
+          OR fax_number LIKE ?
+        )
         ORDER BY company_name ASC
         LIMIT ? OFFSET ?
       `;
-      countParams = [companyIdBuffer, formattedSearchTerm, formattedSearchTerm];
-      selectParams = [companyIdBuffer, formattedSearchTerm, formattedSearchTerm, limit, offset];
+
+      countParams = [
+        companyIdBuffer,
+        formattedSearchTerm,
+        formattedSearchTerm,
+        formattedSearchTerm,
+        formattedSearchTerm,
+        formattedSearchTerm,
+      ];
+      selectParams = [
+        companyIdBuffer,
+        formattedSearchTerm,
+        formattedSearchTerm,
+        formattedSearchTerm,
+        formattedSearchTerm,
+        formattedSearchTerm,
+        limit,
+        offset,
+      ];
     }
 
     // 총 클라이언트 수를 조회
