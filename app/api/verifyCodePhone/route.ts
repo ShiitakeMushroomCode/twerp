@@ -1,7 +1,7 @@
+import { isEmpty } from '@/util/lo';
 import { deleteVerificationToken, getTokenUserData, getVerificationToken, updatePhoneNumber } from '@/util/token';
 import { ACT } from 'auth';
 import { jwtVerify } from 'jose';
-import _ from 'lodash';
 import { NextRequest, NextResponse } from 'next/server';
 
 const secretKey = new TextEncoder().encode(process.env.JWT_SECRET!);
@@ -12,13 +12,13 @@ export async function POST(request: NextRequest) {
     const userId = ((await getTokenUserData()) as ACT).userId;
     // console.log(userId, inputCode, newPhoneNumber);
 
-    if (_.isEmpty(inputCode)) {
+    if (isEmpty(inputCode)) {
       return NextResponse.json({ error: '인증 토큰이 유효하지 않거나 만료되었습니다.' }, { status: 400 });
     }
-    if (_.isEmpty(newPhoneNumber)) {
+    if (isEmpty(newPhoneNumber)) {
       return NextResponse.json({ error: '변경할 휴대폰 번호가 유효하지 않습니다.' }, { status: 400 });
     }
-    if (_.isEmpty(userId)) {
+    if (isEmpty(userId)) {
       return NextResponse.json({ error: 'userId가 입력되지 않았습니다.' }, { status: 400 });
     }
 
