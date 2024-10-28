@@ -9,7 +9,9 @@
 }
 
 .title {
-  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding-top: 1rem;
   padding-bottom: 2rem;
   font-size: x-large;
@@ -68,6 +70,28 @@
 
 .button:hover {
   background-color: #0080ff;
+}
+
+.delButton {
+  background-color: #f44336;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: large;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.delButton:hover {
+  background-color: #d32f2f;
+}
+
+.delButton:disabled {
+  background-color: #a5d6a7;
+  cursor: not-allowed;
 }
 
 .hover {

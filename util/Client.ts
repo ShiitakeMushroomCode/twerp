@@ -19,6 +19,34 @@ export async function hasClient(company_id: Buffer, business_number: string): Pr
   }
 }
 
+//삭제
+export async function deleteClient(business_number: string): Promise<boolean> {
+  try {
+    const companyId = (await getTokenUserData())['companyId'];
+
+    // 클라이언트 존재 여부 확인
+    if (await hasClient(Buffer.from(companyId['data']), business_number)) {
+      const sql = `
+        DELETE FROM clients
+        WHERE company_id = ? AND business_number = ?
+      `;
+
+      const params = [Buffer.from(companyId['data']), business_number];
+
+      await executeQuery(sql, params);
+
+      console.log('클라이언트 정보가 성공적으로 삭제되었습니다.');
+      return true;
+    } else {
+      console.log('삭제할 클라이언트가 존재하지 않습니다.');
+      return false;
+    }
+  } catch (error) {
+    console.error('클라이언트 정보 삭제 중 오류 발생:', error);
+    return false;
+  }
+}
+
 interface ClientData {
   business_number: string;
   company_name: string;

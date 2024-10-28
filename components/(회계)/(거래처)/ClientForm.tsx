@@ -3,6 +3,7 @@ import { formatPhoneNumber } from '@/util/reform';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useState } from 'react';
+import { FaTrashAlt } from 'react-icons/fa'; // react-icons 추가
 import Swal from 'sweetalert2';
 import Address from './Address';
 import styles from './ClientForm.module.css';
@@ -153,6 +154,66 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
     }
   }
 
+  async function handleDelete() {
+    if (!formData.business_number) {
+      await Swal.fire({
+        title: '오류',
+        text: '삭제할 클라이언트의 사업자번호가 필요합니다.',
+        icon: 'error',
+        confirmButtonText: '확인',
+      });
+      return;
+    }
+
+    const confirmResult = await Swal.fire({
+      title: '삭제 확인',
+      text: '정말로 이 클라이언트를 삭제하시겠습니까?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: '삭제',
+      cancelButtonText: '취소',
+    });
+
+    if (confirmResult.isConfirmed) {
+      try {
+        const response = await fetch('/api/clientDelete', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ business_number: formData.business_number.replace(/-/g, '') }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          await Swal.fire({
+            title: '성공',
+            text: data.message,
+            icon: 'success',
+            confirmButtonText: '확인',
+          });
+          router.push('/client-list');
+        } else {
+          await Swal.fire({
+            title: '오류',
+            text: data.message,
+            icon: 'error',
+            confirmButtonText: '확인',
+          });
+        }
+      } catch (error) {
+        console.error('삭제 요청 중 오류 발생:', error);
+        await Swal.fire({
+          title: '오류',
+          text: '클라이언트 삭제 중 오류가 발생했습니다.',
+          icon: 'error',
+          confirmButtonText: '확인',
+        });
+      }
+    }
+  }
+
   function clear() {
     setFormData({
       business_number: '',
@@ -174,7 +235,21 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
   return (
     <div>
       <form onSubmit={handleSubmit} className={styles.form}>
-        <div className={styles.title}>{isEditMode ? '거래처 수정하기' : '거래처 추가하기'}</div>
+        <div className={styles.title}>
+          <span>{isEditMode ? '거래처 수정하기' : '거래처 추가하기'}</span>
+          {isEditMode && (
+            <button
+              type="button"
+              className={styles.delButton}
+              onClick={handleDelete}
+              disabled={isSearch}
+              title="클라이언트 삭제"
+            >
+              삭제
+              <FaTrashAlt style={{ marginLeft: '0.5rem' }} />
+            </button>
+          )}
+        </div>
 
         <div className={styles['form-row']}>
           <label htmlFor="business_number" className={styles.label}>
@@ -387,9 +462,11 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
           {errors.billing_email && <span className={styles.error}>{errors.billing_email}</span>}
         </div>
 
-        <button type="submit" className={styles.button} disabled={isSearch}>
-          {isEditMode ? '수정' : '등록'}
-        </button>
+        <div className={styles['form-row']}>
+          <button type="submit" className={styles.button} disabled={isSearch}>
+            {isEditMode ? '수정' : '등록'}
+          </button>
+        </div>
       </form>
     </div>
   );
