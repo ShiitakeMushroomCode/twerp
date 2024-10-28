@@ -43,7 +43,7 @@ async function addClient(formData: ClientFormData): Promise<{ status: string; me
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Cookie: cookies().toString() },
         body: JSON.stringify(formData),
-        credentials: 'same-origin',
+        credentials: 'include',
       });
       if (res.ok) {
         revalidatePath('/client-list');

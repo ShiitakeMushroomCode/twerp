@@ -42,7 +42,10 @@ export async function POST(request: NextRequest) {
         SELECT
           business_number,
           HEX(clients_id) as clients_id,
-          company_name
+          company_name,
+          representative_name,
+          tell_number,
+          fax_number 
         FROM clients
         WHERE company_id = ?
         ORDER BY company_name ASC
@@ -61,7 +64,10 @@ export async function POST(request: NextRequest) {
         SELECT
           business_number,
           HEX(clients_id) as clients_id,
-          company_name
+          company_name,
+          representative_name,
+          tell_number,
+          fax_number 
         FROM clients
         WHERE company_id = ? AND (company_name LIKE ? OR business_number LIKE ?)
         ORDER BY company_name ASC

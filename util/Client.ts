@@ -30,6 +30,7 @@ interface ClientData {
   start_date?: string;
   business_status?: string;
   main_item_name?: string;
+  description?: string;
 }
 
 // 클라이언트 생성
@@ -49,9 +50,10 @@ export async function insertClient(clientData: ClientData): Promise<boolean> {
         fax_number,
         start_date,
         business_status,
-        main_item_name
+        main_item_name,
+        description
       ) VALUES (
-        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
       )
     `;
 
@@ -67,6 +69,7 @@ export async function insertClient(clientData: ClientData): Promise<boolean> {
         clientData.start_date || null,
         clientData.business_status || null,
         clientData.main_item_name || null,
+        clientData.description || null,
       ];
 
       // console.log('쿼리 실행:', sql);
@@ -88,8 +91,6 @@ export async function insertClient(clientData: ClientData): Promise<boolean> {
 export async function updateClient(clientData: ClientData): Promise<boolean> {
   try {
     const companyId = (await getTokenUserData())['companyId'];
-
-    // 클라이언트가 존재하는지 확인
     if (await hasClient(Buffer.from(companyId['data']), clientData.business_number)) {
       const sql = `
         UPDATE clients
@@ -102,7 +103,8 @@ export async function updateClient(clientData: ClientData): Promise<boolean> {
           fax_number = ?,
           start_date = ?,
           business_status = ?,
-          main_item_name = ?
+          main_item_name = ?,
+          description = ?
         WHERE
           company_id = ? AND business_number = ?
       `;
@@ -117,6 +119,7 @@ export async function updateClient(clientData: ClientData): Promise<boolean> {
         clientData.start_date || null,
         clientData.business_status || null,
         clientData.main_item_name || null,
+        clientData.description || null,
         Buffer.from(companyId['data']),
         clientData.business_number,
       ];

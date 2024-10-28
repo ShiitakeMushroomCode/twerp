@@ -1,8 +1,8 @@
-import styles from '@/styles/NavBar.module.css';
 import { getLoggedin } from '@/util/getLoggedin';
 import Link from 'next/link';
 import AS from './AfterSignIn';
 import BS from './BeforeSignIn';
+import styles from './NavBar.module.css';
 
 export default async function NavBar() {
   const isLoggedIn = await getLoggedin();

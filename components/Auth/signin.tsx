@@ -1,9 +1,9 @@
 'use client';
-import styles from '@/styles/SignInPage.module.css';
 import { formatPhoneNumber } from '@/util/reform';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useState } from 'react';
-import Logging from '../Logging';
+import Logging from '../ETC/Logging';
+import styles from './SignInPage.module.css';
 
 export default function SigninForm() {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -29,6 +29,7 @@ export default function SigninForm() {
       password: formData.get('password')?.toString() || '',
     };
 
+<<<<<<< HEAD
     try {
       const response = await fetch('/api/auth/signin', {
         method: 'POST',
@@ -49,6 +50,12 @@ export default function SigninForm() {
     } catch (error) {
       console.error('Error:', error);
       setError('로그인 중 오류가 발생했습니다. 다시 시도하세요.');
+=======
+    if (response === null) {
+      setError('로그인에 실패했습니다. 다시 시도하세요.');
+    } else {
+      router.push('/');
+>>>>>>> 이게-맞나
     }
   }
 

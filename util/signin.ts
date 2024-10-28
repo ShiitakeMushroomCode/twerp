@@ -15,7 +15,7 @@ export async function signin(formData: FormData) {
         Accept: 'application/json',
       },
       body: JSON.stringify(data),
-      credentials: 'same-origin',
+      credentials: 'include',
     });
     if (response.ok) {
       const data = await response.json();
@@ -25,7 +25,7 @@ export async function signin(formData: FormData) {
         httpOnly: true,
         maxAge: 60 * 60,
         path: '/',
-        sameSite: 'strict',
+        sameSite: 'lax',
         secure: true,
       });
       cookies().set({
@@ -34,7 +34,7 @@ export async function signin(formData: FormData) {
         httpOnly: true,
         maxAge: 60 * 60 * 24 * 30,
         path: '/',
-        sameSite: 'strict',
+        sameSite: 'lax',
         secure: true,
       });
       window.location.reload();

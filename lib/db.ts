@@ -13,7 +13,7 @@ const logger = winston.createLogger({
         })} [${level.toUpperCase()}]: ${message}`
     )
   ),
-  transports: [new winston.transports.Console(), new winston.transports.File({ filename: 'database.log' })],
+  transports: [/*new winston.transports.Console(), */ new winston.transports.File({ filename: 'database.log' })],
 });
 
 // 데이터베이스 풀 생성

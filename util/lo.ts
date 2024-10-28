@@ -1,4 +1,5 @@
 export function isEmpty(value: any): boolean {
+<<<<<<< HEAD
   if (value == null) return true; // null 또는 undefined
   if (typeof value === 'object') return Object.keys(value).length === 0; // 객체
   if (typeof value === 'string') return value.trim().length === 0; // 문자열
@@ -46,4 +47,31 @@ export function cloneDeep(value: any): any {
   } else {
     return value; // 기본 타입의 값은 그대로 반환
   }
+=======
+  if (value == null) {
+    return true;
+  }
+
+  if (typeof value === 'boolean') {
+    return false;
+  }
+
+  if (typeof value === 'number') {
+    return false;
+  }
+
+  if (typeof value === 'string' || Array.isArray(value)) {
+    return value.length === 0;
+  }
+
+  if (value instanceof Map || value instanceof Set) {
+    return value.size === 0;
+  }
+
+  if (typeof value === 'object') {
+    return Object.keys(value).length === 0;
+  }
+
+  return false;
+>>>>>>> 이게-맞나
 }

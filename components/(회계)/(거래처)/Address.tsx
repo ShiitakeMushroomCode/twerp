@@ -1,7 +1,7 @@
 'use client';
-import styles from '@/styles/Address.module.css';
 import { useState } from 'react';
 import PostCode from 'react-daum-postcode';
+import styles from './Address.module.css';
 
 interface AddressProps {
   addrNum: string;

@@ -1,0 +1,28 @@
+.iconLink {
+  display: block;
+  width: 170px;
+  height: 190px;
+  margin: 0 auto;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 12px;
+  overflow: hidden;
+  text-align: center;
+  text-decoration: none;
+}
+
+.iconLink:hover {
+  transform: scale(1.15);
+  box-shadow: 0 10px 14px rgba(0, 0, 0, 0.2);
+  font-weight: bold;
+}
+
+.iconLink img {
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.iconTitle {
+  margin-top: 10px;
+  font-size: 1rem;
+  color: #333;
+}

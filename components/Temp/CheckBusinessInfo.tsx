@@ -1,4 +1,4 @@
-import styles from '@/styles/BusinessForm.module.css';
+import styles from './BusinessForm.module.css';
 
 export default async function CheckBusinessInfo() {
   async function fet(formData: FormData) {

@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { DEFAULT_REDIRECT, PUBLIC_ROUTES } from './lib/routes';
 export const runtime = 'nodejs';
 
+<<<<<<< HEAD
 const domain = getCookieDomain();
 async function signout(refreshToken, res: NextResponse) {
   if (refreshToken) {
@@ -57,11 +58,15 @@ async function logging(msg) {
     console.error('Error during logging:', error);
   }
 }
+=======
+const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+>>>>>>> 이게-맞나
 
 export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get('accessToken');
   const refreshToken = request.cookies.get('refreshToken');
 
+<<<<<<< HEAD
   // console.log(`AccessToken: ${accessToken?.value}`);
   // console.log(`RefreshToken: ${refreshToken?.value}`);
 
@@ -72,6 +77,11 @@ export async function middleware(request: NextRequest) {
     await signout(refreshToken?.value, response); // 수정: refreshToken.value 전달
     return response;
   }
+=======
+  // console.log(
+  //   `${request.url}: accessToken = ${accessToken ? true : false}, refreshToken = ${refreshToken ? true : false}`
+  // );
+>>>>>>> 이게-맞나
 
   // 로그인도 안하고 보호된 경로에 접근 시도
   if (!PUBLIC_ROUTES.includes(request.nextUrl.pathname) && !accessToken) {
@@ -95,6 +105,7 @@ export async function middleware(request: NextRequest) {
       const response = NextResponse.redirect(new URL('/signin', request.url));
       return response; // 로그아웃 처리 없이 바로 리다이렉트
     }
+<<<<<<< HEAD
 
     return handleSignout();
   }
@@ -103,12 +114,17 @@ export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname === '/signout') {
     await logging('로그아웃 요청 처리');
     return handleSignout();
+=======
+    console.log('갱신을 1시간 동안 안 하면 로그아웃한 걸로 간주');
+    return NextResponse.redirect(new URL('/signout', request.url));
+>>>>>>> 이게-맞나
   }
 
   // 액세스 토큰 검증
   if (accessToken) {
     await logging('액세스 토큰이 유효한 경우');
     try {
+<<<<<<< HEAD
       await logging('accessToken 검증');
       const res = await fetch(`${process.env.API_URL}/auth/checkAccessToken`, {
         method: 'POST',
@@ -123,6 +139,43 @@ export async function middleware(request: NextRequest) {
       }
     } catch (refreshError) {
       return handleSignout();
+=======
+      // 액세스 토큰이 유효한 경우
+      await jwtVerify(accessToken.value, secret);
+      return NextResponse.next();
+    } catch (error) {
+      // 액세스 토큰이 만료된 경우 리프레시 토큰을 통해 갱신 시도
+      if (refreshToken) {
+        try {
+          const res = await fetch(`${process.env.API_URL}/auth/refresh`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+            body: JSON.stringify({ refreshToken: refreshToken }),
+          });
+
+          if (res.ok) {
+            const newAccessToken = (await res.json()).accessToken;
+            const response = NextResponse.next();
+            response.cookies.set('accessToken', newAccessToken, {
+              maxAge: 60 * 60, // 1시간
+              path: '/',
+              httpOnly: true,
+              sameSite: 'lax',
+              secure: true,
+            });
+            return response;
+          }
+        } catch (refreshError) {
+          console.error('리프레시 토큰으로 갱신 실패:', refreshError);
+        }
+      }
+      // 리프레시 토큰도 만료되거나 오류 발생 시 로그아웃 처리
+      console.log('리프레시 토큰도 만료되거나 오류 발생 시 로그아웃 처리');
+      return NextResponse.redirect(new URL('/signout', request.url));
+>>>>>>> 이게-맞나
     }
   }
 

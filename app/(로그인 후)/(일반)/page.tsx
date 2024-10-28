@@ -1,4 +1,4 @@
-import HomeMenuIcon from '@/components/HomeMenuIcon';
+import HomeMenuIcon from '@/components/ETC/HomeMenuIcon';
 import styles from '@/styles/home.module.css';
 export const metadata = {
   title: 'Home',

@@ -22,4 +22,5 @@ export interface Client {
   start_date: Date; // 시작일
   business_status?: string; // 업태 (선택 항목)
   main_item_name?: string; // 주종목명 (선택 항목)
+  description?: string; // 주석 (선택 항목)
 }

@@ -1,5 +1,5 @@
-import styles from '@/styles/MenuBar.module.css';
 import Link from 'next/link';
+import styles from './MenuBar.module.css';
 
 const erpMenuItems = [
   {

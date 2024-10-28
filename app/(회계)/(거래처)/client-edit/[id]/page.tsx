@@ -18,7 +18,6 @@ async function fetchClientData(id: string): Promise<ClientFormData> {
   'use server';
   const result = await executeQuery('SELECT * FROM clients WHERE clients_id = ?', [Buffer.from(id, 'hex')]);
   const clientData = result[0] as Client;
-
   const formattedData: ClientFormData = {
     business_number: clientData.business_number,
     company_name: clientData.company_name,
@@ -30,6 +29,7 @@ async function fetchClientData(id: string): Promise<ClientFormData> {
     tell_number: clientData.tell_number,
     fax_number: clientData.fax_number,
     billing_email: clientData.billing_email,
+    description: clientData.description,
   };
 
   return formattedData;
@@ -72,9 +72,8 @@ async function updateClient(formData: ClientFormData): Promise<{ status: string;
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Cookie: cookies().toString() },
         body: JSON.stringify(formData),
-        credentials: 'same-origin',
+        credentials: 'include',
       });
-
       if (res.ok) {
         revalidatePath('/client-list');
         return { status: 'success', message: '거래처가 성공적으로 수정되었습니다.' };
