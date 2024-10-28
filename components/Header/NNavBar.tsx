@@ -1,6 +1,6 @@
-import styles from '@/styles/NavBar.module.css';
 import Link from 'next/link';
 import BS from './BeforeSignIn';
+import styles from './NavBar.module.css';
 
 export default async function NNavBar() {
   return (

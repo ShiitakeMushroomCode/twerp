@@ -46,9 +46,10 @@ export async function middleware(request: NextRequest) {
 
   // 로그아웃을 위한 함수 통합
   async function handleSignout() {
-    const response = NextResponse.redirect(new URL('/signin', request.url));
-    await signout(refreshToken, response);
-    return response;
+    // const response = NextResponse.redirect(new URL('/signin', request.url));
+    // await signout(refreshToken, response);
+    // return response;
+    return NextResponse.redirect(new URL('/signout', request.url));
   }
 
   // 로그인도 안하고 엄한데 들어가는 거 막기

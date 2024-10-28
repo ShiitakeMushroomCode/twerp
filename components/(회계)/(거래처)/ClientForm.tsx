@@ -1,10 +1,10 @@
 'use client';
-import styles from '@/styles/ClientForm.module.css';
 import { formatPhoneNumber } from '@/util/reform';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useState } from 'react';
 import Address from './Address';
+import styles from './ClientForm.module.css';
 import DatePicker from './DatePicker';
 import Modal from './Modal';
 

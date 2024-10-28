@@ -1,7 +1,7 @@
 'use client';
-import styles from '@/styles/VerificationModal.module.css';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import styles from './VerificationModal.module.css';
 
 interface VerificationPhoneModalProps {
   isOpen: boolean;

@@ -1,5 +1,5 @@
 'use client';
-import styles from '@/styles/DatePicker.module.css';
+import styles from './DatePicker.module.css';
 
 import { useEffect, useRef, useState } from 'react';
 

@@ -1,6 +1,6 @@
-import styles from '@/styles/HomeMenuIcon.module.css';
 import Image from 'next/image';
 import Link from 'next/link';
+import styles from './HomeMenuIcon.module.css';
 
 export default function HomeMenuIcon({ href, src, alt, title }) {
   return (

@@ -1,7 +1,7 @@
 'use client';
 
-import styles from '@/styles/SearchBox.module.css';
 import { useState } from 'react';
+import styles from './SearchBox.module.css';
 
 interface SearchBoxProps {
   onSearch: (term: string) => void;

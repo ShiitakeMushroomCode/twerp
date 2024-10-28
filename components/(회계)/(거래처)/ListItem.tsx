@@ -1,8 +1,8 @@
 'use client';
 
-import styles from '@/styles/ListItem.module.css';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import styles from './ListItem.module.css';
 
 interface Company {
   business_number: string;

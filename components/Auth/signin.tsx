@@ -1,9 +1,9 @@
 'use client';
-import styles from '@/styles/SignInPage.module.css';
 import { formatPhoneNumber } from '@/util/reform';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useState } from 'react';
 import Logging from '../Logging';
+import styles from './SignInPage.module.css';
 
 export default function SigninForm({ signin }) {
   const [phoneNumber, setPhoneNumber] = useState('');
