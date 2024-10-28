@@ -3,10 +3,10 @@ import { formatPhoneNumber } from '@/util/reform';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useState } from 'react';
+import Swal from 'sweetalert2';
 import Address from './Address';
 import styles from './ClientForm.module.css';
 import DatePicker from './DatePicker';
-import Modal from './Modal';
 
 export interface ClientFormData {
   business_number: string;
@@ -66,8 +66,6 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
   const [startDate, setStartDate] = useState<Date | null>(
     initialData?.start_date ? new Date(initialData.start_date) : null
   );
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
   const [isSearch, setIsSearch] = useState(false);
   const [addrNum, setAddrNum] = useState('');
   const [addr, setAddr] = useState('');
@@ -135,19 +133,24 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
     };
     const response = await onSubmit(submitData);
     if (response.status === 'error') {
-      setModalMessage(response.message);
+      await Swal.fire({
+        title: '오류',
+        text: response.message,
+        icon: 'error',
+        confirmButtonText: '확인',
+      });
     } else if (response.status === 'success') {
-      setIsModalOpen(true);
-      setModalMessage(response.message);
+      await Swal.fire({
+        title: '성공',
+        text: response.message,
+        icon: 'success',
+        confirmButtonText: '확인',
+      });
       if (!isEditMode) {
         clear();
       }
-      setTimeout(() => {
-        setIsModalOpen(false);
-        router.push('/client-list');
-      }, 1500);
+      router.push('/client-list');
     }
-    setIsModalOpen(true);
   }
 
   function clear() {
@@ -388,7 +391,6 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
           {isEditMode ? '수정' : '등록'}
         </button>
       </form>
-      {isModalOpen && <Modal message={modalMessage} onClose={() => setIsModalOpen(false)} />}
     </div>
   );
 }
