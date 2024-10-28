@@ -2,7 +2,7 @@
 import { formatPhoneNumber } from '@/util/reform';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useState } from 'react';
-import Logging from '../Logging';
+import Logging from '../ETC/Logging';
 import styles from './SignInPage.module.css';
 
 export default function SigninForm({ signin }) {
