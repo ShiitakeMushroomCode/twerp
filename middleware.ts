@@ -59,7 +59,7 @@ export async function middleware(request: NextRequest) {
               maxAge: 60 * 60, // 1시간
               path: '/',
               httpOnly: true,
-              sameSite: 'lax',
+              sameSite: 'strict',
               secure: true,
             });
             return response;

@@ -25,7 +25,7 @@ export async function signin(formData: FormData) {
         httpOnly: true,
         maxAge: 60 * 60,
         path: '/',
-        sameSite: 'lax',
+        sameSite: 'strict',
         secure: true,
       });
       cookies().set({
@@ -34,7 +34,7 @@ export async function signin(formData: FormData) {
         httpOnly: true,
         maxAge: 60 * 60 * 24 * 30,
         path: '/',
-        sameSite: 'lax',
+        sameSite: 'strict',
         secure: true,
       });
       window.location.reload();
