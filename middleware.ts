@@ -8,9 +8,9 @@ export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get('accessToken');
   const refreshToken = request.cookies.get('refreshToken');
 
-  console.log(
-    `${request.url}: accessToken = ${accessToken ? true : false}, refreshToken = ${refreshToken ? true : false}`
-  );
+  // console.log(
+  //   `${request.url}: accessToken = ${accessToken ? true : false}, refreshToken = ${refreshToken ? true : false}`
+  // );
 
   // 로그인도 안하고 엄한데 들어가는 거 막기
   if (!PUBLIC_ROUTES.includes(request.nextUrl.pathname) && !accessToken) {

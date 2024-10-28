@@ -19,6 +19,7 @@ export interface ClientFormData {
   tell_number: string;
   fax_number: string;
   billing_email: string;
+  description: string;
 }
 
 interface FormErrors {
@@ -58,6 +59,7 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
     tell_number: initialData?.tell_number ? formatPhoneNumber(initialData.tell_number) : '',
     fax_number: initialData?.fax_number ? formatPhoneNumber(initialData.fax_number) : '',
     billing_email: initialData?.billing_email || '',
+    description: initialData?.description || '',
   }));
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -86,7 +88,6 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
     let filteredValue = value;
-
     if (['business_number', 'tell_number', 'fax_number'].includes(name)) {
       const numericValue = value.replace(/[^0-9]/g, '');
 
@@ -114,7 +115,6 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const newErrors: FormErrors = {};
-
     if (!formData.business_number) newErrors.business_number = '사업자번호는 필수입니다.';
     if (!formData.company_name) newErrors.company_name = '상호는 필수입니다.';
     if (formData.billing_email && errors.billing_email) newErrors.billing_email = errors.billing_email;
@@ -133,9 +133,7 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
       fax_number: formData.fax_number.replace(/-/g, ''),
       start_date: formattedStartDate,
     };
-
     const response = await onSubmit(submitData);
-
     if (response.status === 'error') {
       setModalMessage(response.message);
     } else if (response.status === 'success') {
@@ -164,6 +162,7 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
       tell_number: '',
       fax_number: '',
       billing_email: '',
+      description: '',
     });
     setStartDate(null);
     setErrors({});
@@ -357,6 +356,23 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
             autoComplete="off"
             value={formData.billing_email}
             title={formData.billing_email}
+            disabled={isSearch}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className={styles['form-row']}>
+          <label htmlFor="description" className={styles.label}>
+            적요
+          </label>
+          <input
+            id="description"
+            name="description"
+            type="text"
+            className={styles.input}
+            autoComplete="off"
+            value={formData.description}
+            title={formData.description}
             disabled={isSearch}
             onChange={handleChange}
           />

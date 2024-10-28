@@ -12,7 +12,7 @@ const logger = winston.createLogger({
       return `${time} [${level.toUpperCase()}]: ${message}`;
     })
   ),
-  transports: [new winston.transports.Console(), new winston.transports.File({ filename: 'not-found.log' })],
+  transports: [/*new winston.transports.Console(),*/ new winston.transports.File({ filename: 'not-found.log' })],
 });
 
 export async function POST(request: NextRequest) {

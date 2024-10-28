@@ -1,5 +1,6 @@
 'use client';
 
+import { formatPhoneNumber } from '@/util/reform';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import styles from './ListItem.module.css';
@@ -10,6 +11,9 @@ interface Company {
   company_name: string;
   is_registered: boolean;
   clients_id: string;
+  representative_name: string;
+  tell_number: string;
+  fax_number: string;
 }
 
 interface ListItemProps {
@@ -26,7 +30,7 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
   const pageSize = 15;
   const router = useRouter();
 
-  function editRoute(clients_id) {
+  function editRoute(clients_id: string) {
     router.push(`https://werp.p-e.kr/client-edit/${clients_id}`);
   }
 
@@ -66,13 +70,19 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
           <div className={styles.tableContainer}>
             <table className={styles.table}>
               <colgroup>
+                <col style={{ width: '15%' }} />
                 <col style={{ width: '30%' }} />
-                <col style={{ width: '70%' }} />
+                <col style={{ width: '15%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '20%' }} />
               </colgroup>
               <thead className={styles.tableHeader}>
                 <tr>
                   <th>사업자번호</th>
                   <th>기업명</th>
+                  <th>대표자명</th>
+                  <th>전화번호</th>
+                  <th>팩스번호</th>
                 </tr>
               </thead>
               <tbody>
@@ -88,14 +98,15 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
                       <td className={styles.centerAlign}>
                         {item.business_number.replace(/(\d{3})(\d{2})(\d{5})/, '$1-$2-$3')}
                       </td>
-                      <td>
-                        <span className={styles.company_name}>{item.company_name}</span>
-                      </td>
+                      <td className={styles.leftAlign}>{item.company_name}</td>
+                      <td className={styles.centerAlign}>{item.representative_name}</td>
+                      <td className={styles.centerAlign}>{formatPhoneNumber(item.tell_number)}</td>
+                      <td className={styles.centerAlign}>{formatPhoneNumber(item.fax_number)}</td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={3} className={styles.noResult}>
+                    <td colSpan={5} className={styles.noResult}>
                       검색 결과가 없습니다
                     </td>
                   </tr>
