@@ -6,14 +6,14 @@ import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import Swal from 'sweetalert2';
 
-export default function ReForm({ sendMail }: { sendMail: () => void }) {
+export default function ReForm({ sendMail }: { sendMail: (formData: any) => Promise<void> }) {
   const [isSendMail, setIsSendMail] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [newPhoneNumber, setNewPhoneNumber] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const phoneFormRef = useRef<HTMLFormElement>(null);
   const emailFormRef = useRef<HTMLFormElement>(null);
-  const router = useRouter(); // useRouter 훅 호출
+  const router = useRouter();
 
   function handlePhoneChange(e: React.ChangeEvent<HTMLInputElement>) {
     let value = e.target.value.replace(/\D/g, '');
@@ -27,14 +27,21 @@ export default function ReForm({ sendMail }: { sendMail: () => void }) {
     e.preventDefault();
     if (newPhoneNumber.length >= 10 && newPhoneNumber.length <= 12) {
       setIsSendMail(true);
-      phoneFormRef.current?.requestSubmit(); // 메일 발송
-      await openPhoneVerificationModal(
+
+      const modalClosePromise = openPhoneVerificationModal(
         newPhoneNumber,
         () => {
           setIsSendMail(false);
         },
         router
-      ); // router 전달
+      );
+
+      const formData = { phoneNumber: newPhoneNumber };
+      sendMail(formData).finally(() => {
+        modalClosePromise.then(() => {
+          setIsSendMail(false);
+        });
+      });
     } else {
       await Swal.fire({
         title: '잘못된 입력',
@@ -50,14 +57,21 @@ export default function ReForm({ sendMail }: { sendMail: () => void }) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (emailRegex.test(newEmail)) {
       setIsSendMail(true);
-      emailFormRef.current?.requestSubmit(); // 메일 발송
-      await openEmailVerificationModal(
+
+      const modalClosePromise = openEmailVerificationModal(
         newEmail,
         () => {
           setIsSendMail(false);
         },
         router
-      ); // router 전달
+      );
+
+      const formData = { email: newEmail };
+      sendMail(formData).finally(() => {
+        modalClosePromise.then(() => {
+          setIsSendMail(false);
+        });
+      });
     } else {
       await Swal.fire({
         title: '잘못된 입력',
@@ -70,7 +84,7 @@ export default function ReForm({ sendMail }: { sendMail: () => void }) {
 
   return (
     <div className={styles.reFormContent}>
-      <form ref={phoneFormRef} action={sendMail} className={styles.info}>
+      <form ref={phoneFormRef} className={styles.info}>
         <label className={styles.flabel}>전화번호</label>
         <input
           type="text"
@@ -87,7 +101,7 @@ export default function ReForm({ sendMail }: { sendMail: () => void }) {
         </button>
       </form>
 
-      <form ref={emailFormRef} action={sendMail} className={styles.info}>
+      <form ref={emailFormRef} className={styles.info}>
         <label className={styles.flabel}>이메일</label>
         <input
           type="email"

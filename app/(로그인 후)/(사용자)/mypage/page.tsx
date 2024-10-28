@@ -11,7 +11,7 @@ async function getUserData() {
   'use server';
   return await getTokenUserData();
 }
-async function sendMail(formData) {
+async function sendMail(formData): Promise<void> {
   'use server';
   const data = (await getTokenUserData()) as ACT;
   const response = await fetch(`${process.env.API_URL}/sendEmail`, {

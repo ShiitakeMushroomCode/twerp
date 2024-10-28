@@ -6,7 +6,7 @@ export async function openPhoneVerificationModal(
   router: any // router를 매개변수로 전달
 ) {
   const { value: verificationCode } = await Swal.fire({
-    title: '전화번호 인증 코드 입력',
+    title: '전화번호 변경 인증 코드 입력',
     input: 'text',
     inputPlaceholder: '인증 코드를 입력하세요',
     showCancelButton: true,
@@ -58,7 +58,7 @@ export async function openEmailVerificationModal(
   router: any // router를 매개변수로 전달
 ) {
   const { value: verificationCode } = await Swal.fire({
-    title: '이메일 인증 코드 입력',
+    title: '이메일 변경 인증 코드 입력',
     input: 'text',
     inputPlaceholder: '인증 코드를 입력하세요',
     showCancelButton: true,
