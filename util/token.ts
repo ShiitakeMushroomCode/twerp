@@ -17,13 +17,6 @@ import { cookies } from 'next/headers';
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
-export function getCookieDomain(): string {
-  if (process.env.NODE_ENV === 'production') {
-    return process.env.DOMAIN_URL;
-  }
-  return undefined; // 개발 환경에서는 도메인 설정 생략
-}
-
 export async function StoreAndGetUserData(userId: any, refreshToken: any) {
   let user;
   try {

@@ -2,7 +2,7 @@ import { removeRefreshTokenFromDB } from '@/util/token';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { NextRequest, NextResponse } from 'next/server';
-export const runtime = 'nodejs';
+
 export async function POST(request: NextRequest) {
   const data = await request.json();
   const refreshToken = await data?.refreshToken?.value;

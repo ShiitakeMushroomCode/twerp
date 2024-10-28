@@ -3,7 +3,7 @@ import { generateAccessToken, getInnerData } from '@/util/token';
 import { ACT } from 'auth';
 import { jwtVerify } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
-export const runtime = 'nodejs';
+
 const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 async function verifyRefreshToken(refreshToken: string) {
   try {
@@ -16,7 +16,7 @@ async function verifyRefreshToken(refreshToken: string) {
 
 export async function POST(request: NextRequest) {
   const d = await request.json();
-  const refreshToken = await d?.refreshToken;
+  const refreshToken = await d?.refreshToken?.value;
   // 리프레시 토큰 있어야함
   if (!refreshToken) {
     return NextResponse.json({ error: '리프레시 토큰 없는듯' }, { status: 401 });

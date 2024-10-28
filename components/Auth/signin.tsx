@@ -5,7 +5,7 @@ import { ChangeEvent, useState } from 'react';
 import Logging from '../ETC/Logging';
 import styles from './SignInPage.module.css';
 
-export default function SigninForm() {
+export default function SigninForm({ signin }) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
@@ -24,38 +24,12 @@ export default function SigninForm() {
     e.preventDefault();
     setError('');
     const formData = new FormData(e.currentTarget);
-    const data = {
-      id: formData.get('phone_number')?.toString().replace(/-/g, '') || '',
-      password: formData.get('password')?.toString() || '',
-    };
+    const response = await signin(formData);
 
-<<<<<<< HEAD
-    try {
-      const response = await fetch('/api/auth/signin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-        credentials: 'include', // 쿠키 포함
-      });
-
-      if (response.ok) {
-        // API에서 쿠키가 설정되었으므로, 홈 페이지로 리다이렉트
-        router.refresh();
-      } else {
-        const errorData = await response.json();
-        setError(errorData.error || '로그인에 실패했습니다. 다시 시도하세요.');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      setError('로그인 중 오류가 발생했습니다. 다시 시도하세요.');
-=======
     if (response === null) {
       setError('로그인에 실패했습니다. 다시 시도하세요.');
     } else {
       router.push('/');
->>>>>>> 이게-맞나
     }
   }
 

@@ -3,7 +3,7 @@ import { deleteVerificationToken, getTokenUserData, getVerificationToken, update
 import { ACT } from 'auth';
 import { jwtVerify } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
-export const runtime = 'nodejs';
+
 const secretKey = new TextEncoder().encode(process.env.JWT_SECRET!);
 
 export async function POST(request: NextRequest) {

@@ -1,11 +1,10 @@
 import SigninForm from '@/components/Auth/signin';
+import { cookies } from 'next/headers';
 
 export const metadata = {
   title: '로그인',
 };
 
-<<<<<<< HEAD
-=======
 async function signin(formData: FormData) {
   'use server';
   try {
@@ -51,9 +50,8 @@ async function signin(formData: FormData) {
   }
 }
 
->>>>>>> 이게-맞나
 export const dynamic = 'force-dynamic';
 
-export default function SignInPage() {
-  return <SigninForm />;
+export default async function SignInPage() {
+  return <SigninForm signin={signin} />;
 }

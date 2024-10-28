@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import winston from 'winston';
-export const runtime = 'nodejs';
+
 const logger = winston.createLogger({
   level: 'info',
   format: winston.format.combine(
