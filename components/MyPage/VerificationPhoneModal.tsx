@@ -1,6 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
 import styles from './VerificationModal.module.css';
 
 interface VerificationPhoneModalProps {
@@ -23,8 +24,14 @@ export default function VerificationPhoneModal({ newPhoneNumber, isOpen, onClose
       setTimeLeft((prevTime) => {
         if (prevTime <= 1) {
           clearInterval(timer);
-          onClose();
-          alert('시간이 만료되었습니다. 다시 시도해주세요.');
+          Swal.fire({
+            title: '시간 만료',
+            text: '시간이 만료되었습니다. 다시 시도해주세요.',
+            icon: 'warning',
+            confirmButtonText: '확인',
+          }).then(() => {
+            onClose();
+          });
           return 0;
         }
         return prevTime - 1;
@@ -46,11 +53,21 @@ export default function VerificationPhoneModal({ newPhoneNumber, isOpen, onClose
 
     const result = await response.json();
     if (response.ok) {
-      alert(result.message);
+      await Swal.fire({
+        title: '성공',
+        text: result.message,
+        icon: 'success',
+        confirmButtonText: '확인',
+      });
       router.push('/signout');
       onClose();
     } else {
-      alert(result.error);
+      await Swal.fire({
+        title: '오류',
+        text: result.error,
+        icon: 'error',
+        confirmButtonText: '확인',
+      });
     }
   }
 

@@ -28,6 +28,7 @@
     "react-daum-postcode": "^3.1.3",
     "react-dom": "^18.3.1",
     "sharp": "^0.33.5",
+    "sweetalert2": "^11.14.4",
     "winston": "^3.15.0"
   },
   "devDependencies": {

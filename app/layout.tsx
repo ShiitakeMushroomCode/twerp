@@ -1,6 +1,7 @@
 import Footer from '@/components/Footer/Footer';
 import '@/styles/global.css';
 import { Metadata } from 'next';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 export const metadata: Metadata = {
   title: {
