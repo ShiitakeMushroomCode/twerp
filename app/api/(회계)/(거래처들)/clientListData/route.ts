@@ -70,7 +70,8 @@ export async function POST(request: NextRequest) {
           company_name,
           representative_name,
           tell_number,
-          fax_number 
+          fax_number,
+          description
         FROM clients
         WHERE company_id = ?
         ${orderByClause}
@@ -100,7 +101,8 @@ export async function POST(request: NextRequest) {
           company_name,
           representative_name,
           tell_number,
-          fax_number 
+          fax_number,
+          description
         FROM clients
         WHERE company_id = ? 
         AND (

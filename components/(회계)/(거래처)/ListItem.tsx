@@ -15,6 +15,7 @@ interface Company {
   representative_name: string;
   tell_number: string;
   fax_number: string;
+  description: string;
 }
 
 interface ListItemProps {
@@ -154,6 +155,7 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
                       onClick={() => {
                         editRoute(item.clients_id);
                       }}
+                      title={item.description}
                     >
                       <td className={styles.centerAlign}>
                         {item.business_number.replace(/(\d{3})(\d{2})(\d{5})/, '$1-$2-$3')}
