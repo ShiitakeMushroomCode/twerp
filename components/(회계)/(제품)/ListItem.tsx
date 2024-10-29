@@ -163,7 +163,7 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
                       <td className={styles.centerAlign}>{item.product_name}</td>
                       <td className={styles.centerAlign}>{item.category || '없음'}</td>
                       <td className={styles.rightAlign}>
-                        {item.price === null || item.price === undefined ? 0 : formatPrice(item.price)}
+                        {item.price === null || item.price === undefined ? 0 : formatPrice(item.price) + '원'}
                       </td>
                       <td className={styles.centerAlign}>{item.manufacturer || '없음'}</td>
                       <td className={styles.centerAlign}>{item.is_use}</td>

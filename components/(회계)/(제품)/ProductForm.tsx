@@ -253,7 +253,6 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
             inputMode="numeric"
             pattern="^-?\d*$"
             className={styles.input}
-            required
             autoComplete="off"
             value={formData.price === 0 ? '' : formData.price.toString()}
             title={formData.price.toString()}
