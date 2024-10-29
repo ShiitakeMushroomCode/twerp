@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     if ((await updateProduct(data)) === true) {
       return NextResponse.json(
         {
-          message: '제품 수정 성공했습니다.',
+          message: '제품 수정을 성공했습니다.',
         },
         { status: 200 }
       );

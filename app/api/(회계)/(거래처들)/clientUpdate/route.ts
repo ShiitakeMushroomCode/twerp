@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     if ((await updateClient(data)) === true) {
       return NextResponse.json(
         {
-          message: '클라이언트 수정 성공했습니다.',
+          message: '클라이언트 수정을 성공했습니다.',
         },
         { status: 200 }
       );
