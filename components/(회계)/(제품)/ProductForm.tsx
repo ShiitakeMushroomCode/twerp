@@ -2,6 +2,7 @@
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useState } from 'react';
+import { FaTrashAlt } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import DatePicker from '../(공용)/DatePicker';
 import styles from './ProductForm.module.css';
@@ -45,6 +46,65 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
   );
   const router = useRouter();
 
+  async function handleDelete() {
+    if (!formData.product_id) {
+      await Swal.fire({
+        title: '오류',
+        text: '삭제할 제품의 ID가 필요합니다.',
+        icon: 'error',
+        confirmButtonText: '확인',
+      });
+      return;
+    }
+
+    const confirmResult = await Swal.fire({
+      title: '삭제 확인',
+      text: '정말로 이 제품을 삭제하시겠습니까?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: '삭제',
+      cancelButtonText: '취소',
+    });
+
+    if (confirmResult.isConfirmed) {
+      try {
+        const response = await fetch(`/api/itemDelete`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ product_id: formData.product_id }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          await Swal.fire({
+            title: '성공',
+            text: data.message,
+            icon: 'success',
+            confirmButtonText: '확인',
+          });
+          router.push('/items-list');
+        } else {
+          await Swal.fire({
+            title: '오류',
+            text: data.message,
+            icon: 'error',
+            confirmButtonText: '확인',
+          });
+        }
+      } catch (error) {
+        console.error('삭제 요청 중 오류 발생:', error);
+        await Swal.fire({
+          title: '오류',
+          text: '제품 삭제 중 오류가 발생했습니다.',
+          icon: 'error',
+          confirmButtonText: '확인',
+        });
+      }
+    }
+  }
   function handleDateChange(date: Date | null) {
     if (date) {
       setStartDate(date);
@@ -140,7 +200,13 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
     <div>
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.title}>
-          <span>{isEditMode ? '제품 수정하기' : '제품 추가하기'}</span>
+          <span>{isEditMode ? '제품 수정하기' : '제품 추가하기'}</span>{' '}
+          {isEditMode && (
+            <button type="button" className={styles.delButton} onClick={handleDelete} title="제품 삭제">
+              삭제
+              <FaTrashAlt style={{ marginLeft: '0.5rem' }} />
+            </button>
+          )}
         </div>
 
         <div className={styles['form-row']}>
