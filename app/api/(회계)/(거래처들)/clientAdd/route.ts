@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     if ((await insertClient(data)) === true) {
       return NextResponse.json(
         {
-          message: '클라이언트 생성을 성공했습니다.',
+          message: '클라이언트가 성공적으로 생성되었습니다.',
         },
         { status: 200 }
       );

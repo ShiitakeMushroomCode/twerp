@@ -58,9 +58,9 @@ export async function POST(request: NextRequest) {
   try {
     await transporter.sendMail(mailOptions);
     await saveVerificationToken(userId, await generateCertificationToken({ userId: userId, cn: cn }));
-    return NextResponse.json({ message: '이메일 전송에 성공했습니다.' }, { status: 200 });
+    return NextResponse.json({ message: '이메일이 성공적으로 전송되었습니다..' }, { status: 200 });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ message: '이메일 전송 실패' }, { status: 500 });
+    return NextResponse.json({ message: '이메일 전송에 실패하였습니다.' }, { status: 500 });
   }
 }

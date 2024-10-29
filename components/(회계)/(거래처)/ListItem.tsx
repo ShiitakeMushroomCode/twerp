@@ -76,7 +76,7 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
           console.error('데이터 형식이 올바르지 않습니다:', result);
         }
       } catch (error) {
-        console.error('데이터를 가져오는데 실패했습니다:', error);
+        console.error('데이터를 가져오는데 실패하였습니다:', error);
       } finally {
         setIsLoading(false);
       }

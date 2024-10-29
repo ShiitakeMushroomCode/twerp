@@ -59,7 +59,7 @@ async function updateProduct(formData: ProductFormData): Promise<{ status: strin
       return { status: 'success', message: '제품이 성공적으로 수정되었습니다.' };
     } else {
       const errorData = await res.json();
-      return { status: 'error', message: errorData.message || '제품 수정에 실패했습니다.' };
+      return { status: 'error', message: errorData.message || '제품 수정에 실패하였습니다.' };
     }
   } catch (error) {
     console.error('API 요청 중 에러 발생:', error);

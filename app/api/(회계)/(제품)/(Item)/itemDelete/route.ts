@@ -8,7 +8,7 @@ export async function DELETE(request: NextRequest) {
     if ((await deleteProduct(data?.product_id)) === true) {
       return NextResponse.json(
         {
-          message: '제품 삭제를 성공했습니다.',
+          message: '제품이 성공적으로 삭제되었습니다.',
         },
         { status: 200 }
       );

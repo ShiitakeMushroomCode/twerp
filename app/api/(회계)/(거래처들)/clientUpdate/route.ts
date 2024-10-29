@@ -8,14 +8,14 @@ export async function POST(request: NextRequest) {
     if ((await updateClient(data)) === true) {
       return NextResponse.json(
         {
-          message: '클라이언트 수정을 성공했습니다.',
+          message: '클라이언트가 성공적으로 수정되었습니다.',
         },
         { status: 200 }
       );
     } else {
       return NextResponse.json(
         {
-          message: '클라이언트 수정 실패, 존재하지 않는 클라이언트입니다.',
+          message: '클라이언트 수정에 실패하였습니다.\n 존재하지 않는 클라이언트입니다.',
         },
         { status: 400 }
       );

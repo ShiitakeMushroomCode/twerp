@@ -27,7 +27,7 @@ export default function SigninForm({ signin }) {
     const response = await signin(formData);
 
     if (response === null) {
-      setError('로그인에 실패했습니다. 다시 시도하세요.');
+      setError('로그인에 실패하였습니다. 다시 시도하세요.');
     } else {
       router.push('/');
     }

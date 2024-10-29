@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json({
       accessToken: accessToken,
       refreshToken: refreshToken,
-      message: '로그인을 성공했습니다.',
+      message: '성공적으로 로그인되었습니다..',
     });
 
     return response;
