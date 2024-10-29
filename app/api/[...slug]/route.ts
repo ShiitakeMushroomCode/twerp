@@ -5,7 +5,7 @@ export async function GET(request: Request) {
 
   // 로깅 API 호출
   try {
-    await fetch(`/api/log`, {
+    await fetch(`${process.env.API_URL}/log`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
 
   // 로깅 API 호출
   try {
-    await fetch(`/api/log`, {
+    await fetch(`${process.env.API_URL}/log`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

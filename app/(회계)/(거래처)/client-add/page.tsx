@@ -39,7 +39,7 @@ async function addClient(formData: ClientFormData): Promise<{ status: string; me
     const validValue = jsonResponse.data[0].valid;
 
     if (validValue === '01') {
-      const res = await fetch(`/api/clientAdd`, {
+      const res = await fetch(`${process.env.API_URL}/clientAdd`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Cookie: cookies().toString() },
         body: JSON.stringify(formData),

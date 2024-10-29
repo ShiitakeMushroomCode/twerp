@@ -22,7 +22,7 @@ export async function openPhoneVerificationModal(
   });
 
   if (verificationCode) {
-    const response = await fetch(`/api/verifyCodePhone`, {
+    const response = await fetch(`${process.env.API_URL}/verifyCodePhone`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ inputCode: verificationCode, newPhoneNumber: newPhoneNumber }),
@@ -74,7 +74,7 @@ export async function openEmailVerificationModal(
   });
 
   if (verificationCode) {
-    const response = await fetch(`/api/verifyCodeEmail`, {
+    const response = await fetch(`${process.env.API_URL}/verifyCodeEmail`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ inputCode: verificationCode, newEmail: newEmail }),

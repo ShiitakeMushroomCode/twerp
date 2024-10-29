@@ -96,3 +96,14 @@
   margin: 0 auto;
   text-align: center;
 }
+
+.dateInput {
+  flex: 1;
+  padding: 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: large;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+}

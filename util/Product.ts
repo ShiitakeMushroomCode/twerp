@@ -55,7 +55,7 @@ export async function deleteProduct(product_id: string | undefined): Promise<boo
     throw new Error('companyId를 찾을 수 없습니다.');
   }
 
-  const companyIdBuffer = Buffer.from(companyId['data']);
+  const companyIdBuffer = Buffer.from(companyId['data'], 'hex');
 
   if (await hasProductById(companyIdBuffer, product_id)) {
     const bufferId = Buffer.from(product_id.replace(/-/g, ''), 'hex');
@@ -96,7 +96,7 @@ export async function insertProduct(productData: ProductData): Promise<boolean> 
       throw new Error('companyId를 찾을 수 없습니다.');
     }
 
-    const companyIdBuffer = Buffer.from(companyId['data']);
+    const companyIdBuffer = Buffer.from(companyId['data'], 'hex');
 
     if (!(await hasProduct(companyIdBuffer, productData.product_name))) {
       const sql = `
@@ -112,7 +112,7 @@ export async function insertProduct(productData: ProductData): Promise<boolean> 
           description,
           image_url
         ) VALUES (
-          UUID_TO_BIN(UUID()),
+          unhex(replace(uuid(),'-','')),
           ?, ?, ?, ?, ?, ?, ?, ?, ?
         )
       `;
@@ -157,7 +157,7 @@ export async function updateProduct(productData: ProductData): Promise<boolean> 
       throw new Error('companyId를 찾을 수 없습니다.');
     }
 
-    const companyIdBuffer = Buffer.from(companyId['data']);
+    const companyIdBuffer = Buffer.from(companyId['data'], 'hex');
 
     if (await hasProductById(companyIdBuffer, productData.product_id)) {
       const bufferId = Buffer.from(productData.product_id.replace(/-/g, ''), 'hex');

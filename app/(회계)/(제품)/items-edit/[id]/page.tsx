@@ -1,5 +1,3 @@
-// app/(회계)/(제품)/items-edit/[id]/page.tsx
-
 import ProductForm, { ProductFormData } from '@/components/(회계)/(제품)/ProductForm';
 import { executeQuery } from '@/lib/db';
 import { revalidatePath } from 'next/cache';
@@ -19,6 +17,7 @@ interface PageProps {
 }
 
 async function fetchProductData(id: string): Promise<ProductFormData> {
+  'use server';
   if (!id) {
     throw new Error('product_id가 제공되지 않았습니다.');
   }
@@ -47,8 +46,9 @@ async function fetchProductData(id: string): Promise<ProductFormData> {
 }
 
 async function updateProduct(formData: ProductFormData): Promise<{ status: string; message: string }> {
+  'use server';
   try {
-    const res = await fetch('/api/productUpdate', {
+    const res = await fetch(`${process.env.API_URL}/itemUpdate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Cookie: cookies().toString() },
       body: JSON.stringify(formData),

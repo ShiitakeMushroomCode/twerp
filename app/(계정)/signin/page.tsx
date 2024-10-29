@@ -12,7 +12,7 @@ async function signin(formData: FormData) {
       id: formData.get('phone_number').toString().replace(/-/g, ''),
       password: formData.get('password'),
     };
-    const response = await fetch(`/api/auth/signin`, {
+    const response = await fetch(`${process.env.API_URL}/auth/signin`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

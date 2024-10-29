@@ -10,14 +10,14 @@ async function addProduct(formData: ProductFormData): Promise<{ status: string; 
   'use server';
 
   try {
-    const res = await fetch(`/api/itemAdd`, {
+    const res = await fetch(`${process.env.API_URL}/itemAdd`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Cookie: cookies().toString() },
       body: JSON.stringify(formData),
       credentials: 'include',
     });
     if (res.ok) {
-      revalidatePath('/product-list');
+      revalidatePath('/items-list');
       return { status: 'success', message: '제품이 성공적으로 등록되었습니다.' };
     } else {
       return { status: 'error', message: (await res.json()).message };

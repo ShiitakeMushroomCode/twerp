@@ -1,5 +1,6 @@
 'use client';
 
+import Spinner from '@/components/ETC/Spinner/Spinner';
 import { formatPrice } from '@/util/reform';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -12,6 +13,7 @@ interface Product {
   price: number;
   manufacturer: string;
   is_use: string;
+  description: string;
 }
 
 interface ListItemProps {
@@ -29,7 +31,7 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
   const router = useRouter();
 
   function editRoute(product_id: string) {
-    router.push(`/product-edit/${product_id}`);
+    router.push(`/items-edit/${product_id}`);
   }
 
   useEffect(() => {
@@ -62,18 +64,17 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
   return (
     <div className={styles.container}>
       {isLoading ? (
-        <p className={styles.loading}>로딩 중...</p>
+        <Spinner />
       ) : (
         <>
           <div className={styles.tableContainer}>
             <table className={styles.table}>
               <colgroup>
-                <col style={{ width: '20%' }} />
-                <col style={{ width: '25%' }} />
-                <col style={{ width: '15%' }} />
-                <col style={{ width: '20%' }} />
-                <col style={{ width: '10%' }} />
-                <col style={{ width: '10%' }} />
+                <col style={{ width: '22%' }} />
+                <col style={{ width: '27%' }} />
+                <col style={{ width: '17%' }} />
+                <col style={{ width: '22%' }} />
+                <col style={{ width: '12%' }} />
               </colgroup>
               <thead className={styles.tableHeader}>
                 <tr>
@@ -82,7 +83,6 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
                   <th>가격</th>
                   <th>제조업체</th>
                   <th>사용 여부</th>
-                  <th>관리</th>
                 </tr>
               </thead>
               <tbody>
@@ -94,20 +94,20 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
                       onClick={() => {
                         editRoute(item.product_id);
                       }}
+                      title={item.description}
                     >
-                      <td className={styles.leftAlign}>{item.product_name}</td>
-                      <td className={styles.centerAlign}>{item.category || 'N/A'}</td>
-                      <td className={styles.rightAlign}>{formatPrice(item.price)}</td>
-                      <td className={styles.centerAlign}>{item.manufacturer || 'N/A'}</td>
-                      <td className={styles.centerAlign}>{item.is_use}</td>
-                      <td className={styles.centerAlign}>
-                        <button onClick={() => editRoute(item.product_id)}>수정</button>
+                      <td className={styles.centerAlign}>{item.product_name}</td>
+                      <td className={styles.centerAlign}>{item.category || '없음'}</td>
+                      <td className={styles.rightAlign}>
+                        {item.price === null || undefined ? 0 : formatPrice(item.price)}
                       </td>
+                      <td className={styles.centerAlign}>{item.manufacturer || '없음'}</td>
+                      <td className={styles.centerAlign}>{item.is_use}</td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={6} className={styles.noResult}>
+                    <td colSpan={5} className={styles.noResult}>
                       검색 결과가 없습니다
                     </td>
                   </tr>

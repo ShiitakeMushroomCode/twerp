@@ -25,13 +25,13 @@ export async function deleteClient(business_number: string): Promise<boolean> {
     const companyId = (await getTokenUserData())['companyId'];
 
     // 클라이언트 존재 여부 확인
-    if (await hasClient(Buffer.from(companyId['data']), business_number)) {
+    if (await hasClient(Buffer.from(companyId['data'], 'hex'), business_number)) {
       const sql = `
         DELETE FROM clients
         WHERE company_id = ? AND business_number = ?
       `;
 
-      const params = [Buffer.from(companyId['data']), business_number];
+      const params = [Buffer.from(companyId['data'], 'hex'), business_number];
 
       await executeQuery(sql, params);
 
@@ -65,7 +65,7 @@ interface ClientData {
 export async function insertClient(clientData: ClientData): Promise<boolean> {
   try {
     const companyId = (await getTokenUserData())['companyId'];
-    if (!(await hasClient(Buffer.from(companyId['data']), clientData.business_number))) {
+    if (!(await hasClient(Buffer.from(companyId['data'], 'hex'), clientData.business_number))) {
       const sql = `
       INSERT INTO clients (
         company_id,
@@ -86,7 +86,7 @@ export async function insertClient(clientData: ClientData): Promise<boolean> {
     `;
 
       const params = [
-        Buffer.from(companyId['data']),
+        Buffer.from(companyId['data'], 'hex'),
         clientData.business_number,
         clientData.company_name,
         clientData.representative_name || null,
@@ -119,7 +119,7 @@ export async function insertClient(clientData: ClientData): Promise<boolean> {
 export async function updateClient(clientData: ClientData): Promise<boolean> {
   try {
     const companyId = (await getTokenUserData())['companyId'];
-    if (await hasClient(Buffer.from(companyId['data']), clientData.business_number)) {
+    if (await hasClient(Buffer.from(companyId['data'], 'hex'), clientData.business_number)) {
       const sql = `
         UPDATE clients
         SET
@@ -148,7 +148,7 @@ export async function updateClient(clientData: ClientData): Promise<boolean> {
         clientData.business_status || null,
         clientData.main_item_name || null,
         clientData.description || null,
-        Buffer.from(companyId['data']),
+        Buffer.from(companyId['data'], 'hex'),
         clientData.business_number,
       ];
 

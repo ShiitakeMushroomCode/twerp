@@ -1,0 +1,13 @@
+.spinnerContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 200px; /* 필요에 따라 조정 */
+}
+
+.loadingText {
+  margin-top: 10px;
+  font-size: 1.2rem;
+  color: #555;
+}

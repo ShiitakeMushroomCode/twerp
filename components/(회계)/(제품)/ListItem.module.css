@@ -21,7 +21,6 @@
   border-collapse: collapse;
   table-layout: fixed;
 }
-
 .table th,
 .table td {
   padding: 12px;
@@ -31,7 +30,20 @@
 
 .table th {
   background-color: #f0f0f0;
-  text-align: center; 
+  text-align: center;
+}
+
+.tableRow:hover {
+  background-color: #f9f9f9;
+  cursor: pointer;
+}
+
+.rightAlign {
+  text-align: right;
+}
+
+.centerAlign {
+  text-align: center;
 }
 
 .tableRow:hover {

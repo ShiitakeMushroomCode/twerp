@@ -1,5 +1,6 @@
 'use client';
 
+import Spinner from '@/components/ETC/Spinner/Spinner';
 import { formatPhoneNumber } from '@/util/reform';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -31,7 +32,7 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
   const router = useRouter();
 
   function editRoute(clients_id: string) {
-    router.push(`https://werp.p-e.kr/client-edit/${clients_id}`);
+    router.push(`/client-edit/${clients_id}`);
   }
 
   useEffect(() => {
@@ -64,7 +65,7 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
   return (
     <div className={styles.container}>
       {isLoading ? (
-        <p className={styles.loading}>로딩 중...</p>
+        <Spinner />
       ) : (
         <>
           <div className={styles.tableContainer}>

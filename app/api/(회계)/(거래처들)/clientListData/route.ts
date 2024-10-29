@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     // 토큰에서 companyId를 가져와서 Buffer로 변환
     const tokenUserData = await getTokenUserData();
     const companyId = tokenUserData['companyId'];
-    const companyIdBuffer = Buffer.from(companyId['data']);
+    const companyIdBuffer = Buffer.from(companyId['data'], 'hex');
 
     let countQuery: string;
     let selectQuery: string;

@@ -1,7 +1,9 @@
 'use client';
+import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useState } from 'react';
 import Swal from 'sweetalert2';
+import DatePicker from '../(공용)/DatePicker';
 import styles from './ProductForm.module.css';
 
 export interface ProductFormData {
@@ -38,15 +40,47 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
   }));
 
   const [errors, setErrors] = useState<FormErrors>({});
+  const [startDate, setStartDate] = useState<Date | null>(
+    initialData?.start_date ? new Date(initialData.start_date) : null
+  );
   const router = useRouter();
+
+  function handleDateChange(date: Date | null) {
+    if (date) {
+      setStartDate(date);
+      const formattedDate = format(date, 'yyyy-MM-dd'); // 날짜 형식을 'yyyy-MM-dd'로 설정
+      setFormData((prev) => ({
+        ...prev,
+        start_date: formattedDate,
+      }));
+    }
+  }
 
   function handleChange(e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
     const { name, value } = e.target;
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === 'price' ? parseFloat(value) : value,
-    }));
+    if (name === 'price') {
+      // 음수 16자리, 양수 15자리 정규식
+      const regex1 = /^-?\d*\.?\d*$/; // 숫자와 소수점만 허용
+      const isNegative = value.startsWith('-'); // 음수인지 확인
+      const maxLength = isNegative ? 17 : 16; // 음수는 17자리, 양수는 16자리 제한
+
+      // 입력된 값이 유효할 때만 처리
+      if (regex1.test(value) && value.replace(/[^0-9]/g, '').length <= maxLength) {
+        // 쉼표를 제거한 순수 숫자 값
+        const numericValue = value.replace(/,/g, '');
+
+        setFormData((prev) => ({
+          ...prev,
+          price: numericValue === '' || numericValue === '-' ? 0 : parseFloat(numericValue),
+        }));
+      }
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -84,67 +118,7 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
       if (!isEditMode) {
         clear();
       }
-      router.push('/product-list');
-    }
-  }
-
-  async function handleDelete() {
-    if (!formData.product_id) {
-      await Swal.fire({
-        title: '오류',
-        text: '삭제할 제품의 product_id가 필요합니다.',
-        icon: 'error',
-        confirmButtonText: '확인',
-      });
-      return;
-    }
-
-    const confirmResult = await Swal.fire({
-      title: '삭제 확인',
-      text: '정말로 이 제품을 삭제하시겠습니까?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: '삭제',
-      cancelButtonText: '취소',
-    });
-
-    if (confirmResult.isConfirmed) {
-      try {
-        const response = await fetch('/api/productDelete', {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ product_id: formData.product_id }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          await Swal.fire({
-            title: '성공',
-            text: data.message,
-            icon: 'success',
-            confirmButtonText: '확인',
-          });
-          router.push('/product-list');
-        } else {
-          await Swal.fire({
-            title: '오류',
-            text: data.message,
-            icon: 'error',
-            confirmButtonText: '확인',
-          });
-        }
-      } catch (error) {
-        console.error('삭제 요청 중 오류 발생:', error);
-        await Swal.fire({
-          title: '오류',
-          text: '제품 삭제 중 오류가 발생했습니다.',
-          icon: 'error',
-          confirmButtonText: '확인',
-        });
-      }
+      router.push('/items-list');
     }
   }
 
@@ -158,6 +132,7 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
       is_use: '사용',
       description: '',
     });
+    setStartDate(null);
     setErrors({});
   }
 
@@ -166,11 +141,6 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.title}>
           <span>{isEditMode ? '제품 수정하기' : '제품 추가하기'}</span>
-          {isEditMode && (
-            <button type="button" className={styles.delButton} onClick={handleDelete} title="제품 삭제">
-              삭제
-            </button>
-          )}
         </div>
 
         <div className={styles['form-row']}>
@@ -213,13 +183,16 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
           <input
             id="price"
             name="price"
-            type="number"
+            type="text"
+            inputMode="numeric"
+            pattern="^-?\d*$"
             className={styles.input}
             required
             autoComplete="off"
-            value={formData.price}
+            value={formData.price === 0 ? '' : formData.price.toString()}
             title={formData.price.toString()}
             onChange={handleChange}
+            placeholder="숫자와 '-'만 입력 가능합니다."
           />
         </div>
 
@@ -243,16 +216,9 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
           <label htmlFor="start_date" className={styles.label}>
             시작일자
           </label>
-          <input
-            id="start_date"
-            name="start_date"
-            type="date"
-            className={styles.input}
-            autoComplete="off"
-            value={formData.start_date}
-            title={formData.start_date}
-            onChange={handleChange}
-          />
+          <div className={styles.dateInput}>
+            <DatePicker selectedDate={startDate} onDateChange={handleDateChange} inputId="start_date" />
+          </div>
         </div>
 
         <div className={styles['form-row']}>
@@ -283,7 +249,6 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
         <div className={styles['form-row']}>
           {errors.product_name && <span className={styles.error}>{errors.product_name}</span>}
           {errors.price && <span className={styles.error}>{errors.price}</span>}
-          {errors.product_id && <span className={styles.error}>{errors.product_id}</span>}
         </div>
 
         <div className={styles['form-row']}>

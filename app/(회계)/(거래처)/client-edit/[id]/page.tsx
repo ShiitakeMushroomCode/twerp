@@ -68,7 +68,7 @@ async function updateClient(formData: ClientFormData): Promise<{ status: string;
     const validValue = jsonResponse.data[0].valid;
 
     if (validValue === '01') {
-      const res = await fetch(`/api/clientUpdate`, {
+      const res = await fetch(`${process.env.API_URL}/clientUpdate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Cookie: cookies().toString() },
         body: JSON.stringify(formData),

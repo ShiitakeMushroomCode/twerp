@@ -43,7 +43,7 @@ export async function middleware(request: NextRequest) {
       // 액세스 토큰이 만료된 경우 리프레시 토큰을 통해 갱신 시도
       if (refreshToken) {
         try {
-          const res = await fetch(`/api/auth/refresh`, {
+          const res = await fetch(`${process.env.API_URL}/auth/refresh`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

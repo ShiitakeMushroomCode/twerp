@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     // 토큰에서 companyId를 가져와서 Buffer로 변환
     const tokenUserData = await getTokenUserData();
     const companyId = tokenUserData['companyId'];
-    const companyIdBuffer = Buffer.from(companyId['data']);
+    const companyIdBuffer = Buffer.from(companyId['data'], 'hex');
 
     let countQuery: string;
     let selectQuery: string;
@@ -48,7 +48,8 @@ export async function POST(request: NextRequest) {
           category,
           price,
           manufacturer,
-          is_use
+          is_use,
+          description
         FROM product
         WHERE company_id = ?
         ORDER BY product_name ASC
@@ -76,7 +77,8 @@ export async function POST(request: NextRequest) {
           category,
           price,
           manufacturer,
-          is_use
+          is_use,
+          description
         FROM product
         WHERE company_id = ? 
         AND (
@@ -88,20 +90,8 @@ export async function POST(request: NextRequest) {
         LIMIT ? OFFSET ?
       `;
 
-      countParams = [
-        companyIdBuffer,
-        formattedSearchTerm,
-        formattedSearchTerm,
-        formattedSearchTerm,
-      ];
-      selectParams = [
-        companyIdBuffer,
-        formattedSearchTerm,
-        formattedSearchTerm,
-        formattedSearchTerm,
-        limit,
-        offset,
-      ];
+      countParams = [companyIdBuffer, formattedSearchTerm, formattedSearchTerm, formattedSearchTerm];
+      selectParams = [companyIdBuffer, formattedSearchTerm, formattedSearchTerm, formattedSearchTerm, limit, offset];
     }
 
     // 총 제품 수를 조회
