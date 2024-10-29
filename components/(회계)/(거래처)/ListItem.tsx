@@ -28,13 +28,31 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
   const [data, setData] = useState<Company[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [sortColumn, setSortColumn] = useState<string>('company_name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const pageSize = 15;
   const router = useRouter();
 
+  // 상세 페이지로 이동하는 함수
   function editRoute(clients_id: string) {
     router.push(`/client-edit/${clients_id}`);
   }
 
+  // 정렬을 처리하는 함수
+  function handleSort(column: string) {
+    if (sortColumn === column) {
+      // 같은 열을 클릭하면 정렬 순서를 토글합니다.
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      // 다른 열을 클릭하면 해당 열로 정렬하고 순서는 오름차순으로 설정합니다.
+      setSortColumn(column);
+      setSortOrder('asc');
+    }
+    // 정렬이 변경되면 페이지를 첫 번째 페이지로 리셋합니다.
+    setPage(1);
+  }
+
+  // 데이터 Fetch
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -42,7 +60,13 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
         const response = await fetch(`/api/clientListData`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ searchTerm, page, pageSize }),
+          body: JSON.stringify({
+            searchTerm,
+            page,
+            pageSize,
+            sortColumn,
+            sortOrder,
+          }),
         });
         const result = await response.json();
         if (Array.isArray(result.data)) {
@@ -58,7 +82,7 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
       }
     };
     fetchData();
-  }, [triggerSearch, page, searchTerm]);
+  }, [triggerSearch, page, searchTerm, sortColumn, sortOrder]);
 
   const totalPages = Math.max(Math.ceil(total / pageSize), 1);
 
@@ -79,11 +103,46 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
               </colgroup>
               <thead className={styles.tableHeader}>
                 <tr>
-                  <th>사업자번호</th>
-                  <th>기업명</th>
-                  <th>대표자명</th>
-                  <th>대표번호</th>
-                  <th>팩스번호</th>
+                  <th onClick={() => handleSort('business_number')}>
+                    <span className={styles.headerCell}>
+                      사업자번호
+                      <span className={styles.sortArrow}>
+                        {sortColumn === 'business_number' && (sortOrder === 'asc' ? '▲' : '▼')}
+                      </span>
+                    </span>
+                  </th>
+                  <th onClick={() => handleSort('company_name')}>
+                    <span className={styles.headerCell}>
+                      기업명
+                      <span className={styles.sortArrow}>
+                        {sortColumn === 'company_name' && (sortOrder === 'asc' ? '▲' : '▼')}
+                      </span>
+                    </span>
+                  </th>
+                  <th onClick={() => handleSort('representative_name')}>
+                    <span className={styles.headerCell}>
+                      대표자명
+                      <span className={styles.sortArrow}>
+                        {sortColumn === 'representative_name' && (sortOrder === 'asc' ? '▲' : '▼')}
+                      </span>
+                    </span>
+                  </th>
+                  <th onClick={() => handleSort('tell_number')}>
+                    <span className={styles.headerCell}>
+                      대표번호
+                      <span className={styles.sortArrow}>
+                        {sortColumn === 'tell_number' && (sortOrder === 'asc' ? '▲' : '▼')}
+                      </span>
+                    </span>
+                  </th>
+                  <th onClick={() => handleSort('fax_number')}>
+                    <span className={styles.headerCell}>
+                      팩스번호
+                      <span className={styles.sortArrow}>
+                        {sortColumn === 'fax_number' && (sortOrder === 'asc' ? '▲' : '▼')}
+                      </span>
+                    </span>
+                  </th>
                 </tr>
               </thead>
               <tbody>

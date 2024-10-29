@@ -5,6 +5,22 @@
   margin-top: 20px;
 }
 
+/* 헤더 셀 내부 스타일 */
+.headerCell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* 정렬 화살표 스타일 */
+.sortArrow {
+  display: inline-block;
+  width: 1em; /* 화살표 공간 확보 */
+  margin-left: 5px; /* 텍스트와 화살표 사이 간격 */
+  font-size: 0.8em; /* 화살표 크기 조정 */
+}
+
 .loading {
   text-align: center;
   font-size: 1.2em;
@@ -31,7 +47,7 @@
 
 .table th {
   background-color: #f0f0f0;
-  text-align: center; 
+  text-align: center;
 }
 
 .tableRow:hover {

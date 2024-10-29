@@ -6,6 +6,8 @@ interface DataRequestBody {
   searchTerm?: string;
   page?: number;
   pageSize?: number;
+  sortColumn?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 interface Product {
@@ -20,12 +22,20 @@ interface Product {
 // 제품 데이터를 페이징 및 검색하여 반환하는 API
 export async function POST(request: NextRequest) {
   try {
-    // 요청 본문에서 검색어와 페이징 정보를 추출
-    const { searchTerm = '', page = 1, pageSize = 15 }: DataRequestBody = await request.json();
+    // 요청 본문에서 파라미터 추출
+    let { searchTerm = '', page = 1, pageSize = 15, sortColumn, sortOrder }: DataRequestBody = await request.json();
+
+    // sortColumn과 sortOrder에 기본값 적용
+    sortColumn = sortColumn || 'product_name';
+    sortOrder = sortOrder || 'asc';
 
     const parsedPage = parseInt(page.toString(), 10) || 1;
     const limit = parseInt(pageSize.toString(), 10) || 15;
     const offset = (parsedPage - 1) * limit;
+
+    // 숫자형으로 변환하여 SQL 인젝션 방지
+    const safeLimit = Number(limit);
+    const safeOffset = Number(offset);
 
     // 토큰에서 companyId를 가져와서 Buffer로 변환
     const tokenUserData = await getTokenUserData();
@@ -37,6 +47,18 @@ export async function POST(request: NextRequest) {
     let countParams: any[] = [];
     let selectParams: any[] = [];
     const formattedSearchTerm = `%${searchTerm.trim()}%`;
+
+    // 허용된 정렬 컬럼인지 검증
+    const allowedSortColumns = ['product_name', 'category', 'price', 'manufacturer', 'is_use'];
+    if (!allowedSortColumns.includes(sortColumn)) {
+      throw new Error('Invalid sort column');
+    }
+
+    // 정렬 순서 검증
+    const sortOrderUpper = sortOrder.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+
+    // 정렬 문자열 생성 (SQL 인젝션 방지를 위해 컬럼명과 정렬 순서 검증 완료)
+    const orderByClause = `ORDER BY ${sortColumn} ${sortOrderUpper}`;
 
     if (searchTerm.trim() === '') {
       // 전체 제품 수와 데이터를 조회하는 쿼리
@@ -52,11 +74,11 @@ export async function POST(request: NextRequest) {
           description
         FROM product
         WHERE company_id = ?
-        ORDER BY product_name ASC
-        LIMIT ? OFFSET ?
+        ${orderByClause}
+        LIMIT ${safeLimit} OFFSET ${safeOffset}
       `;
       countParams = [companyIdBuffer];
-      selectParams = [companyIdBuffer, limit, offset];
+      selectParams = [companyIdBuffer];
     } else {
       // 검색 조건에 맞는 제품 수와 데이터를 조회하는 쿼리
       countQuery = `
@@ -67,6 +89,7 @@ export async function POST(request: NextRequest) {
           product_name LIKE ? 
           OR category LIKE ? 
           OR manufacturer LIKE ?
+          OR is_use LIKE ?
         )
       `;
 
@@ -85,13 +108,27 @@ export async function POST(request: NextRequest) {
           product_name LIKE ? 
           OR category LIKE ? 
           OR manufacturer LIKE ?
+          OR is_use LIKE ?
         )
-        ORDER BY product_name ASC
-        LIMIT ? OFFSET ?
+        ${orderByClause}
+        LIMIT ${safeLimit} OFFSET ${safeOffset}
       `;
 
-      countParams = [companyIdBuffer, formattedSearchTerm, formattedSearchTerm, formattedSearchTerm];
-      selectParams = [companyIdBuffer, formattedSearchTerm, formattedSearchTerm, formattedSearchTerm, limit, offset];
+      // 검색 파라미터에 'is_use' 추가
+      countParams = [
+        companyIdBuffer,
+        formattedSearchTerm,
+        formattedSearchTerm,
+        formattedSearchTerm,
+        formattedSearchTerm,
+      ];
+      selectParams = [
+        companyIdBuffer,
+        formattedSearchTerm,
+        formattedSearchTerm,
+        formattedSearchTerm,
+        formattedSearchTerm,
+      ];
     }
 
     // 총 제품 수를 조회

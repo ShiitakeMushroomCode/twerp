@@ -27,21 +27,60 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
   const [data, setData] = useState<Product[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [sortColumn, setSortColumn] = useState<string>('product_name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const pageSize = 15;
   const router = useRouter();
 
+  // 제품 수정 페이지로 이동하는 함수
   function editRoute(product_id: string) {
     router.push(`/items-edit/${product_id}`);
   }
 
+  // 정렬을 처리하는 함수
+  function handleSort(column: string) {
+    if (sortColumn === column) {
+      // 같은 열을 클릭하면 정렬 순서를 토글합니다.
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      // 다른 열을 클릭하면 해당 열로 정렬하고 순서는 오름차순으로 설정합니다.
+      setSortColumn(column);
+      setSortOrder('asc');
+    }
+    // 정렬이 변경되면 페이지를 첫 번째 페이지로 리셋합니다.
+    setPage(1);
+  }
+
+  // 정렬 화살표를 렌더링하는 함수
+  function renderSortArrow(column: string) {
+    if (sortColumn === column) {
+      return sortOrder === 'asc' ? '▲' : '▼';
+    } else {
+      return ''; // 화살표 공간을 확보하기 위해 빈 문자열 반환
+    }
+  }
+
+  // 데이터 Fetch
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
+        const requestBody: any = {
+          searchTerm,
+          page,
+          pageSize,
+        };
+
+        // 정렬 조건이 있을 때만 포함
+        if (sortColumn) {
+          requestBody.sortColumn = sortColumn;
+          requestBody.sortOrder = sortOrder;
+        }
+
         const response = await fetch(`/api/itemListData`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ searchTerm, page, pageSize }),
+          body: JSON.stringify(requestBody),
         });
         const result = await response.json();
         if (Array.isArray(result.data)) {
@@ -57,7 +96,7 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
       }
     };
     fetchData();
-  }, [triggerSearch, page, searchTerm]);
+  }, [triggerSearch, page, searchTerm, sortColumn, sortOrder]);
 
   const totalPages = Math.max(Math.ceil(total / pageSize), 1);
 
@@ -78,11 +117,36 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
               </colgroup>
               <thead className={styles.tableHeader}>
                 <tr>
-                  <th>제품명</th>
-                  <th>카테고리</th>
-                  <th>가격</th>
-                  <th>제조업체</th>
-                  <th>사용 여부</th>
+                  <th onClick={() => handleSort('product_name')}>
+                    <span className={styles.headerCell}>
+                      제품명
+                      <span className={styles.sortArrow}>{renderSortArrow('product_name')}</span>
+                    </span>
+                  </th>
+                  <th onClick={() => handleSort('category')}>
+                    <span className={styles.headerCell}>
+                      카테고리
+                      <span className={styles.sortArrow}>{renderSortArrow('category')}</span>
+                    </span>
+                  </th>
+                  <th onClick={() => handleSort('price')}>
+                    <span className={styles.headerCell}>
+                      가격
+                      <span className={styles.sortArrow}>{renderSortArrow('price')}</span>
+                    </span>
+                  </th>
+                  <th onClick={() => handleSort('manufacturer')}>
+                    <span className={styles.headerCell}>
+                      제조업체
+                      <span className={styles.sortArrow}>{renderSortArrow('manufacturer')}</span>
+                    </span>
+                  </th>
+                  <th onClick={() => handleSort('is_use')}>
+                    <span className={styles.headerCell}>
+                      사용 여부
+                      <span className={styles.sortArrow}>{renderSortArrow('is_use')}</span>
+                    </span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -99,7 +163,7 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
                       <td className={styles.centerAlign}>{item.product_name}</td>
                       <td className={styles.centerAlign}>{item.category || '없음'}</td>
                       <td className={styles.rightAlign}>
-                        {item.price === null || undefined ? 0 : formatPrice(item.price)}
+                        {item.price === null || item.price === undefined ? 0 : formatPrice(item.price)}
                       </td>
                       <td className={styles.centerAlign}>{item.manufacturer || '없음'}</td>
                       <td className={styles.centerAlign}>{item.is_use}</td>
