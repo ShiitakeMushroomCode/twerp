@@ -14,17 +14,6 @@
   padding-bottom: 1rem;
 }
 
-.card {
-  width: 60%;
-  padding: 30px;
-  height: 60vh;
-  background-color: #ffffff;
-  border-radius: 30px;
-  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  padding-bottom: 3rem;
-}
-
 .title {
   padding-top: 1rem;
   font-size: 32px;
@@ -90,4 +79,25 @@
 .footer {
   margin-top: 30px;
   color: #777;
+}
+
+.card {
+  width: 60%;
+  padding: 30px;
+  height: auto; /* 높이를 자동으로 조정하여 스크롤바를 방지 */
+  background-color: #ffffff;
+  border-radius: 30px;
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  padding-bottom: 3rem;
+  overflow: hidden; /* 스크롤바가 보이지 않도록 설정 */
+  min-width: 600px;
+}
+
+.reFormContent {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  overflow: hidden; /* 스크롤바가 보이지 않도록 설정 */
 }
