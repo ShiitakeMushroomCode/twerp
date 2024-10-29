@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ msg: '로그인 성공' }, { status: 200 });
   } catch (e) {
     const refreshTokenValue = cookies().get('refreshToken').value;
-    const res = await fetch(`${process.env.API_URL}/auth/refresh`, {
+    const res = await fetch(`/api/auth/refresh`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

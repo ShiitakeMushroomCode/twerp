@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { FaTrashAlt } from 'react-icons/fa'; // react-icons 추가
 import Swal from 'sweetalert2';
+import DatePicker from '../(공용)/DatePicker';
 import Address from './Address';
 import styles from './ClientForm.module.css';
-import DatePicker from './DatePicker';
 
 export interface ClientFormData {
   business_number: string;
@@ -176,7 +176,7 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
 
     if (confirmResult.isConfirmed) {
       try {
-        const response = await fetch('/api/clientDelete', {
+        const response = await fetch(`/api/clientDelete`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',

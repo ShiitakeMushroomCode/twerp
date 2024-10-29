@@ -2,7 +2,7 @@ import ListItem from './ListItem';
 // 이게 어따 쓰는거지? 그냥 테스트용이구나
 async function getTest() {
   try {
-    const response = await fetch(`${process.env.API_URL}/test`, {
+    const response = await fetch(`/api/test`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

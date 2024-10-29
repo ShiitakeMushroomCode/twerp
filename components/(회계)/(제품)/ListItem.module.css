@@ -1,0 +1,90 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin-top: 20px;
+}
+
+.loading {
+  text-align: center;
+  font-size: 1.2em;
+  color: #555;
+}
+
+.tableContainer {
+  flex: 1;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.table th,
+.table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  word-wrap: break-word;
+}
+
+.table th {
+  background-color: #f0f0f0;
+  text-align: center; 
+}
+
+.tableRow:hover {
+  background-color: #f9f9f9;
+  cursor: pointer;
+}
+
+.noResult {
+  text-align: center;
+  padding: 20px;
+  color: #888;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  padding: 10px 0;
+  background-color: #f9f9f9;
+}
+
+.paginationButton {
+  background-color: #0070f3;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  margin: 0 5px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  font-size: 1em;
+}
+
+.paginationButton:hover:not(:disabled) {
+  background-color: #005bb5;
+}
+
+.paginationButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  margin: 0 10px;
+  font-weight: bold;
+  color: #333;
+}
+
+.centerAlign {
+  text-align: center;
+}
+
+.leftAlign {
+  text-align: left;
+}

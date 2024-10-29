@@ -1,19 +1,17 @@
 'use client';
 
-import { formatPhoneNumber } from '@/util/reform';
+import { formatPrice } from '@/util/reform';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import styles from './ListItem.module.css';
 
-interface Company {
-  business_number: string;
-  company_id: string;
-  company_name: string;
-  is_registered: boolean;
-  clients_id: string;
-  representative_name: string;
-  tell_number: string;
-  fax_number: string;
+interface Product {
+  product_id: string;
+  product_name: string;
+  category: string;
+  price: number;
+  manufacturer: string;
+  is_use: string;
 }
 
 interface ListItemProps {
@@ -24,21 +22,21 @@ interface ListItemProps {
 }
 
 export default function ListItem({ searchTerm, page, setPage, triggerSearch }: ListItemProps) {
-  const [data, setData] = useState<Company[]>([]);
+  const [data, setData] = useState<Product[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const pageSize = 15;
   const router = useRouter();
 
-  function editRoute(clients_id: string) {
-    router.push(`https://werp.p-e.kr/client-edit/${clients_id}`);
+  function editRoute(product_id: string) {
+    router.push(`/product-edit/${product_id}`);
   }
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/clientListData`, {
+        const response = await fetch(`/api/itemListData`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ searchTerm, page, pageSize }),
@@ -70,43 +68,46 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
           <div className={styles.tableContainer}>
             <table className={styles.table}>
               <colgroup>
-                <col style={{ width: '15%' }} />
-                <col style={{ width: '30%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '25%' }} />
                 <col style={{ width: '15%' }} />
                 <col style={{ width: '20%' }} />
-                <col style={{ width: '20%' }} />
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '10%' }} />
               </colgroup>
               <thead className={styles.tableHeader}>
                 <tr>
-                  <th>사업자번호</th>
-                  <th>기업명</th>
-                  <th>대표자명</th>
-                  <th>대표번호</th>
-                  <th>팩스번호</th>
+                  <th>제품명</th>
+                  <th>카테고리</th>
+                  <th>가격</th>
+                  <th>제조업체</th>
+                  <th>사용 여부</th>
+                  <th>관리</th>
                 </tr>
               </thead>
               <tbody>
                 {data.length > 0 ? (
                   data.map((item) => (
                     <tr
-                      key={item.clients_id}
+                      key={item.product_id}
                       className={styles.tableRow}
                       onClick={() => {
-                        editRoute(item.clients_id);
+                        editRoute(item.product_id);
                       }}
                     >
+                      <td className={styles.leftAlign}>{item.product_name}</td>
+                      <td className={styles.centerAlign}>{item.category || 'N/A'}</td>
+                      <td className={styles.rightAlign}>{formatPrice(item.price)}</td>
+                      <td className={styles.centerAlign}>{item.manufacturer || 'N/A'}</td>
+                      <td className={styles.centerAlign}>{item.is_use}</td>
                       <td className={styles.centerAlign}>
-                        {item.business_number.replace(/(\d{3})(\d{2})(\d{5})/, '$1-$2-$3')}
+                        <button onClick={() => editRoute(item.product_id)}>수정</button>
                       </td>
-                      <td className={styles.leftAlign}>{item.company_name}</td>
-                      <td className={styles.centerAlign}>{item.representative_name}</td>
-                      <td className={styles.centerAlign}>{formatPhoneNumber(item.tell_number)}</td>
-                      <td className={styles.centerAlign}>{formatPhoneNumber(item.fax_number)}</td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className={styles.noResult}>
+                    <td colSpan={6} className={styles.noResult}>
                       검색 결과가 없습니다
                     </td>
                   </tr>

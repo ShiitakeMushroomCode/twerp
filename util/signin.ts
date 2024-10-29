@@ -8,7 +8,7 @@ export async function signin(formData: FormData) {
       id: formData.get('phone_number'),
       password: formData.get('password'),
     };
-    const response = await fetch(`${process.env.API_URL}/auth/signin`, {
+    const response = await fetch(`/api/auth/signin`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

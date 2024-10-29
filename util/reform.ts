@@ -15,3 +15,9 @@ export function formatPhoneNumber(value: string): string {
     return cleanValue;
   }
 }
+export function formatPrice(price: number): string {
+  if (isNaN(price)) return 'N/A';
+
+  // 소수점 2자리까지 표시하고, 천 단위로 쉼표를 추가
+  return price.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}

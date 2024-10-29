@@ -1,0 +1,98 @@
+.form {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2.5rem;
+  border: #ffffff 1px solid;
+  border-radius: 3%;
+  background-color: #ffffff;
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+  font-size: x-large;
+  font-weight: bold;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.label {
+  width: 150px;
+  text-align: left;
+  margin-right: 10px;
+  font-weight: bold;
+  font-size: large;
+  white-space: nowrap;
+}
+
+.input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: large;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.textarea {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: large;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+  min-height: 100px;
+  resize: vertical;
+}
+
+.button {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-top: 20px;
+  background-color: #499eff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: large;
+}
+
+.button:hover {
+  background-color: #0080ff;
+}
+
+.delButton {
+  background-color: #f44336;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: large;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.delButton:hover {
+  background-color: #d32f2f;
+}
+
+.error {
+  color: red;
+  margin: 0 auto;
+  text-align: center;
+}

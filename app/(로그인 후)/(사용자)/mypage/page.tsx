@@ -14,7 +14,7 @@ async function getUserData() {
 async function sendMail(formData): Promise<void> {
   'use server';
   const data = (await getTokenUserData()) as ACT;
-  const response = await fetch(`${process.env.API_URL}/sendEmail`, {
+  const response = await fetch(`/api/sendEmail`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
