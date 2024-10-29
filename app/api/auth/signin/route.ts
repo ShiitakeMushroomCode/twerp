@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json({
       accessToken: accessToken,
       refreshToken: refreshToken,
-      message: '로그인 성공적',
+      message: '로그인 성공했습니다.',
     });
 
     return response;

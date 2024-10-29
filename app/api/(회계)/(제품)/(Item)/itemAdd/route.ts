@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     if ((await insertProduct(data)) === true) {
       return NextResponse.json(
         {
-          message: '제품 생성 성공적',
+          message: '제품 생성 성공했습니다.',
         },
         { status: 200 }
       );

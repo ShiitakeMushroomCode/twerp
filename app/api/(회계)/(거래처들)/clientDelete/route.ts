@@ -8,7 +8,7 @@ export async function DELETE(request: NextRequest) {
     if ((await deleteClient(data?.business_number)) === true) {
       return NextResponse.json(
         {
-          message: '클라이언트 삭제 성공적',
+          message: '클라이언트 삭제 성공했습니다.',
         },
         { status: 200 }
       );
