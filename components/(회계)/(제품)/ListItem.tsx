@@ -82,8 +82,9 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
       return prevPageSize;
     });
 
-    if (page === 1) {
+    if (newTotalPages === 1) {
       setTriggerSearch((prev) => !prev);
+      setPage(1);
     }
 
     // 창 크기가 변경되면 팝업 닫기
