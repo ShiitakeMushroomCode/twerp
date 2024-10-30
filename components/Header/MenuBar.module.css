@@ -7,13 +7,28 @@
 }
 
 .menuContent {
-  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   justify-content: flex-start;
   gap: 15px;
   padding-left: 1rem;
   padding-right: 1rem;
+}
+
+/* FHD 이하 (1920px 이하) */
+@media screen and (max-width: 1920px) {
+  /* FHD 이하에서 적용될 스타일 */
+  .menuContent {
+    max-width: 1024px;
+  }
+}
+
+/* FHD 초과 (1920px 초과) */
+@media screen and (min-width: 1921px) {
+  /* FHD 초과에서 적용될 스타일 */
+  .menuContent {
+    max-width: 1200px;
+  }
 }
 
 .menuItem {

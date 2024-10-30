@@ -21,17 +21,47 @@ interface ListItemProps {
   page: number;
   setPage: (page: number) => void;
   triggerSearch: boolean;
+  setTriggerSearch: any;
 }
 
-export default function ListItem({ searchTerm, page, setPage, triggerSearch }: ListItemProps) {
+export default function ListItem({ searchTerm, page, setPage, triggerSearch, setTriggerSearch }: ListItemProps) {
   const [data, setData] = useState<Product[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [sortColumn, setSortColumn] = useState<string>('product_name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const pageSize = 15;
+  const [pageSize, setPageSize] = useState<number>(15);
   const router = useRouter();
 
+  useEffect(() => {
+    // 화면 크기에 따라 값이 변경되도록 함수 정의
+    const handleResize = () => {
+      const screenWidth = window.innerWidth;
+
+      if (screenWidth >= 2560) {
+        // 4K 이상 해상도일 때
+        setPageSize(20);
+      } else if (screenWidth <= 1280) {
+        // HD 이하 해상도일 때
+        setPageSize(5);
+      } else if (screenWidth <= 1920) {
+        // FHD 이하 해상도일 때
+        setPageSize(9);
+      } else {
+        // FHD 초과 ~ 2560px 미만일 때
+        setPageSize(15);
+      }
+
+      setTriggerSearch((prev) => !prev); // 검색 트리거 토글
+    };
+
+    // 컴포넌트가 마운트되면 리스너 추가 및 초기 화면 크기 설정
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    // 컴포넌트가 언마운트될 때 리스너 제거
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   // 제품 수정 페이지로 이동하는 함수
   function editRoute(product_id: string) {
     router.push(`/items-edit/${product_id}`);
@@ -96,7 +126,7 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch }: L
       }
     };
     fetchData();
-  }, [triggerSearch, page, searchTerm, sortColumn, sortOrder]);
+  }, [triggerSearch, page, searchTerm, sortColumn, sortOrder, pageSize]);
 
   const totalPages = Math.max(Math.ceil(total / pageSize), 1);
 
