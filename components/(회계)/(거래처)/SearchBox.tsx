@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import styles from './SearchBox.module.css';
 
@@ -9,7 +10,10 @@ interface SearchBoxProps {
 
 export default function SearchBox({ onSearch }: SearchBoxProps) {
   const [input, setInput] = useState<string>('');
-
+  const router = useRouter();
+  const handleAdd = () => {
+    router.push('/client-add');
+  };
   const handleSearch = () => {
     onSearch(input.trim());
   };
@@ -32,6 +36,9 @@ export default function SearchBox({ onSearch }: SearchBoxProps) {
       />
       <button onClick={handleSearch} className={styles.button}>
         검색
+      </button>
+      <button onClick={handleAdd} className={styles.button}>
+        추가
       </button>
     </div>
   );

@@ -1,10 +1,11 @@
 'use client';
 
 import Spinner from '@/components/ETC/Spinner/Spinner';
+import styles from '@/styles/ListItem.module.css';
 import { formatPrice } from '@/util/reform';
+import useDebounce from '@/util/useDebounce';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import styles from './ListItem.module.css';
 
 interface Product {
   product_id: string;
@@ -21,47 +22,72 @@ interface ListItemProps {
   page: number;
   setPage: (page: number) => void;
   triggerSearch: boolean;
-  setTriggerSearch: any;
+  setTriggerSearch: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function ListItem({ searchTerm, page, setPage, triggerSearch, setTriggerSearch }: ListItemProps) {
+export default function ProductListItem({ searchTerm, page, setPage, triggerSearch, setTriggerSearch }: ListItemProps) {
+  const router = useRouter();
   const [data, setData] = useState<Product[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [sortColumn, setSortColumn] = useState<string>('product_name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [pageSize, setPageSize] = useState<number>(15);
-  const router = useRouter();
+
+  // 초기 pageSize를 화면 크기에 따라 설정하는 함수
+  const getInitialPageSize = () => {
+    if (typeof window !== 'undefined') {
+      const screenHeight = window.innerHeight;
+      let newPageSize: number;
+
+      if (screenHeight >= 1440) {
+        newPageSize = 20;
+      } else if (screenHeight <= 720) {
+        newPageSize = 5;
+      } else if (screenHeight <= 1080) {
+        newPageSize = 9;
+      } else {
+        newPageSize = 15;
+      }
+      return newPageSize;
+    }
+    return 15; // 서버 사이드 렌더링 시 기본값
+  };
+
+  const [pageSize, setPageSize] = useState<number>(getInitialPageSize);
+
+  // Debounce를 사용하여 handleResize 함수 최적화
+  const debouncedHandleResize = useDebounce(() => {
+    const screenHeight = window.innerHeight;
+    let newPageSize: number;
+
+    if (screenHeight >= 1440) {
+      newPageSize = 20;
+    } else if (screenHeight <= 720) {
+      newPageSize = 5;
+    } else if (screenHeight <= 1080) {
+      newPageSize = 9;
+    } else {
+      newPageSize = 15;
+    }
+
+    setPageSize((prevPageSize) => {
+      if (prevPageSize !== newPageSize) {
+        setTriggerSearch((prev) => !prev); // 검색 트리거 토글
+        return newPageSize;
+      }
+      return prevPageSize;
+    });
+  }, 300); // 300ms 지연
 
   useEffect(() => {
-    // 화면 크기에 따라 값이 변경되도록 함수 정의
-    const handleResize = () => {
-      const screenWidth = window.innerWidth;
+    window.addEventListener('resize', debouncedHandleResize);
 
-      if (screenWidth >= 2560) {
-        // 4K 이상 해상도일 때
-        setPageSize(20);
-      } else if (screenWidth <= 1280) {
-        // HD 이하 해상도일 때
-        setPageSize(5);
-      } else if (screenWidth <= 1920) {
-        // FHD 이하 해상도일 때
-        setPageSize(9);
-      } else {
-        // FHD 초과 ~ 2560px 미만일 때
-        setPageSize(15);
-      }
-
-      setTriggerSearch((prev) => !prev); // 검색 트리거 토글
+    // 컴포넌트 언마운트 시 리스너 제거
+    return () => {
+      window.removeEventListener('resize', debouncedHandleResize);
     };
+  }, [debouncedHandleResize]);
 
-    // 컴포넌트가 마운트되면 리스너 추가 및 초기 화면 크기 설정
-    handleResize();
-    window.addEventListener('resize', handleResize);
-
-    // 컴포넌트가 언마운트될 때 리스너 제거
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
   // 제품 수정 페이지로 이동하는 함수
   function editRoute(product_id: string) {
     router.push(`/items-edit/${product_id}`);
@@ -70,15 +96,12 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch, set
   // 정렬을 처리하는 함수
   function handleSort(column: string) {
     if (sortColumn === column) {
-      // 같은 열을 클릭하면 정렬 순서를 토글합니다.
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
-      // 다른 열을 클릭하면 해당 열로 정렬하고 순서는 오름차순으로 설정합니다.
       setSortColumn(column);
       setSortOrder('asc');
     }
-    // 정렬이 변경되면 페이지를 첫 번째 페이지로 리셋합니다.
-    setPage(1);
+    setPage(1); // 정렬 변경 시 페이지를 첫 번째 페이지로 리셋
   }
 
   // 정렬 화살표를 렌더링하는 함수
@@ -92,6 +115,8 @@ export default function ListItem({ searchTerm, page, setPage, triggerSearch, set
 
   // 데이터 Fetch
   useEffect(() => {
+    if (pageSize === null) return; // pageSize가 설정되기 전에는 데이터를 가져오지 않음
+
     const fetchData = async () => {
       setIsLoading(true);
       try {

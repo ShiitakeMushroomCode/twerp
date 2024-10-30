@@ -1,73 +1,62 @@
 .menu {
   background-color: #f8f9fa;
-  padding: 10px 0;
+  padding: 0; /* 패딩 제거 */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   width: 100%;
   margin: 0 auto;
+}
+
+.toolbar {
+  min-height: 48px !important; /* 기본 높이의 절반으로 설정 (보통 64px) */
+  padding: 0 16px; /* 좌우 패딩 조정 */
 }
 
 .menuContent {
   margin: 0 auto;
   display: flex;
   justify-content: flex-start;
-  gap: 15px;
+  align-items: center;
+  gap: 20px; /* 메뉴 아이템 간격 증가 */
   padding-left: 1rem;
   padding-right: 1rem;
-}
-
-/* FHD 이하 (1920px 이하) */
-@media screen and (max-width: 1920px) {
-  /* FHD 이하에서 적용될 스타일 */
-  .menuContent {
-    max-width: 1024px;
-  }
-}
-
-/* FHD 초과 (1920px 초과) */
-@media screen and (min-width: 1921px) {
-  /* FHD 초과에서 적용될 스타일 */
-  .menuContent {
-    max-width: 1200px;
-  }
+  width: 100%;
+  max-width: 1200px; /* 최대 너비 설정 */
 }
 
 .menuItem {
   margin-left: 10px;
   position: relative;
   cursor: pointer;
-  transition: color 0.3s;
-  font-size: large;
+  transition: color 0.3s, border-bottom 0.3s;
+  font-size: 1rem;
+  padding: 8px 12px; /* 패딩 조정 */
+  border-bottom: 2px solid transparent; /* 기본 상태에서 아래쪽 경계선 투명 */
 }
 
 .menuItem:hover {
   color: #007bff;
+  border-bottom: 2px solid #007bff; /* 호버 시 아래쪽 경계선 표시 */
 }
 
-.dropdown {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  z-index: 1;
+@media screen and (max-width: 1920px) {
+  .menuContent {
+    max-width: 1024px;
+  }
+  .menuItem {
+    font-size: 0.9rem;
+    padding: 6px 10px;
+  }
 }
 
-.menuItem:hover .dropdown {
-  display: block;
-}
-
-.link {
-  display: block;
-  padding: 8px 10px;
-  color: #333;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.link:hover {
-  background-color: #f1f1f1;
-  border-radius: 5px;
+@media screen and (max-width: 768px) {
+  .menuContent {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  .menuItem {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+  }
 }
