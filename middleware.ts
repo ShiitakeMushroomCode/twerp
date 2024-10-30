@@ -40,6 +40,8 @@ export async function middleware(request: NextRequest) {
       await jwtVerify(accessToken.value, secret);
       return NextResponse.next();
     } catch (error) {
+      console.log('액세스 토큰 만료 또는 검증 실패:', error);
+
       // 액세스 토큰이 만료된 경우 리프레시 토큰을 통해 갱신 시도
       if (refreshToken) {
         try {
@@ -49,12 +51,14 @@ export async function middleware(request: NextRequest) {
               'Content-Type': 'application/json',
               Accept: 'application/json',
             },
-            body: JSON.stringify({ refreshToken: refreshToken }),
+            body: JSON.stringify({ refreshToken }),
           });
 
           if (res.ok) {
             const newAccessToken = (await res.json()).accessToken;
             const response = NextResponse.next();
+
+            // 새 액세스 토큰 설정
             response.cookies.set('accessToken', newAccessToken, {
               maxAge: 60 * 60, // 1시간
               path: '/',
@@ -69,7 +73,7 @@ export async function middleware(request: NextRequest) {
         }
       }
       // 리프레시 토큰도 만료되거나 오류 발생 시 로그아웃 처리
-      console.log('리프레시 토큰도 만료되거나 오류 발생 시 로그아웃 처리');
+      console.log('리프레시 토큰 만료 또는 오류 발생');
       return NextResponse.redirect(new URL('/signout', request.url));
     }
   }

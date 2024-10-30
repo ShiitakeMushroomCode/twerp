@@ -69,11 +69,16 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
       newPageSize = 15;
     }
 
+    const newTotalPages = Math.max(Math.ceil(total / newPageSize), 1);
     setPageSize((prevPageSize) => {
       if (prevPageSize !== newPageSize) {
         setTriggerSearch((prev) => !prev);
+        if (totalPages > newTotalPages) {
+          setPage(newTotalPages);
+        }
         return newPageSize;
       }
+
       return prevPageSize;
     });
 
@@ -81,7 +86,7 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
     if (Swal.isVisible()) {
       Swal.close();
 
-      let currentTotalPages = Math.max(Math.ceil(total / newPageSize), 1); // 초기 totalPages 계산
+      let currentTotalPages = newTotalPages; // 초기 totalPages 계산
       if (currentTotalPages > 1) {
         handlePageJump(currentTotalPages);
       }
