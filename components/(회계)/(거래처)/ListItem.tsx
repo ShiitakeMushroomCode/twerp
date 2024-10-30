@@ -77,7 +77,7 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
     setPageSize((prevPageSize) => {
       if (prevPageSize !== newPageSize) {
         setTriggerSearch((prev) => !prev); // 검색 트리거 토글
-        if (totalPages > newTotalPages) {
+        if (page > newTotalPages) {
           setPage(newTotalPages);
         }
         return newPageSize;

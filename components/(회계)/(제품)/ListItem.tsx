@@ -73,7 +73,7 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
     setPageSize((prevPageSize) => {
       if (prevPageSize !== newPageSize) {
         setTriggerSearch((prev) => !prev);
-        if (totalPages > newTotalPages) {
+        if (page > newTotalPages) {
           setPage(newTotalPages);
         }
         return newPageSize;
