@@ -6,6 +6,7 @@ import { formatPhoneNumber } from '@/util/reform';
 import useDebounce from '@/util/useDebounce';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
 
 interface Company {
   business_number: string;
@@ -79,6 +80,17 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
       }
       return prevPageSize;
     });
+
+    // 창 크기가 변경되면 팝업 닫기
+    if (Swal.isVisible()) {
+      Swal.close();
+
+      let currentTotalPages = Math.max(Math.ceil(total / newPageSize), 1); // 초기 totalPages 계산
+      if (currentTotalPages > 1) {
+        // SweetAlert2 팝업을 엽니다
+        handlePageJump(currentTotalPages);
+      }
+    }
   }, 300); // 300ms 지연
 
   useEffect(() => {
@@ -93,26 +105,20 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
   // 상세 페이지로 이동하는 함수
   function editRoute(clients_id: string, isNewTab: boolean) {
     if (isNewTab) {
-      // 팝업 창 크기와 위치 설정 (예: 600x400 크기의 창, 중앙에 열기)
       const width = 600;
       const height = 400;
       const left = (window.innerWidth - width) / 2;
       const top = (window.innerHeight - height) / 2;
-
-      // 새 창을 팝업처럼 열고, 이름을 'editClientPopup'으로 설정
       const popupWindow = window.open(
         `/client-edit/${clients_id}`,
-        'editClientPopup', // 창의 이름
+        'editClientPopup',
         `width=${width},height=${height},top=${top},left=${left}`
       );
-
-      // 새 창을 열었을 때 그 창이 최상위로 뜨도록 처리
       if (popupWindow) {
         popupWindow.focus();
         popupWindow.name = 'editClientPopup';
       }
     } else {
-      // 기존 탭에서 이동
       router.push(`/client-edit/${clients_id}`);
     }
   }
@@ -126,6 +132,41 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
       setSortOrder('asc');
     }
     setPage(1); // 정렬 변경 시 페이지를 첫 번째 페이지로 리셋
+  }
+
+  // totalPages 계산 함수
+  const calculateTotalPages = () => {
+    return Math.max(Math.ceil(total / pageSize), 1);
+  };
+
+  // 페이지 번호를 입력받아 해당 페이지로 이동하는 함수
+  function handlePageJump(currentTotalPages) {
+    // SweetAlert2 팝업을 엽니다
+    Swal.fire({
+      title: `이동할 페이지 번호를 입력하세요 (1 ~ ${currentTotalPages})`,
+      input: 'number',
+      inputAttributes: {
+        min: '1',
+        step: '1',
+        max: currentTotalPages.toString(),
+        placeholder: `페이지 번호는 1에서 ${currentTotalPages} 사이여야 합니다.`,
+      },
+      showCancelButton: true,
+      confirmButtonText: '이동',
+      cancelButtonText: '취소',
+      preConfirm: (pageNumber) => {
+        const pageNum = Number(pageNumber);
+        if (pageNum < 1 || pageNum > currentTotalPages || isNaN(pageNum)) {
+          Swal.showValidationMessage(`페이지 번호는 1에서 ${currentTotalPages} 사이여야 합니다.`);
+          return false;
+        }
+        return pageNum;
+      },
+    }).then((result) => {
+      if (result.isConfirmed && result.value) {
+        setPage(result.value); // 사용자가 입력한 페이지로 이동
+      }
+    });
   }
 
   // 데이터 Fetch
@@ -162,7 +203,7 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
     fetchData();
   }, [triggerSearch, page, searchTerm, sortColumn, sortOrder, pageSize]);
 
-  const totalPages = Math.max(Math.ceil(total / pageSize), 1);
+  const totalPages = calculateTotalPages();
 
   return (
     <div className={styles.container}>
@@ -254,6 +295,7 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
             </table>
           </div>
           <div className={styles.pagination}>
+            {totalPages !== 1 && <button className={styles.fakeButton}>이건 가짜지</button>}
             <button
               className={styles.paginationButton}
               onClick={() => setPage(Math.max(page - 1, 1))}
@@ -271,6 +313,17 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
             >
               다음
             </button>
+            {totalPages !== 1 && (
+              <button
+                className={styles.paginationButton}
+                onClick={() => {
+                  handlePageJump(calculateTotalPages());
+                }}
+                disabled={totalPages === 1}
+              >
+                페이지 이동
+              </button>
+            )}
           </div>
         </>
       )}

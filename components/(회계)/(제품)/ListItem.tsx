@@ -6,6 +6,7 @@ import { formatPrice } from '@/util/reform';
 import useDebounce from '@/util/useDebounce';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
 
 interface Product {
   product_id: string;
@@ -33,7 +34,6 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
   const [sortColumn, setSortColumn] = useState<string>('product_name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  // 초기 pageSize를 화면 크기에 따라 설정하는 함수
   const getInitialPageSize = () => {
     if (typeof window !== 'undefined') {
       const screenHeight = window.innerHeight;
@@ -50,12 +50,11 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
       }
       return newPageSize;
     }
-    return 15; // 서버 사이드 렌더링 시 기본값
+    return 15;
   };
 
   const [pageSize, setPageSize] = useState<number>(getInitialPageSize);
 
-  // Debounce를 사용하여 handleResize 함수 최적화
   const debouncedHandleResize = useDebounce(() => {
     const screenHeight = window.innerHeight;
     let newPageSize: number;
@@ -72,50 +71,50 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
 
     setPageSize((prevPageSize) => {
       if (prevPageSize !== newPageSize) {
-        setTriggerSearch((prev) => !prev); // 검색 트리거 토글
+        setTriggerSearch((prev) => !prev);
         return newPageSize;
       }
       return prevPageSize;
     });
-  }, 300); // 300ms 지연
+
+    // 창 크기가 변경되면 팝업 닫기
+    if (Swal.isVisible()) {
+      Swal.close();
+
+      let currentTotalPages = Math.max(Math.ceil(total / newPageSize), 1); // 초기 totalPages 계산
+      if (currentTotalPages > 1) {
+        handlePageJump(currentTotalPages);
+      }
+    }
+  }, 300);
 
   useEffect(() => {
     window.addEventListener('resize', debouncedHandleResize);
-
-    // 컴포넌트 언마운트 시 리스너 제거
     return () => {
       window.removeEventListener('resize', debouncedHandleResize);
     };
   }, [debouncedHandleResize]);
 
-  // 제품 수정 페이지로 이동하는 함수
   function editRoute(product_id: string, isNewTab: boolean) {
     if (isNewTab) {
-      // 팝업 창 크기와 위치 설정 (예: 600x400 크기의 창, 중앙에 열기)
       const width = 600;
       const height = 400;
       const left = (window.innerWidth - width) / 2;
       const top = (window.innerHeight - height) / 2;
-
-      // 새 창을 팝업처럼 열고, 이름을 'editClientPopup'으로 설정
       const popupWindow = window.open(
         `/items-edit/${product_id}`,
-        'editClientPopup', // 창의 이름
+        'editClientPopup',
         `width=${width},height=${height},top=${top},left=${left}`
       );
-
-      // 새 창을 열었을 때 그 창이 최상위로 뜨도록 처리
       if (popupWindow) {
         popupWindow.focus();
         popupWindow.name = 'editClientPopup';
       }
     } else {
-      // 기존 탭에서 이동
       router.push(`/items-edit/${product_id}`);
     }
   }
 
-  // 정렬을 처리하는 함수
   function handleSort(column: string) {
     if (sortColumn === column) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -123,21 +122,11 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
       setSortColumn(column);
       setSortOrder('asc');
     }
-    setPage(1); // 정렬 변경 시 페이지를 첫 번째 페이지로 리셋
+    setPage(1);
   }
 
-  // 정렬 화살표를 렌더링하는 함수
-  function renderSortArrow(column: string) {
-    if (sortColumn === column) {
-      return sortOrder === 'asc' ? '▲' : '▼';
-    } else {
-      return ''; // 화살표 공간을 확보하기 위해 빈 문자열 반환
-    }
-  }
-
-  // 데이터 Fetch
   useEffect(() => {
-    if (pageSize === null) return; // pageSize가 설정되기 전에는 데이터를 가져오지 않음
+    if (pageSize === null) return;
 
     const fetchData = async () => {
       setIsLoading(true);
@@ -148,7 +137,6 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
           pageSize,
         };
 
-        // 정렬 조건이 있을 때만 포함
         if (sortColumn) {
           requestBody.sortColumn = sortColumn;
           requestBody.sortOrder = sortOrder;
@@ -175,7 +163,39 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
     fetchData();
   }, [triggerSearch, page, searchTerm, sortColumn, sortOrder, pageSize]);
 
-  const totalPages = Math.max(Math.ceil(total / pageSize), 1);
+  const calculateTotalPages = () => {
+    return Math.max(Math.ceil(total / pageSize), 1);
+  };
+  const totalPages = calculateTotalPages();
+
+  function handlePageJump(currentTotalPages) {
+    // SweetAlert2 팝업을 엽니다
+    Swal.fire({
+      title: `이동할 페이지 번호를 입력하세요 (1 ~ ${currentTotalPages})`,
+      input: 'number',
+      inputAttributes: {
+        min: '1',
+        step: '1',
+        max: currentTotalPages.toString(),
+        placeholder: `페이지 번호는 1에서 ${currentTotalPages} 사이여야 합니다.`,
+      },
+      showCancelButton: true,
+      confirmButtonText: '이동',
+      cancelButtonText: '취소',
+      preConfirm: (pageNumber) => {
+        const pageNum = Number(pageNumber);
+        if (pageNum < 1 || pageNum > currentTotalPages || isNaN(pageNum)) {
+          Swal.showValidationMessage(`페이지 번호는 1에서 ${currentTotalPages} 사이여야 합니다.`);
+          return false;
+        }
+        return pageNum;
+      },
+    }).then((result) => {
+      if (result.isConfirmed && result.value) {
+        setPage(result.value); // 사용자가 입력한 페이지로 이동
+      }
+    });
+  }
 
   return (
     <div className={styles.container}>
@@ -197,31 +217,41 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
                   <th onClick={() => handleSort('product_name')}>
                     <span className={styles.headerCell}>
                       제품명
-                      <span className={styles.sortArrow}>{renderSortArrow('product_name')}</span>
+                      <span className={styles.sortArrow}>
+                        {sortColumn === 'product_name' && (sortOrder === 'asc' ? '▲' : '▼')}
+                      </span>
                     </span>
                   </th>
                   <th onClick={() => handleSort('category')}>
                     <span className={styles.headerCell}>
                       카테고리
-                      <span className={styles.sortArrow}>{renderSortArrow('category')}</span>
+                      <span className={styles.sortArrow}>
+                        {sortColumn === 'category' && (sortOrder === 'asc' ? '▲' : '▼')}
+                      </span>
                     </span>
                   </th>
                   <th onClick={() => handleSort('price')}>
                     <span className={styles.headerCell}>
                       가격
-                      <span className={styles.sortArrow}>{renderSortArrow('price')}</span>
+                      <span className={styles.sortArrow}>
+                        {sortColumn === 'price' && (sortOrder === 'asc' ? '▲' : '▼')}
+                      </span>
                     </span>
                   </th>
                   <th onClick={() => handleSort('manufacturer')}>
                     <span className={styles.headerCell}>
                       제조업체
-                      <span className={styles.sortArrow}>{renderSortArrow('manufacturer')}</span>
+                      <span className={styles.sortArrow}>
+                        {sortColumn === 'manufacturer' && (sortOrder === 'asc' ? '▲' : '▼')}
+                      </span>
                     </span>
                   </th>
                   <th onClick={() => handleSort('is_use')}>
                     <span className={styles.headerCell}>
                       사용 여부
-                      <span className={styles.sortArrow}>{renderSortArrow('is_use')}</span>
+                      <span className={styles.sortArrow}>
+                        {sortColumn === 'is_use' && (sortOrder === 'asc' ? '▲' : '▼')}
+                      </span>
                     </span>
                   </th>
                 </tr>
@@ -257,6 +287,7 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
             </table>
           </div>
           <div className={styles.pagination}>
+            {totalPages !== 1 && <button className={styles.fakeButton}>이건 가짜지</button>}
             <button
               className={styles.paginationButton}
               onClick={() => setPage(Math.max(page - 1, 1))}
@@ -274,6 +305,17 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
             >
               다음
             </button>
+            {totalPages !== 1 && (
+              <button
+                className={styles.paginationButton}
+                onClick={() => {
+                  handlePageJump(calculateTotalPages());
+                }}
+                disabled={totalPages === 1}
+              >
+                페이지 이동
+              </button>
+            )}
           </div>
         </>
       )}
