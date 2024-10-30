@@ -7,11 +7,9 @@
 }
 
 .content {
-  padding-left: 2rem;
+  padding: 1.5rem;
   margin: 0 auto;
   text-align: left;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
 }
 
 .title {
