@@ -82,6 +82,10 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
       return prevPageSize;
     });
 
+    if (page === 1) {
+      setTriggerSearch((prev) => !prev);
+    }
+
     // 창 크기가 변경되면 팝업 닫기
     if (Swal.isVisible()) {
       Swal.close();
