@@ -85,7 +85,12 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
             icon: 'success',
             confirmButtonText: '확인',
           });
-          router.push('/items-list');
+          if (window.name === 'editClientPopup') {
+            localStorage.setItem('reloadItems', new Date().toString());
+            window.close();
+          } else {
+            router.push('/items-list');
+          }
         } else {
           await Swal.fire({
             title: '오류',
@@ -178,7 +183,12 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
       if (!isEditMode) {
         clear();
       }
-      router.push('/items-list');
+      if (window.name === 'editClientPopup') {
+        localStorage.setItem('reloadItems', new Date().toString());
+        window.close();
+      } else {
+        router.push('/items-list');
+      }
     }
   }
 

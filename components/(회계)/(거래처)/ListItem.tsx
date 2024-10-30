@@ -91,8 +91,30 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
   }, [debouncedHandleResize]);
 
   // 상세 페이지로 이동하는 함수
-  function editRoute(clients_id: string) {
-    router.push(`/client-edit/${clients_id}`);
+  function editRoute(clients_id: string, isNewTab: boolean) {
+    if (isNewTab) {
+      // 팝업 창 크기와 위치 설정 (예: 600x400 크기의 창, 중앙에 열기)
+      const width = 600;
+      const height = 400;
+      const left = (window.innerWidth - width) / 2;
+      const top = (window.innerHeight - height) / 2;
+
+      // 새 창을 팝업처럼 열고, 이름을 'editClientPopup'으로 설정
+      const popupWindow = window.open(
+        `/client-edit/${clients_id}`,
+        'editClientPopup', // 창의 이름
+        `width=${width},height=${height},top=${top},left=${left}`
+      );
+
+      // 새 창을 열었을 때 그 창이 최상위로 뜨도록 처리
+      if (popupWindow) {
+        popupWindow.focus();
+        popupWindow.name = 'editClientPopup';
+      }
+    } else {
+      // 기존 탭에서 이동
+      router.push(`/client-edit/${clients_id}`);
+    }
   }
 
   // 정렬을 처리하는 함수
@@ -207,8 +229,8 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
                     <tr
                       key={item.clients_id}
                       className={styles.tableRow}
-                      onClick={() => {
-                        editRoute(item.clients_id);
+                      onClick={(event) => {
+                        editRoute(item.clients_id, event.ctrlKey || event.metaKey);
                       }}
                       title={item.description}
                     >

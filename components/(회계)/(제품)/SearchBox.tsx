@@ -11,10 +11,31 @@ interface SearchBoxProps {
 export default function SearchBox({ onSearch }: SearchBoxProps) {
   const [input, setInput] = useState<string>('');
   const router = useRouter();
-  const handleAdd = () => {
-    router.push('/items-add');
-  };
 
+  function handleAdd(isNewTab: boolean) {
+    if (isNewTab) {
+      // 팝업 창 크기와 위치 설정 (예: 600x400 크기의 창, 중앙에 열기)
+      const width = 600;
+      const height = 400;
+      const left = (window.screen.width - width) / 2;
+      const top = (window.screen.height - height) / 2;
+
+      // 팝업 창으로 열기 위한 세부 설정
+      const popupWindow = window.open(
+        `/items-add`,
+        'editClientPopup', // 창의 이름
+        `width=${width},height=${height},top=${top},left=${left},resizable,scrollbars`
+      );
+
+      // 새 창을 열었을 때 그 창이 최상위로 뜨도록 처리
+      if (popupWindow) {
+        popupWindow.focus();
+      }
+    } else {
+      // 기존 탭에서 이동
+      router.push(`/items-add`);
+    }
+  }
   const handleSearch = () => {
     onSearch(input.trim());
   };
@@ -38,7 +59,12 @@ export default function SearchBox({ onSearch }: SearchBoxProps) {
       <button onClick={handleSearch} className={styles.button}>
         검색
       </button>
-      <button onClick={handleAdd} className={styles.button}>
+      <button
+        onClick={(event) => {
+          handleAdd(event.ctrlKey || event.metaKey);
+        }}
+        className={styles.button}
+      >
         추가
       </button>
     </div>
