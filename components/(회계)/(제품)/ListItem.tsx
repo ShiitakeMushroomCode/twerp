@@ -2,10 +2,11 @@
 
 import Spinner from '@/components/ETC/Spinner/Spinner';
 import styles from '@/styles/ListItem.module.css';
-import { formatPrice } from '@/util/reform';
-import useDebounce from '@/util/useDebounce';
+import { appendParticle, formatPrice } from '@/util/reform';
+import useThrottle from '@/util/useThrottle';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import Switch from 'react-switch';
 import Swal from 'sweetalert2';
 
 interface Product {
@@ -34,42 +35,39 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
   const [sortColumn, setSortColumn] = useState<string>('product_name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  const getInitialPageSize = () => {
-    if (typeof window !== 'undefined') {
-      const screenHeight = window.innerHeight;
-      let newPageSize: number;
+  // 각 아이템의 높이를 설정합니다 (예: 55px)
+  const itemHeight = 55;
 
-      if (screenHeight >= 1440) {
-        newPageSize = 20;
-      } else if (screenHeight <= 720) {
-        newPageSize = 5;
-      } else if (screenHeight <= 1080) {
-        newPageSize = 9;
-      } else {
-        newPageSize = 15;
-      }
-      return newPageSize;
-    }
-    return 15;
+  // 헤더, 푸터 등의 고정된 요소의 높이를 설정합니다 (예: 350px)
+  const fixedHeight = 400;
+
+  // 최소 및 최대 페이지 사이즈를 설정합니다
+  const MIN_PAGE_SIZE = 5;
+  const MAX_PAGE_SIZE = 20;
+
+  // 페이지 사이즈를 동적으로 계산하는 함수
+  const calculatePageSize = (screenHeight: number): number => {
+    const availableHeight = screenHeight - fixedHeight;
+    let newPageSize = Math.floor(availableHeight / itemHeight);
+    return Math.max(MIN_PAGE_SIZE, Math.min(newPageSize, MAX_PAGE_SIZE));
   };
 
-  const [pageSize, setPageSize] = useState<number>(getInitialPageSize);
+  // pageSize의 초기값을 null로 설정
+  const [pageSize, setPageSize] = useState<number | null>(null);
 
-  const debouncedHandleResize = useDebounce(() => {
+  // 컴포넌트 마운트 시 정확한 pageSize 계산
+  useEffect(() => {
     const screenHeight = window.innerHeight;
-    let newPageSize: number;
+    const newPageSize = calculatePageSize(screenHeight);
+    setPageSize(newPageSize);
+  }, []);
 
-    if (screenHeight >= 1440) {
-      newPageSize = 20;
-    } else if (screenHeight <= 720) {
-      newPageSize = 5;
-    } else if (screenHeight <= 1080) {
-      newPageSize = 9;
-    } else {
-      newPageSize = 15;
-    }
-
+  // Throttle을 사용하여 handleResize 함수 최적화
+  const handleResize = useThrottle(() => {
+    const screenHeight = window.innerHeight;
+    const newPageSize = calculatePageSize(screenHeight);
     const newTotalPages = Math.max(Math.ceil(total / newPageSize), 1);
+
     setPageSize((prevPageSize) => {
       if (prevPageSize !== newPageSize) {
         setTriggerSearch((prev) => !prev);
@@ -78,7 +76,6 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
         }
         return newPageSize;
       }
-
       return prevPageSize;
     });
 
@@ -86,24 +83,24 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
       setPage(1);
     }
 
-    // 창 크기가 변경되면 팝업 닫기
-    if (Swal.isVisible()) {
+    // 창 크기가 변경되면 페이지 이동 모달을 닫고 다시 엽니다
+    if (Swal.isVisible() && Swal.getTitle()?.textContent?.startsWith('이동할')) {
       Swal.close();
-
-      let currentTotalPages = newTotalPages; // 초기 totalPages 계산
-      if (currentTotalPages > 1) {
-        handlePageJump(currentTotalPages);
+      if (newTotalPages > 1) {
+        handlePageJump(newTotalPages);
       }
     }
-  }, 300);
+  }, 1000); // 1초 간격으로 실행
 
+  // 창 크기 조정 이벤트를 등록합니다
   useEffect(() => {
-    window.addEventListener('resize', debouncedHandleResize);
+    window.addEventListener('resize', handleResize);
     return () => {
-      window.removeEventListener('resize', debouncedHandleResize);
+      window.removeEventListener('resize', handleResize);
     };
-  }, [debouncedHandleResize]);
+  }, [handleResize]);
 
+  // 상세 페이지로 이동하는 함수
   function editRoute(product_id: string, isNewTab: boolean) {
     if (isNewTab) {
       const width = 600;
@@ -112,18 +109,19 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
       const top = (window.innerHeight - height) / 2;
       const popupWindow = window.open(
         `/items-edit/${product_id}`,
-        `editClientPopup-${product_id}`,
+        `editProductPopup-${product_id}`,
         `width=${width},height=${height},top=${top},left=${left}`
       );
       if (popupWindow) {
         popupWindow.focus();
-        popupWindow.name = `editClientPopup-${product_id}`;
+        popupWindow.name = `editProductPopup-${product_id}`;
       }
     } else {
       router.push(`/items-edit/${product_id}`);
     }
   }
 
+  // 정렬을 처리하는 함수
   function handleSort(column: string) {
     if (sortColumn === column) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -131,53 +129,19 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
       setSortColumn(column);
       setSortOrder('asc');
     }
-    setPage(1);
+    setPage(1); // 정렬 변경 시 페이지를 첫 번째 페이지로 리셋
   }
 
-  useEffect(() => {
-    if (pageSize === null) return;
-
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const requestBody: any = {
-          searchTerm,
-          page,
-          pageSize,
-        };
-
-        if (sortColumn) {
-          requestBody.sortColumn = sortColumn;
-          requestBody.sortOrder = sortOrder;
-        }
-
-        const response = await fetch(`/api/itemListData`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestBody),
-        });
-        const result = await response.json();
-        if (Array.isArray(result.data)) {
-          setData(result.data);
-          setTotal(result.total);
-        } else {
-          console.error('데이터 형식이 올바르지 않습니다:', result);
-        }
-      } catch (error) {
-        console.error('데이터를 가져오는데 실패하였습니다:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, [triggerSearch, page, searchTerm, sortColumn, sortOrder, pageSize]);
-
-  const calculateTotalPages = () => {
+  // totalPages 계산 함수
+  const calculateTotalPages = (): number => {
+    if (pageSize === null) return 1;
     return Math.max(Math.ceil(total / pageSize), 1);
   };
+
   const totalPages = calculateTotalPages();
 
-  function handlePageJump(currentTotalPages) {
+  // 페이지 번호를 입력받아 해당 페이지로 이동하는 함수
+  function handlePageJump(currentTotalPages: number) {
     // SweetAlert2 팝업을 엽니다
     Swal.fire({
       title: `이동할 페이지 번호를 입력하세요 (1 ~ ${currentTotalPages})`,
@@ -204,6 +168,98 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
         setPage(result.value); // 사용자가 입력한 페이지로 이동
       }
     });
+  }
+
+  // 토글 스위치를 눌렀을 때 모달을 띄우고 상태를 반전시킬지 묻는 로직
+  const handleToggle = async (item: Product, checked: boolean) => {
+    Swal.fire({
+      title: `${item.product_name}의 사용 여부 변경`,
+      text: checked
+        ? `${appendParticle(item.product_name, '을/를')} 사용하시겠습니까?`
+        : `${item.product_name}의 사용을 중지하시겠습니까?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: checked ? `사용하겠습니다.` : `중지하겠습니다.`,
+      cancelButtonText: '취소',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const newItem = {
+          ...item,
+          is_use: checked ? '사용' : '중지',
+        };
+
+        try {
+          // 클라이언트에서 직접 API 호출
+          const res = await fetch(`/api/itemUpdate`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newItem),
+            credentials: 'include',
+          });
+
+          if (res.ok) {
+            Swal.fire(
+              '성공',
+              checked
+                ? `이제 ${appendParticle(item.product_name, '을/를')} 사용합니다.`
+                : `${item.product_name}의 사용을 중지합니다.`,
+              'success'
+            );
+
+            setTriggerSearch((prev) => !prev);
+          } else {
+            const errorData = await res.json();
+            Swal.fire('오류', errorData.message || '제품 수정에 실패하였습니다.', 'error');
+          }
+        } catch (error) {
+          console.error('API 요청 중 에러 발생:', error);
+          Swal.fire('오류', 'API 요청 중 에러가 발생했습니다.', 'error');
+        }
+      }
+    });
+  };
+
+  // 데이터 Fetch
+  useEffect(() => {
+    if (pageSize === null) return; // pageSize가 설정되기 전에는 데이터를 가져오지 않음
+
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const requestBody: any = {
+          searchTerm,
+          page,
+          pageSize,
+          sortColumn,
+          sortOrder,
+        };
+
+        const response = await fetch(`/api/itemListData`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody),
+        });
+        const result = await response.json();
+        if (Array.isArray(result.data)) {
+          setData(result.data);
+          setTotal(result.total);
+        } else {
+          console.error('데이터 형식이 올바르지 않습니다:', result);
+        }
+      } catch (error) {
+        console.error('데이터를 가져오는데 실패하였습니다:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, [triggerSearch, page, searchTerm, sortColumn, sortOrder, pageSize]);
+
+  if (pageSize === null) {
+    // pageSize가 설정되기 전에는 로딩 상태를 표시
+    return <Spinner />;
   }
 
   return (
@@ -268,21 +324,49 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
               <tbody>
                 {data.length > 0 ? (
                   data.map((item) => (
-                    <tr
-                      key={item.product_id}
-                      className={styles.tableRow}
-                      onClick={(event) => {
-                        editRoute(item.product_id, event.ctrlKey || event.metaKey);
-                      }}
-                      title={item.description}
-                    >
-                      <td className={styles.centerAlign}>{item.product_name}</td>
-                      <td className={styles.centerAlign}>{item.category || '없음'}</td>
-                      <td className={styles.rightAlign}>
-                        {item.price === null || item.price === undefined ? 0 : formatPrice(item.price) + '원'}
+                    <tr key={item.product_id} className={styles.tableRow} title={item.description}>
+                      <td
+                        className={styles.centerAlign}
+                        onClick={(event) => {
+                          editRoute(item.product_id, event.ctrlKey || event.metaKey);
+                        }}
+                      >
+                        {item.product_name}
                       </td>
-                      <td className={styles.centerAlign}>{item.manufacturer || '없음'}</td>
-                      <td className={styles.centerAlign}>{item.is_use}</td>
+                      <td
+                        className={styles.centerAlign}
+                        onClick={(event) => {
+                          editRoute(item.product_id, event.ctrlKey || event.metaKey);
+                        }}
+                      >
+                        {item.category || '없음'}
+                      </td>
+                      <td
+                        className={styles.rightAlign}
+                        onClick={(event) => {
+                          editRoute(item.product_id, event.ctrlKey || event.metaKey);
+                        }}
+                      >
+                        {item.price === null || item.price === undefined ? '0원' : `${formatPrice(item.price)}원`}
+                      </td>
+                      <td
+                        className={styles.centerAlign}
+                        onClick={(event) => {
+                          editRoute(item.product_id, event.ctrlKey || event.metaKey);
+                        }}
+                      >
+                        {item.manufacturer || '없음'}
+                      </td>
+                      <td className={styles.centerAlign}>
+                        <Switch
+                          onChange={(checked) => handleToggle(item, checked)}
+                          checked={item.is_use === '사용'}
+                          uncheckedIcon={false}
+                          checkedIcon={false}
+                          onColor="#499eff"
+                          offColor="#ccc"
+                        />
+                      </td>
                     </tr>
                   ))
                 ) : (
@@ -296,7 +380,6 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
             </table>
           </div>
           <div className={styles.pagination}>
-            {totalPages !== 1 && <button className={styles.fakeButton}>이건 가짜지</button>}
             <button
               className={styles.paginationButton}
               onClick={() => setPage(Math.max(page - 1, 1))}
@@ -315,13 +398,7 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
               다음
             </button>
             {totalPages !== 1 && (
-              <button
-                className={styles.paginationButton}
-                onClick={() => {
-                  handlePageJump(calculateTotalPages());
-                }}
-                disabled={totalPages === 1}
-              >
+              <button className={styles.paginationButton} onClick={() => handlePageJump(totalPages)}>
                 페이지 이동
               </button>
             )}

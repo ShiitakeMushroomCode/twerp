@@ -107,3 +107,60 @@
   box-sizing: border-box;
   max-width: 100%;
 }
+.radioGroup {
+  display: flex;
+  align-items: center;
+}
+
+.customRadio {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-left: 35px;
+  margin-right: 20px;
+  cursor: pointer;
+  font-size: large;
+  font-weight: bold;
+}
+
+.customRadio input[type='radio'] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.customRadio input[type='radio']:checked ~ .radioLabelText::before {
+  background-color: #499eff;
+  border-color: #499eff;
+}
+
+.customRadio .radioLabelText::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  background-color: white;
+  transition: all 0.3s ease;
+}
+
+.customRadio .radioLabelText::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: white;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.customRadio input[type='radio']:checked ~ .radioLabelText::after {
+  background-color: #fff;
+  opacity: 1;
+}

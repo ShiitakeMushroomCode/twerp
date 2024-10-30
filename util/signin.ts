@@ -23,7 +23,7 @@ export async function signin(formData: FormData) {
         name: 'accessToken',
         value: data.accessToken,
         httpOnly: true,
-        maxAge: 60 * 60,
+        maxAge: 60 * 15,
         path: '/',
         sameSite: 'strict',
         secure: true,

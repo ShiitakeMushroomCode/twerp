@@ -56,6 +56,7 @@
   padding: 12px;
   border: 1px solid #ddd;
   word-wrap: break-word;
+  vertical-align: middle;
 }
 
 /* 테이블 행 마우스 오버 효과 */

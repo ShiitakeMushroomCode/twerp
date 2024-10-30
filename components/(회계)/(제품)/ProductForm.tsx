@@ -1,4 +1,5 @@
 'use client';
+import { FormControlLabel, Radio, RadioGroup } from '@mui/material';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useState } from 'react';
@@ -300,10 +301,17 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
           <label htmlFor="is_use" className={styles.label}>
             사용 여부
           </label>
-          <select id="is_use" name="is_use" className={styles.input} value={formData.is_use} onChange={handleChange}>
-            <option value="사용">사용</option>
-            <option value="중지">중지</option>
-          </select>
+          <RadioGroup
+            row
+            aria-label="is_use"
+            name="is_use"
+            value={formData.is_use}
+            onChange={handleChange}
+            className={styles.radioGroup}
+          >
+            <FormControlLabel value="사용" control={<Radio />} label="사용" />
+            <FormControlLabel value="중지" control={<Radio />} label="중지" />
+          </RadioGroup>
         </div>
 
         <div className={styles['form-row']}>

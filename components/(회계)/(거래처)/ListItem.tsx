@@ -3,7 +3,7 @@
 import Spinner from '@/components/ETC/Spinner/Spinner';
 import styles from '@/styles/ListItem.module.css';
 import { formatPhoneNumber } from '@/util/reform';
-import useDebounce from '@/util/useDebounce';
+import useThrottle from '@/util/useThrottle';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
@@ -36,79 +36,56 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
   const [sortColumn, setSortColumn] = useState<string>('company_name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  // 초기 pageSize를 화면 크기에 따라 설정하는 함수
-  const getInitialPageSize = () => {
-    if (typeof window !== 'undefined') {
-      const screenHeight = window.innerHeight;
-      let newPageSize: number;
+  // 각 아이템의 높이를 설정합니다 (예: 55px)
+  const itemHeight = 41;
 
-      if (screenHeight >= 1440) {
-        newPageSize = 20;
-      } else if (screenHeight <= 720) {
-        newPageSize = 5;
-      } else if (screenHeight <= 1080) {
-        newPageSize = 9;
-      } else {
-        newPageSize = 15;
-      }
-      return newPageSize;
-    }
-    return 15; // 서버 사이드 렌더링 시 기본값
+  // 헤더, 푸터 등의 고정된 요소의 높이를 설정합니다 (예: 350px)
+  const fixedHeight = 400;
+
+  // 최소 및 최대 페이지 사이즈를 설정합니다
+  const MIN_PAGE_SIZE = 5;
+  const MAX_PAGE_SIZE = 20;
+
+  // 페이지 사이즈를 동적으로 계산하는 함수
+  const calculatePageSize = (screenHeight) => {
+    const availableHeight = screenHeight - fixedHeight;
+    let newPageSize = Math.floor(availableHeight / itemHeight);
+    return Math.max(MIN_PAGE_SIZE, Math.min(newPageSize, MAX_PAGE_SIZE));
   };
 
-  const [pageSize, setPageSize] = useState<number>(getInitialPageSize);
+  // pageSize의 초기값을 null로 설정
+  const [pageSize, setPageSize] = useState<number | null>(null);
 
-  // Debounce를 사용하여 handleResize 함수 최적화
-  const debouncedHandleResize = useDebounce(() => {
+  // 컴포넌트 마운트 시 정확한 pageSize 계산
+  useEffect(() => {
     const screenHeight = window.innerHeight;
-    let newPageSize: number;
+    const newPageSize = calculatePageSize(screenHeight);
+    setPageSize(newPageSize);
+  }, []);
 
-    if (screenHeight >= 1440) {
-      newPageSize = 20;
-    } else if (screenHeight <= 720) {
-      newPageSize = 5;
-    } else if (screenHeight <= 1080) {
-      newPageSize = 9;
-    } else {
-      newPageSize = 15;
-    }
+  // Throttle을 사용하여 handleResize 함수 최적화
+  const handleResize = useThrottle(() => {
+    const screenHeight = window.innerHeight;
+    const newPageSize = calculatePageSize(screenHeight);
 
-    const newTotalPages = Math.max(Math.ceil(total / newPageSize), 1);
+    // 페이지 사이즈가 변경되었을 때만 업데이트
     setPageSize((prevPageSize) => {
       if (prevPageSize !== newPageSize) {
-        setTriggerSearch((prev) => !prev); // 검색 트리거 토글
-        if (page > newTotalPages) {
-          setPage(newTotalPages);
-        }
         return newPageSize;
       }
       return prevPageSize;
     });
+  }, 1000); // 1초 간격으로 실행
 
-    if (newTotalPages === 1) {
-      setPage(1);
-    }
-
-    // 창 크기가 변경되면 팝업 닫기
-    if (Swal.isVisible()) {
-      Swal.close();
-
-      let currentTotalPages = newTotalPages; // 초기 totalPages 계산
-      if (currentTotalPages > 1) {
-        // SweetAlert2 팝업을 엽니다
-        handlePageJump(currentTotalPages);
-      }
-    }
-  }, 300); // 300ms 지연
-
+  // 창 크기 조정 이벤트를 등록합니다
   useEffect(() => {
-    window.addEventListener('resize', debouncedHandleResize);
+    window.addEventListener('resize', handleResize);
 
-    // 컴포넌트 언마운트 시 리스너 제거
+    // 컴포넌트 언마운트 시 이벤트 리스너를 해제합니다
     return () => {
-      window.removeEventListener('resize', debouncedHandleResize);
+      window.removeEventListener('resize', handleResize);
     };
-  }, [debouncedHandleResize]);
+  }, []);
 
   // 상세 페이지로 이동하는 함수
   function editRoute(clients_id: string, isNewTab: boolean) {
@@ -211,7 +188,12 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
     fetchData();
   }, [triggerSearch, page, searchTerm, sortColumn, sortOrder, pageSize]);
 
-  const totalPages = calculateTotalPages();
+  const totalPages = pageSize !== null ? calculateTotalPages() : 1;
+
+  if (pageSize === null) {
+    // pageSize가 설정되기 전에는 로딩 상태를 표시
+    return <Spinner />;
+  }
 
   return (
     <div className={styles.container}>
@@ -325,7 +307,7 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
               <button
                 className={styles.paginationButton}
                 onClick={() => {
-                  handlePageJump(calculateTotalPages());
+                  handlePageJump(totalPages);
                 }}
                 disabled={totalPages === 1}
               >
