@@ -1,5 +1,6 @@
 import { executeQuery } from '@/lib/db';
 import { isEmpty } from '@/util/lo';
+import { hashPassword } from '@/util/password';
 import { ACT } from 'auth';
 import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
@@ -126,7 +127,7 @@ export async function updatePhoneNumber(userId: string, newPhoneNumber: string):
   }
 }
 
-// 전화번호 업데이트 함수
+// 이메일 업데이트 함수
 export async function updateEmail(userId: string, newEmail: string): Promise<boolean> {
   // 값 검증
   if (isEmpty(userId) || isEmpty(newEmail)) {
@@ -135,8 +136,29 @@ export async function updateEmail(userId: string, newEmail: string): Promise<boo
   }
 
   try {
-    // 전화번호 업데이트
+    // 이메일 업데이트
     await executeQuery('UPDATE employee SET email = ? WHERE phone_number = ?;', [newEmail, userId]);
+    return true;
+  } catch (error) {
+    console.error(error.message);
+    return false;
+  }
+}
+
+// 비밀번호 업데이트 함수
+export async function updatePassword(userId: string, newPassword: string): Promise<boolean> {
+  // 값 검증
+  if (isEmpty(userId) || isEmpty(newPassword)) {
+    console.error('유효하지 않은 userId 또는 newPassword 값입니다.');
+    return false;
+  }
+
+  try {
+    // 전화번호 업데이트
+    await executeQuery('UPDATE employee SET password = ? WHERE phone_number = ?;', [
+      await hashPassword(newPassword),
+      userId,
+    ]);
     return true;
   } catch (error) {
     console.error(error.message);
