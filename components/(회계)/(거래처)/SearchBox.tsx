@@ -23,7 +23,7 @@ export default function SearchBox({ onSearch }: SearchBoxProps) {
       // 팝업 창으로 열기 위한 세부 설정
       const popupWindow = window.open(
         `/client-add`,
-        'editClientPopup', // 창의 이름
+        `editClientPopup-${Date.now()}`, // 창의 이름
         `width=${width},height=${height},top=${top},left=${left},resizable,scrollbars`
       );
 

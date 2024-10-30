@@ -85,7 +85,7 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
             icon: 'success',
             confirmButtonText: '확인',
           });
-          if (window.name === 'editClientPopup') {
+          if (window.name.startsWith('editClientPopup')) {
             localStorage.setItem('reloadItems', new Date().toString());
             window.close();
           } else {
@@ -183,7 +183,7 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
       if (!isEditMode) {
         clear();
       }
-      if (window.name === 'editClientPopup') {
+      if (window.name.startsWith('editClientPopup')) {
         localStorage.setItem('reloadItems', new Date().toString());
         window.close();
       } else {

@@ -112,12 +112,12 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
       const top = (window.innerHeight - height) / 2;
       const popupWindow = window.open(
         `/items-edit/${product_id}`,
-        'editClientPopup',
+        `editClientPopup-${product_id}`,
         `width=${width},height=${height},top=${top},left=${left}`
       );
       if (popupWindow) {
         popupWindow.focus();
-        popupWindow.name = 'editClientPopup';
+        popupWindow.name = `editClientPopup-${product_id}`;
       }
     } else {
       router.push(`/items-edit/${product_id}`);

@@ -119,12 +119,12 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
       const top = (window.innerHeight - height) / 2;
       const popupWindow = window.open(
         `/client-edit/${clients_id}`,
-        'editClientPopup',
+        `editClientPopup-${clients_id}`,
         `width=${width},height=${height},top=${top},left=${left}`
       );
       if (popupWindow) {
         popupWindow.focus();
-        popupWindow.name = 'editClientPopup';
+        popupWindow.name = `editClientPopup-${clients_id}`;
       }
     } else {
       router.push(`/client-edit/${clients_id}`);
