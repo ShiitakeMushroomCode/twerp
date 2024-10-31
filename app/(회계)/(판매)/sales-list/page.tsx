@@ -1,6 +1,8 @@
+import SalesList from '@/components/(회계)/(거래)/(판매)/SalesList';
+
 export const metadata = {
   title: '매출 목록',
 };
 export default async function Page() {
-  return <div></div>;
+  return <SalesList />;
 }

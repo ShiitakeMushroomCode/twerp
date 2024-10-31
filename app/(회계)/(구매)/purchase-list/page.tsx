@@ -1,6 +1,8 @@
+import PurchaseList from '@/components/(회계)/(거래)/(구매)/PurchaseList';
+
 export const metadata = {
-  title: '매입자료',
+  title: '매입 목록',
 };
 export default async function Page() {
-  return <div>매입자료 확인하는 곳</div>;
+  return <PurchaseList />;
 }
