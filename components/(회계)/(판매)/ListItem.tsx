@@ -1,11 +1,11 @@
 'use client';
-
 import Spinner from '@/components/ETC/Spinner/Spinner';
 import styles from '@/styles/ListItem.module.css';
 import { formatPrice } from '@/util/reform';
 import useThrottle from '@/util/useThrottle';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { FiCopy, FiFileText, FiPrinter } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 
 interface SaleData {
@@ -201,15 +201,17 @@ export default function SalesListItem({ searchTerm, page, setPage, triggerSearch
           <div className={styles.tableContainer}>
             <table className={styles.table}>
               <colgroup>
-                <col style={{ width: '25%' }} />
-                <col style={{ width: '25%' }} />
+                <col style={{ width: '8%' }} />
+                <col style={{ width: '23%' }} />
+                <col style={{ width: '23%' }} />
                 <col style={{ width: '15%' }} />
                 <col style={{ width: '15%' }} />
-                <col style={{ width: '10%' }} />
-                <col style={{ width: '10%' }} />
+                <col style={{ width: '8%' }} />
+                <col style={{ width: '8%' }} />
               </colgroup>
               <thead className={styles.tableHeader}>
                 <tr>
+                  <th>복사</th>
                   <th onClick={() => handleSort('client_name')}>
                     <span className={styles.headerCell}>
                       <span className={styles.fakeLabel}>▲</span>
@@ -258,6 +260,17 @@ export default function SalesListItem({ searchTerm, page, setPage, triggerSearch
                     return (
                       <tr key={item.sales_id} className={styles.tableRow} title={item.description || ''}>
                         <td
+                          className={styles.centerAlign}
+                          onClick={(event) => {
+                            //복사 해야함
+                          }}
+                        >
+                          <span className={styles.iconButton}>
+                            <FiCopy />
+                            복사
+                          </span>
+                        </td>
+                        <td
                           className={styles.leftAlign}
                           onClick={(event) => {
                             editRoute(item.sales_id, event.ctrlKey || event.metaKey);
@@ -297,7 +310,11 @@ export default function SalesListItem({ searchTerm, page, setPage, triggerSearch
                             // 인쇄 기능 호출
                           }}
                         >
-                          인쇄
+                          <span className={styles.iconButton}>
+                            {' '}
+                            <FiPrinter />
+                            인쇄
+                          </span>
                         </td>
                         <td
                           className={styles.centerAlign}
@@ -306,7 +323,10 @@ export default function SalesListItem({ searchTerm, page, setPage, triggerSearch
                             // 전표 조회 기능 호출
                           }}
                         >
-                          조회
+                          <span className={styles.iconButton}>
+                            <FiFileText />
+                            조회
+                          </span>
                         </td>
                       </tr>
                     );

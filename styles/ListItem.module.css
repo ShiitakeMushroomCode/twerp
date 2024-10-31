@@ -32,7 +32,8 @@
   background-color: #f0f0f0;
   word-wrap: break-word;
   text-align: center;
-  cursor: pointer; /* 포인터 커서 추가 */
+  cursor: pointer;
+  border: 1px solid #ddd;
 }
 
 /* 헤더 셀 내부 스타일 */
@@ -130,4 +131,31 @@
 
 .fakeLabel {
   visibility: hidden;
+}
+
+.iconButton {
+  background: none;
+  border: none;
+  color: #0070f3;
+  padding: 5px 10px;
+  font-size: 0.9em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.iconButton:hover {
+  color: #005bb5;
+}
+
+.iconButton:active {
+  color: #004494;
+}
+
+.iconButton:disabled {
+  color: #ccc;
+  cursor: not-allowed;
 }

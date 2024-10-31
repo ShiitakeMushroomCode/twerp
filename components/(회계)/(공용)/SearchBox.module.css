@@ -25,6 +25,7 @@
   cursor: pointer;
   border-radius: 4px;
   transition: background-color 0.3s;
+  vertical-align: middle;
 }
 
 .button:hover {
