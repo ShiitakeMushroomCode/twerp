@@ -1,3 +1,4 @@
+import Footer from '@/components/Footer/Footer';
 import NNavBar from '@/components/Header/NNavBar';
 import '@/styles/global.css';
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -5,6 +6,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div>
       <NNavBar />
       <div className="content">{children}</div>
+      <Footer />
     </div>
   );
 }

@@ -1,0 +1,42 @@
+.notFoundContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  background-color: #f4f4f4;
+  padding: 20px;
+}
+
+.title {
+  font-size: 6rem;
+  font-weight: bold;
+  color: #0070f3;
+  margin: 0;
+}
+
+.message {
+  font-size: 1.5rem;
+  color: #333;
+  margin: 20px 0;
+}
+
+.redirectMessage {
+  font-size: 1.2rem;
+  color: #555;
+  margin-top: 10px;
+  animation: fadeInOut 2.5s ease-in-out infinite;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
