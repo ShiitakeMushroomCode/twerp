@@ -41,25 +41,26 @@ export default async function MyPage() {
         <h1 className={styles.title}>마이페이지</h1>
         <div className={styles.content}>
           <p className={styles.info}>
-            <span className={styles.label}>이름:</span> {user.name}
+            <span className={styles.label}>이름:</span> {user.name || '없음'}
           </p>
           <p className={styles.info}>
-            <span className={styles.label}>부서:</span> {user.department}
+            <span className={styles.label}>부서:</span> {user.department || '없음'}
           </p>
           <p className={styles.info}>
-            <span className={styles.label}>직급:</span> {user.position}
+            <span className={styles.label}>직급:</span> {user.position || '없음'}
           </p>
           <p className={styles.info}>
-            <span className={styles.label}>이메일:</span> {user.email}
+            <span className={styles.label}>이메일:</span> {user.email || '없음'}
           </p>
           <p className={styles.info}>
-            <span className={styles.label}>전화번호:</span> {user.userId.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3')}
+            <span className={styles.label}>전화번호:</span>{' '}
+            {user.userId.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3') || '없음'}
           </p>
           <p className={styles.info}>
             <span className={styles.label}>입사일:</span>{' '}
             {new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }).format(
               new Date(user.hireDate)
-            )}
+            ) || '없음'}
           </p>
         </div>
         <hr />
