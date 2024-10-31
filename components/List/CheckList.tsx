@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers';
 import ListItem from './ListItem';
 // 이게 어따 쓰는거지? 그냥 테스트용이구나
 async function getTest() {
@@ -6,6 +7,7 @@ async function getTest() {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        Cookie: cookies().toString(),
       },
     });
 

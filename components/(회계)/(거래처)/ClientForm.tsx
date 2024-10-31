@@ -186,6 +186,7 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
           headers: {
             'Content-Type': 'application/json',
           },
+          credentials: 'include',
           body: JSON.stringify({ business_number: formData.business_number.replace(/-/g, '') }),
         });
 

@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
+        Cookie: cookies().toString(),
       },
       body: JSON.stringify({ refreshToken: refreshTokenValue }),
     });

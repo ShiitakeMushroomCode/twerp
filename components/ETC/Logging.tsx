@@ -12,6 +12,7 @@ export default function Logging() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ pathname }),
       });
     }

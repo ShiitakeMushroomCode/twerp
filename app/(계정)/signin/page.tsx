@@ -17,6 +17,7 @@ async function signin(formData: FormData) {
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
+        Cookie: cookies().toString(),
       },
       body: JSON.stringify(data),
       credentials: 'include',

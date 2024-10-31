@@ -74,6 +74,7 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
           headers: {
             'Content-Type': 'application/json',
           },
+          credentials: 'include',
           body: JSON.stringify({ product_id: formData.product_id }),
         });
 

@@ -164,6 +164,7 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
         const response = await fetch(`/api/clientListData`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({
             searchTerm,
             page,

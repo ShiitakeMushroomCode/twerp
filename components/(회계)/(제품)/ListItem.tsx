@@ -239,6 +239,7 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
         const response = await fetch(`/api/itemListData`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(requestBody),
         });
         const result = await response.json();

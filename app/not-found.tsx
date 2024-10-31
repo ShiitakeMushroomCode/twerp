@@ -17,6 +17,7 @@ export default function NotFound() {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({ pathname }),
     });
 
