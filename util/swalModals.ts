@@ -1,7 +1,7 @@
 import Swal from 'sweetalert2';
 
 /**
- * 전화번호 인증 모달을 열고 사용자가 입력한 코드를 반환합니다.
+ * 전화번호 인증 모달을 열고 사용자가 입력한 코드를 반환
  * @returns Promise<string | null>
  */
 export function openPhoneVerificationModal(): Promise<string | null> {
@@ -27,7 +27,7 @@ export function openPhoneVerificationModal(): Promise<string | null> {
 }
 
 /**
- * 이메일 인증 모달을 열고 사용자가 입력한 코드를 반환합니다.
+ * 이메일 인증 모달을 열고 사용자가 입력한 코드를 반환
  * @returns Promise<string | null>
  */
 export function openEmailVerificationModal(): Promise<string | null> {
@@ -53,7 +53,7 @@ export function openEmailVerificationModal(): Promise<string | null> {
 }
 
 /**
- * 비밀번호 인증 모달을 열고 사용자가 입력한 코드를 반환합니다.
+ * 비밀번호 인증 모달을 열고 사용자가 입력한 코드를
  * @returns Promise<string | null>
  */
 export function openPasswordVerificationModal(): Promise<string | null> {

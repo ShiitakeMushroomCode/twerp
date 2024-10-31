@@ -35,13 +35,13 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
   const [sortColumn, setSortColumn] = useState<string>('product_name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  // 각 아이템의 높이를 설정합니다 (예: 55px)
+  // 각 아이템의 높이를 설정
   const itemHeight = 55;
 
-  // 헤더, 푸터 등의 고정된 요소의 높이를 설정합니다 (예: 350px)
+  // 헤더, 푸터 등의 고정된 요소의 높이를 설정
   const fixedHeight = 400;
 
-  // 최소 및 최대 페이지 사이즈를 설정합니다
+  // 최소 및 최대 페이지 사이즈를 설정
   const MIN_PAGE_SIZE = 5;
   const MAX_PAGE_SIZE = 20;
 
@@ -83,7 +83,7 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
       setPage(1);
     }
 
-    // 창 크기가 변경되면 페이지 이동 모달을 닫고 다시 엽니다
+    // 창 크기가 변경되면 페이지 이동 모달을 닫고 다시 열기
     if (Swal.isVisible() && Swal.getTitle()?.textContent?.startsWith('이동할')) {
       Swal.close();
       if (newTotalPages > 1) {
@@ -92,7 +92,7 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
     }
   }, 1000); // 1초 간격으로 실행
 
-  // 창 크기 조정 이벤트를 등록합니다
+  // 창 크기 조정 이벤트를 등록
   useEffect(() => {
     window.addEventListener('resize', handleResize);
     return () => {

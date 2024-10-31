@@ -7,7 +7,7 @@ export const metadata = {
   title: '제품 수정하기',
 };
 
-// 동적 렌더링을 강제합니다.
+// 동적 렌더링을 강제
 export const dynamic = 'force-dynamic';
 
 interface PageProps {

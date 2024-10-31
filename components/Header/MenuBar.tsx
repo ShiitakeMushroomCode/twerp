@@ -6,10 +6,10 @@ import styles from './MenuBar.module.css';
 
 //나중에 id별로 바꿀꺼임 아마
 const erpMenuItems = [
-  { title: '거래처정보', href: '/client-list' },
-  { title: '매출정보', href: '/sales-list' },
-  { title: '매입정보', href: '/purchase-list' },
-  { title: '제품정보', href: '/items-list' },
+  { title: '거래처 목록', href: '/client-list' },
+  { title: '매출 정보', href: '/sales-list' },
+  { title: '매입 정보', href: '/purchase-list' },
+  { title: '제품 목록', href: '/items-list' },
   // { title: '재고', href: '/inventory-list' },
   // { title: '세금계산서', href: '/invoice-list' },
 ];

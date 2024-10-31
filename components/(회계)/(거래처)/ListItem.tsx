@@ -36,13 +36,13 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
   const [sortColumn, setSortColumn] = useState<string>('company_name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  // 각 아이템의 높이를 설정합니다 (예: 55px)
+  // 각 아이템의 높이를 설정
   const itemHeight = 41;
 
-  // 헤더, 푸터 등의 고정된 요소의 높이를 설정합니다 (예: 350px)
-  const fixedHeight = 400;
+  // 헤더, 푸터 등의 고정된 요소의 높이를 설정
+  const fixedHeight = 380;
 
-  // 최소 및 최대 페이지 사이즈를 설정합니다
+  // 최소 및 최대 페이지 사이즈를 설정
   const MIN_PAGE_SIZE = 5;
   const MAX_PAGE_SIZE = 20;
 
@@ -77,11 +77,11 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
     });
   }, 1000); // 1초 간격으로 실행
 
-  // 창 크기 조정 이벤트를 등록합니다
+  // 창 크기 조정 이벤트를 등록
   useEffect(() => {
     window.addEventListener('resize', handleResize);
 
-    // 컴포넌트 언마운트 시 이벤트 리스너를 해제합니다
+    // 컴포넌트 언마운트 시 이벤트 리스너를 해제
     return () => {
       window.removeEventListener('resize', handleResize);
     };
