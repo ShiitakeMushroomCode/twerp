@@ -127,3 +127,7 @@
 .fakeButton {
   visibility: hidden;
 }
+
+.fakeLabel {
+  visibility: hidden;
+}

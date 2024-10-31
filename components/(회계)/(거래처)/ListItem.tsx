@@ -25,10 +25,9 @@ interface ListItemProps {
   page: number;
   setPage: (page: number) => void;
   triggerSearch: boolean;
-  setTriggerSearch: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function CompanyListItem({ searchTerm, page, setPage, triggerSearch, setTriggerSearch }: ListItemProps) {
+export default function CompanyListItem({ searchTerm, page, setPage, triggerSearch }: ListItemProps) {
   const router = useRouter();
   const [data, setData] = useState<Company[]>([]);
   const [total, setTotal] = useState<number>(0);
@@ -215,6 +214,7 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
                 <tr>
                   <th onClick={() => handleSort('business_number')}>
                     <span className={styles.headerCell}>
+                      <span className={styles.fakeLabel}>▲</span>
                       사업자번호
                       <span className={styles.sortArrow}>
                         {sortColumn === 'business_number' && (sortOrder === 'asc' ? '▲' : '▼')}
@@ -223,6 +223,7 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
                   </th>
                   <th onClick={() => handleSort('company_name')}>
                     <span className={styles.headerCell}>
+                      <span className={styles.fakeLabel}>▲</span>
                       기업명
                       <span className={styles.sortArrow}>
                         {sortColumn === 'company_name' && (sortOrder === 'asc' ? '▲' : '▼')}
@@ -231,6 +232,7 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
                   </th>
                   <th onClick={() => handleSort('representative_name')}>
                     <span className={styles.headerCell}>
+                      <span className={styles.fakeLabel}>▲</span>
                       대표자명
                       <span className={styles.sortArrow}>
                         {sortColumn === 'representative_name' && (sortOrder === 'asc' ? '▲' : '▼')}
@@ -239,6 +241,7 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
                   </th>
                   <th onClick={() => handleSort('tell_number')}>
                     <span className={styles.headerCell}>
+                      <span className={styles.fakeLabel}>▲</span>
                       대표번호
                       <span className={styles.sortArrow}>
                         {sortColumn === 'tell_number' && (sortOrder === 'asc' ? '▲' : '▼')}
@@ -247,6 +250,7 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
                   </th>
                   <th onClick={() => handleSort('fax_number')}>
                     <span className={styles.headerCell}>
+                      <span className={styles.fakeLabel}>▲</span>
                       팩스번호
                       <span className={styles.sortArrow}>
                         {sortColumn === 'fax_number' && (sortOrder === 'asc' ? '▲' : '▼')}

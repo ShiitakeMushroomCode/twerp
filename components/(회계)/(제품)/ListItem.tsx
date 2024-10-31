@@ -284,6 +284,7 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
                 <tr>
                   <th onClick={() => handleSort('product_name')}>
                     <span className={styles.headerCell}>
+                      <span className={styles.fakeLabel}>▲</span>
                       제품명
                       <span className={styles.sortArrow}>
                         {sortColumn === 'product_name' && (sortOrder === 'asc' ? '▲' : '▼')}
@@ -292,6 +293,7 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
                   </th>
                   <th onClick={() => handleSort('category')}>
                     <span className={styles.headerCell}>
+                      <span className={styles.fakeLabel}>▲</span>
                       카테고리
                       <span className={styles.sortArrow}>
                         {sortColumn === 'category' && (sortOrder === 'asc' ? '▲' : '▼')}
@@ -300,6 +302,7 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
                   </th>
                   <th onClick={() => handleSort('price')}>
                     <span className={styles.headerCell}>
+                      <span className={styles.fakeLabel}>▲</span>
                       가격
                       <span className={styles.sortArrow}>
                         {sortColumn === 'price' && (sortOrder === 'asc' ? '▲' : '▼')}
@@ -308,6 +311,7 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
                   </th>
                   <th onClick={() => handleSort('manufacturer')}>
                     <span className={styles.headerCell}>
+                      <span className={styles.fakeLabel}>▲</span>
                       제조업체
                       <span className={styles.sortArrow}>
                         {sortColumn === 'manufacturer' && (sortOrder === 'asc' ? '▲' : '▼')}
@@ -316,6 +320,7 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
                   </th>
                   <th onClick={() => handleSort('is_use')}>
                     <span className={styles.headerCell}>
+                      <span className={styles.fakeLabel}>▲</span>
                       사용 여부
                       <span className={styles.sortArrow}>
                         {sortColumn === 'is_use' && (sortOrder === 'asc' ? '▲' : '▼')}
@@ -353,7 +358,7 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
                         {item.price === null || item.price === undefined ? '0원' : `${formatPrice(item.price)}원`}
                       </td>
                       <td
-                        className={styles.centerAlign}
+                        className={styles.leftAlign}
                         onClick={(event) => {
                           editRoute(item.product_id, event.ctrlKey || event.metaKey);
                         }}
