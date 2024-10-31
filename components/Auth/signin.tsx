@@ -6,9 +6,15 @@ import Logging from '../ETC/Logging';
 import styles from './SignInPage.module.css';
 
 export default function SigninForm({ signin }) {
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('010-1234-5678');
+  const [password, setPassword] = useState('12345678');
   const [error, setError] = useState('');
   const router = useRouter();
+
+  function handlePasswordChange(e: ChangeEvent<HTMLInputElement>) {
+    const { value } = e.target;
+    setPassword(value);
+  }
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     const { value } = e.target;
@@ -67,6 +73,8 @@ export default function SigninForm({ signin }) {
           placeholder="비밀번호 입력"
           title="비밀번호는 최소 8자 이상이어야 하며, 영문 대문자 또는 소문자와 숫자를 포함해야 합니다. 특수문자는 선택 사항입니다."
           autoComplete="off"
+          value={password}
+          onChange={handlePasswordChange}
         />
       </div>
       <button type="submit" className={styles.button}>

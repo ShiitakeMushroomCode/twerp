@@ -6,7 +6,7 @@ export interface ACT {
   tellNumber?: string; // 전화번호
   position?: string; // 직급
   email?: string; // 이메일
-  hireDate?: Date; // 입사일
+  hireDate?: string; // 입사일
   status?: string; // 현상태
 }
 export interface Client {

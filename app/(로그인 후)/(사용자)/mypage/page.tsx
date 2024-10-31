@@ -34,7 +34,7 @@ async function sendMail(formData): Promise<void> {
 
 export default async function MyPage() {
   const user = (await getUserData()) as ACT;
-
+  const [year, month, day] = user.hireDate.split('-');
   return (
     <div className={styles.container}>
       <div className={styles.card}>
@@ -57,10 +57,7 @@ export default async function MyPage() {
             {user.userId.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3') || '없음'}
           </p>
           <p className={styles.info}>
-            <span className={styles.label}>입사일:</span>{' '}
-            {new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }).format(
-              new Date(user.hireDate)
-            ) || '없음'}
+            <span className={styles.label}>입사일:</span> {`${year}년 ${+month}월 ${+day}일`}
           </p>
         </div>
         <hr />

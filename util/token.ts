@@ -24,6 +24,11 @@ export async function StoreAndGetUserData(userId: any, refreshToken: any) {
     // 한번에 필요한 데이터 조회
     user = await executeQuery('SELECT * FROM employee WHERE phone_number = ?', [userId]);
     if (user) {
+      //이거 왜 이렇게 안하면 안되냐 짜증나게 ㅋㅋ
+      user[0] = {
+        ...user[0],
+        hire_date: new Date(user[0].hire_date.getTime() + 32400000),
+      };
       // 리프레시 토큰 업데이트
       await executeQuery('UPDATE employee SET ref_token = ? WHERE phone_number = ?', [refreshToken, userId]);
     }
