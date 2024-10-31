@@ -150,8 +150,8 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
       if (!isEditMode) {
         clear();
       }
-      if (window.name.startsWith('editClientPopup')) {
-        localStorage.setItem('reloadItems', new Date().toString());
+      localStorage.setItem('reloadItems', new Date().toString());
+      if (window.name.startsWith('editPopup')) {
         window.close();
       } else {
         router.push('/client-list');
@@ -199,8 +199,8 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
             icon: 'success',
             confirmButtonText: '확인',
           });
-          if (window.name.startsWith('editClientPopup')) {
-            localStorage.setItem('reloadItems', new Date().toString());
+          localStorage.setItem('reloadItems', new Date().toString());
+          if (window.name.startsWith('editPopup')) {
             window.close();
           } else {
             router.push('/client-list');

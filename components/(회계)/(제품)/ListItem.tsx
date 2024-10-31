@@ -109,12 +109,12 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
       const top = (window.innerHeight - height) / 2;
       const popupWindow = window.open(
         `/items-edit/${product_id}`,
-        `editProductPopup-${product_id}`,
+        `editPopup-${product_id}`,
         `width=${width},height=${height},top=${top},left=${left}`
       );
       if (popupWindow) {
         popupWindow.focus();
-        popupWindow.name = `editProductPopup-${product_id}`;
+        popupWindow.name = `editPopup-${product_id}`;
       }
     } else {
       router.push(`/items-edit/${product_id}`);
@@ -175,7 +175,7 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
     Swal.fire({
       title: `${item.product_name}의 사용 여부 변경`,
       text: checked
-        ? `${appendParticle(item.product_name, '을/를')} 사용하시겠습니까?`
+        ? `${appendParticle(item.product_name)} 사용하시겠습니까?`
         : `${item.product_name}의 사용을 중지하시겠습니까?`,
       icon: 'warning',
       showCancelButton: true,
@@ -200,14 +200,16 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
           });
 
           if (res.ok) {
-            Swal.fire(
-              '성공',
-              checked
-                ? `이제 ${appendParticle(item.product_name, '을/를')} 사용합니다.`
+            Swal.fire({
+              title: '성공',
+              text: checked
+                ? `이제 ${appendParticle(item.product_name)} 사용합니다.`
                 : `${item.product_name}의 사용을 중지합니다.`,
-              'success'
-            );
-
+              icon: 'success',
+              showConfirmButton: false,
+              timer: 1250,
+            });
+            localStorage.setItem('reloadItems', new Date().toString());
             setTriggerSearch((prev) => !prev);
           } else {
             const errorData = await res.json();
@@ -273,10 +275,10 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
             <table className={styles.table}>
               <colgroup>
                 <col style={{ width: '22%' }} />
-                <col style={{ width: '27%' }} />
-                <col style={{ width: '17%' }} />
-                <col style={{ width: '22%' }} />
-                <col style={{ width: '12%' }} />
+                <col style={{ width: '24%' }} />
+                <col style={{ width: '18%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '16%' }} />
               </colgroup>
               <thead className={styles.tableHeader}>
                 <tr>
