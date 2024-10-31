@@ -28,9 +28,5 @@ async function addProduct(formData: ProductFormData): Promise<{ status: string; 
 }
 
 export default function Page() {
-  return (
-    <div>
-      <ProductForm onSubmit={addProduct} isEditMode={false} />
-    </div>
-  );
+  return <ProductForm onSubmit={addProduct} isEditMode={false} />;
 }

@@ -60,9 +60,5 @@ async function addClient(formData: ClientFormData): Promise<{ status: string; me
 }
 
 export default function Page() {
-  return (
-    <div>
-      <ClientForm onSubmit={addClient} isEditMode={false} />
-    </div>
-  );
+  return <ClientForm onSubmit={addClient} isEditMode={false} />;
 }

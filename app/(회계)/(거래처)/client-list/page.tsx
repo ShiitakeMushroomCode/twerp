@@ -5,9 +5,5 @@ export const metadata = {
 };
 
 export default async function Page() {
-  return (
-    <div>
-      <ClientList />
-    </div>
-  );
+  return <ClientList />;
 }

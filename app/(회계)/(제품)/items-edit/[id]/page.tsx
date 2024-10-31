@@ -72,7 +72,6 @@ export default async function Page({ params: { id } }: PageProps) {
     const data = await fetchProductData(id);
     return <ProductForm initialData={data} onSubmit={updateProduct} isEditMode={true} />;
   } catch (error) {
-    // 에러 페이지로 리다이렉트하거나 에러 메시지를 표시할 수 있습니다.
     return <div>오류: {(error as Error).message}</div>;
   }
 }
