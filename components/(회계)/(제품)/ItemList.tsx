@@ -1,9 +1,9 @@
 'use client';
 
+import SearchBox from '@/components/(회계)/(공용)/SearchBox';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import ListItem from './ListItem';
-import SearchBox from './SearchBox';
 
 export default function ItemList() {
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -35,7 +35,7 @@ export default function ItemList() {
 
   return (
     <div>
-      <SearchBox onSearch={handleSearch} />
+      <SearchBox type="items" onSearch={handleSearch} />
       <ListItem
         searchTerm={searchTerm}
         page={page}

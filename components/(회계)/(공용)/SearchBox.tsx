@@ -5,10 +5,11 @@ import { useState } from 'react';
 import styles from './SearchBox.module.css';
 
 interface SearchBoxProps {
+  type: string;
   onSearch: (term: string) => void;
 }
 
-export default function SearchBox({ onSearch }: SearchBoxProps) {
+export default function SearchBox({ type, onSearch }: SearchBoxProps) {
   const [input, setInput] = useState<string>('');
   const router = useRouter();
 
@@ -22,8 +23,8 @@ export default function SearchBox({ onSearch }: SearchBoxProps) {
 
       // 팝업 창으로 열기 위한 세부 설정
       const popupWindow = window.open(
-        `/items-add`,
-        `editClientPopup-${Date.now()}`, // 창의 이름
+        `/${type}-add`,
+        `edit${type}Popup-${Date.now()}`, // 창의 이름
         `width=${width},height=${height},top=${top},left=${left},resizable,scrollbars`
       );
 
@@ -33,9 +34,10 @@ export default function SearchBox({ onSearch }: SearchBoxProps) {
       }
     } else {
       // 기존 탭에서 이동
-      router.push(`/items-add`);
+      router.push(`/${type}-add`);
     }
   }
+
   const handleSearch = () => {
     onSearch(input.trim());
   };
