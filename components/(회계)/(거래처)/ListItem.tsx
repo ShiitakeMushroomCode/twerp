@@ -101,7 +101,7 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, [handleResize]);
+  }, []);
 
   // 상세 페이지로 이동하는 함수
   function editRoute(clients_id: string, isNewTab: boolean) {

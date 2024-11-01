@@ -22,7 +22,7 @@ interface SaleData {
 
 interface ListItemProps {
   searchTerm: string;
-  searchOptions: any; // 추가된 부분
+  searchOptions: any;
   page: number;
   setPage: (page: number) => void;
   triggerSearch: boolean;
@@ -109,7 +109,7 @@ export default function SalesListItem({
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, [handleResize]);
+  }, []);
 
   // 상세 페이지로 이동하는 함수
   function editRoute(sales_id: string, isNewTab: boolean) {
