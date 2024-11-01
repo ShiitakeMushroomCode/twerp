@@ -5,76 +5,74 @@ export async function POST(request: NextRequest) {
   try {
     const { searchTerm, page, pageSize, sortColumn, sortOrder } = await request.json();
 
-    // 페이지네이션을 위한 계산
+    // 페이지네이션 계산
     const offset = (page - 1) * pageSize;
 
     // 검색어 처리
-    const searchCondition = searchTerm
-      ? `AND (c.company_name LIKE ? OR s.description LIKE ? OR si.product_name LIKE ?)`
-      : '';
+    const formattedSearchTerm = `%${searchTerm}%`;
 
-    const searchParams = searchTerm ? [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`] : [];
-
-    // 정렬 가능한 컬럼 리스트 (SQL 인젝션 방지)
+    // SQL 인젝션 방지를 위한 정렬 가능한 컬럼 검증
     const validSortColumns = ['sale_date', 'company_name', 'item_names', 'total_amount'];
-    const sortColumnMapping = {
-      sale_date: 'sale_date',
-      company_name: 'company_name',
-      item_names: 'item_names',
-      total_amount: 'total_amount',
-    };
+    const sortColumnSafe = validSortColumns.includes(sortColumn) ? sortColumn : 'sale_date';
+    const sortOrderSafe = sortOrder === 'asc' ? 'ASC' : 'DESC';
 
-    const sortColumnSafe = validSortColumns.includes(sortColumn) ? sortColumnMapping[sortColumn] : 'sale_date';
-
-    const sortOrderSafe = sortOrder && sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'; // 기본값은 'DESC'
-
-    // 총 데이터 수를 가져오기 위한 쿼리
-    const countQuery = `
-      SELECT COUNT(DISTINCT s.sales_id) AS total
+    // 기본 쿼리 구성
+    const baseQuery = `
       FROM sales s
       LEFT JOIN clients c ON s.client_id = c.clients_id
       LEFT JOIN sales_items si ON s.sales_id = si.sales_id
-      WHERE 1=1 ${searchCondition}
+      WHERE 1=1
+    `;
+
+    // 검색 조건 구성
+    let searchCondition = '';
+    let searchParams = [];
+
+    if (searchTerm) {
+      searchCondition = `
+        AND (
+          c.company_name LIKE ?
+          OR s.client_name LIKE ?
+          OR si.product_name LIKE ?
+        )
+      `;
+      searchParams.push(formattedSearchTerm, formattedSearchTerm, formattedSearchTerm);
+    }
+
+    // 총 개수 계산 쿼리
+    const countQuery = `
+      SELECT COUNT(DISTINCT s.sales_id) AS total
+      ${baseQuery}
+      ${searchCondition}
     `;
 
     const countResult = await executeQuery(countQuery, searchParams);
-
     const total = countResult[0]?.total || 0;
 
-    // 실제 데이터를 가져오기 위한 쿼리
+    // 데이터 조회 쿼리
     const dataQuery = `
-      SELECT * FROM (
-        SELECT
-          s.sales_id,
-          COALESCE(c.company_name, s.client_name) AS company_name,
-          s.transaction_type,
-          s.description,
-          s.sale_date,
-          s.update_at,
-          (
-            SELECT SUM((si.price+si.sub_price) * si.quantity)
-            FROM sales_items si
-            WHERE si.sales_id = s.sales_id
-          ) AS total_amount,
-          (
-            SELECT GROUP_CONCAT(si.product_name SEPARATOR ', ')
-            FROM sales_items si
-            WHERE si.sales_id = s.sales_id
-          ) AS item_names,
-          COUNT(*) OVER (PARTITION BY s.sale_date) - ROW_NUMBER() OVER (PARTITION BY s.sale_date ORDER BY s.update_at DESC) + 1 AS sequence_number
-        FROM sales s
-        LEFT JOIN clients c ON s.client_id = c.clients_id
-        WHERE 1=1 ${searchCondition}
-        GROUP BY s.sales_id
-      ) AS subquery
-      ORDER BY ${sortColumnSafe} ${sortOrderSafe}, sale_date DESC
+      SELECT
+        s.sales_id,
+        COALESCE(c.company_name, s.client_name) AS company_name,
+        s.transaction_type,
+        s.description,
+        s.sale_date,
+        s.update_at,
+        SUM((si.price + si.sub_price) * si.quantity) AS total_amount,
+        GROUP_CONCAT(DISTINCT si.product_name ORDER BY si.product_name SEPARATOR ', ') AS item_names,
+        ROW_NUMBER() OVER (ORDER BY s.sale_date DESC, s.update_at DESC) AS sequence_number
+      ${baseQuery}
+      ${searchCondition}
+      GROUP BY s.sales_id
+      ORDER BY ${sortColumnSafe} ${sortOrderSafe}, s.sale_date DESC
       LIMIT ? OFFSET ?
     `;
 
-    const dataResult = await executeQuery(dataQuery, [...searchParams, pageSize, offset]);
+    const dataParams = [...searchParams, pageSize, offset];
 
-    // 데이터 형식을 프론트엔드에 맞게 변환
-    const data = dataResult.map((row: any) => ({
+    const dataResult = await executeQuery(dataQuery, dataParams);
+
+    const data = dataResult.map((row) => ({
       sales_id: Buffer.from(row.sales_id).toString('hex'),
       company_name: row.company_name,
       item_names: row.item_names ? row.item_names.split(', ') : [],

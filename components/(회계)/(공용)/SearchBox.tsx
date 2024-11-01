@@ -58,6 +58,7 @@ export default function SearchBox({ type, onSearch }: SearchBoxProps) {
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
       />
+      {type === 'sales' ? <button className={styles.button}>옵션</button> : null}
       <button onClick={handleSearch} className={styles.button}>
         검색
       </button>

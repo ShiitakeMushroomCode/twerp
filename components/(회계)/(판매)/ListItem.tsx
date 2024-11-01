@@ -321,7 +321,9 @@ export default function SalesListItem({ searchTerm, page, setPage, triggerSearch
                           onClick={(event) => {
                             editRoute(item.sales_id, event.ctrlKey || event.metaKey);
                           }}
-                          title={`${firstItemName}${remainingItemsCount > 0 ? ` 외 ${remainingItemsCount}건` : ``}`}
+                          title={`${firstItemName}${
+                            remainingItemsCount > 0 ? ` 외 ${remainingItemsCount}건\n${item.item_names.join(', ')}` : ``
+                          }`}
                         >
                           {firstItemName}
                           {remainingItemsCount > 0 && ` 외 ${remainingItemsCount}건`}
