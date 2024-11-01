@@ -34,6 +34,9 @@
   text-align: center;
   cursor: pointer;
   border: 1px solid #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* 헤더 셀 내부 스타일 */
@@ -47,9 +50,9 @@
 /* 정렬 화살표 스타일 */
 .sortArrow {
   display: inline-block;
-  width: 1em; /* 화살표 공간 확보 */
-  margin-left: 5px; /* 텍스트와 화살표 사이 간격 */
-  font-size: 0.8em; /* 화살표 크기 조정 */
+  width: 1em;
+  margin-left: 5px;
+  font-size: 0.8em;
 }
 
 /* 테이블 데이터 셀 스타일 */
@@ -57,11 +60,9 @@
   padding: 12px;
   border: 1px solid #ddd;
   vertical-align: middle;
-
-  /* 텍스트 넘칠 때 "..." 표시 */
-  white-space: nowrap; /* 줄바꿈 방지 */
-  overflow: hidden; /* 넘치는 부분 숨기기 */
-  text-overflow: ellipsis; /* "..."으로 표시 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* 테이블 행 마우스 오버 효과 */
@@ -129,14 +130,23 @@
   color: #333;
 }
 
+/* 가짜 버튼 스타일 */
 .fakeButton {
-  visibility: hidden;
+  visibility: visible;
+  padding: 8px 16px;
+  background-color: transparent;
+  border: none;
+  cursor: default;
+  opacity: 0;
 }
 
+/* 가짜 라벨 스타일 */
 .fakeLabel {
-  visibility: hidden;
+  visibility: visible;
+  opacity: 0;
 }
 
+/* 아이콘 버튼 스타일 */
 .iconButton {
   background: none;
   border: none;
