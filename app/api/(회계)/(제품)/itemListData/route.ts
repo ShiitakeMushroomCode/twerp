@@ -29,9 +29,15 @@ export async function POST(request: NextRequest) {
     sortColumn = sortColumn || 'product_name';
     sortOrder = sortOrder || 'asc';
 
-    const parsedPage = parseInt(page.toString(), 10) || 1;
-    const limit = parseInt(pageSize.toString(), 10) || 15;
-    const offset = (parsedPage - 1) * limit;
+    // page가 정수인지 체크하고, 아니면 기본값인 1로 설정
+    page = Number.isInteger(page) && page > 0 ? page : 1;
+
+    // pageSize가 정수인지 체크하고, 아니면 기본값인 15로 설정
+    pageSize = Number.isInteger(pageSize) && pageSize > 0 ? pageSize : 15;
+
+    // limit과 offset 계산
+    const limit = pageSize; // pageSize를 limit으로 사용
+    const offset = (page - 1) * limit;
 
     // 숫자형으로 변환하여 SQL 인젝션 방지
     const safeLimit = Number(limit);

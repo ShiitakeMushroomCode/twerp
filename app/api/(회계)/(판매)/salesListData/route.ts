@@ -13,8 +13,12 @@ export async function POST(request: NextRequest) {
       sortOrder = 'desc',
     } = await request.json();
 
+    // 페이지와 페이지 사이즈 유효성 검사 및 기본값 설정
+    const parsedPage = Number.isInteger(page) && page > 0 ? page : 1;
+    const parsedPageSize = Number.isInteger(pageSize) && pageSize > 0 ? pageSize : 15;
+
     // 페이지네이션 계산
-    const offset = (page - 1) * pageSize;
+    const offset = (parsedPage - 1) * parsedPageSize;
 
     // 검색어 처리
     let whereCondition = '';
