@@ -1,5 +1,7 @@
+// SearchBox.tsx
 'use client';
 
+import { formatPrice } from '@/util/reform';
 import { format, subDays } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -12,6 +14,7 @@ const MySwal = withReactContent(Swal);
 interface SearchOptions {
   clientName?: string;
   startDate?: string;
+  itemName?: string;
   endDate?: string;
   minAmount?: number;
   maxAmount?: number;
@@ -72,32 +75,45 @@ export default function SearchBox({ type, onSearch, searchOptions, setSearchOpti
       }" />
           </div>
           <div class="${styles.popupRow}">
+            <label for="swal-input-item-name">품목명 :</label>
+            <input type="text" id="swal-input-item-name" class="${styles.swal2Input}" value="${
+        searchOptions.itemName || ''
+      }" />
+          </div>
+          <div class="${styles.popupRow}">
             <label>거래일자 :</label>
-            <div class="${styles.dateInputContainer}">
+            <div class="${styles.popupRow}">
               <input type="date" id="swal-input-start-date" class="${styles.dateInput}" value="${
         searchOptions.startDate || ''
-      }" />
-              ~
+      }" />  ~ 
               <input type="date" id="swal-input-end-date" class="${styles.dateInput}" value="${
         searchOptions.endDate || ''
       }" />
+              <button type="button" id="date-reset-button" class="${styles.dateResetButton}">날짜 초기화</button>
             </div>
           </div>
           <div class="${styles.popupRow}">
             <label>금액 :</label>
-            <input type="number" id="swal-input-min-amount" class="${
-              styles.swal2Input
-            }" placeholder="최소 금액" value="${searchOptions.minAmount || ''}" />
-            ~
-            <input type="number" id="swal-input-max-amount" class="${
-              styles.swal2Input
-            }" placeholder="최대 금액" value="${searchOptions.maxAmount || ''}" />
+            <div class="${styles.amountContainer}">
+              <input type="text" id="swal-input-min-amount" class="${
+                styles.swal2Input
+              }" placeholder="최소 금액" value="${
+        searchOptions.minAmount !== undefined ? formatPrice(searchOptions.minAmount) : ''
+      }" /> 원
+              ~ 
+              <input type="text" id="swal-input-max-amount" class="${
+                styles.swal2Input
+              }" placeholder="최대 금액" value="${
+        searchOptions.maxAmount !== undefined ? formatPrice(searchOptions.maxAmount) : ''
+      }" /> 원
+            </div>
           </div>
           <div class="${styles.presetContainer}">
             <span>옵션 :</span>
             <button type="button" class="${styles.presetButton}" data-preset="today">오늘</button>
             <button type="button" class="${styles.presetButton}" data-preset="last7">지난 7일</button>
             <button type="button" class="${styles.presetButton}" data-preset="last30">지난 30일</button>
+            <button type="button" class="${styles.presetButton}" data-preset="nowYear">올해</button>
             <button type="button" class="${styles.resetButton}">초기화</button>
           </div>
         </div>
@@ -105,7 +121,7 @@ export default function SearchBox({ type, onSearch, searchOptions, setSearchOpti
       showCancelButton: true,
       confirmButtonText: '검색',
       cancelButtonText: '취소',
-      width: '600px',
+      width: '630px',
       didOpen: () => {
         // ARIA 속성 추가
         const modal = Swal.getPopup();
@@ -140,6 +156,11 @@ export default function SearchBox({ type, onSearch, searchOptions, setSearchOpti
                   start = format(last30, 'yyyy-MM-dd');
                   end = format(today, 'yyyy-MM-dd');
                   break;
+                case 'nowYear':
+                  const currentYear = new Date().getFullYear();
+                  start = format(new Date(`${currentYear}-01-01`), 'yyyy-MM-dd');
+                  end = format(new Date(`${currentYear}-12-31`), 'yyyy-MM-dd');
+                  break;
                 default:
                   break;
               }
@@ -162,19 +183,37 @@ export default function SearchBox({ type, onSearch, searchOptions, setSearchOpti
           resetButton.addEventListener('click', () => {
             // 모달 입력 필드 초기화
             const clientNameInput = document.getElementById('swal-input-client-name') as HTMLInputElement;
+            const itemNameInput = document.getElementById('swal-input-item-name') as HTMLInputElement;
             const startDateInput = document.getElementById('swal-input-start-date') as HTMLInputElement;
             const endDateInput = document.getElementById('swal-input-end-date') as HTMLInputElement;
             const minAmountInput = document.getElementById('swal-input-min-amount') as HTMLInputElement;
             const maxAmountInput = document.getElementById('swal-input-max-amount') as HTMLInputElement;
 
             if (clientNameInput) clientNameInput.value = '';
+            if (itemNameInput) itemNameInput.value = '';
             if (startDateInput) startDateInput.value = '';
             if (endDateInput) endDateInput.value = '';
             if (minAmountInput) minAmountInput.value = '';
             if (maxAmountInput) maxAmountInput.value = '';
 
-            // 상위 컴포넌트의 옵션 초기화
+            // 상위 컴포넌트의 옵션 초기화 함수 호출
             onResetOptions();
+          });
+        }
+
+        // 날짜 초기화 버튼 이벤트 핸들러 추가
+        const dateResetButton = document.getElementById('date-reset-button') as HTMLButtonElement;
+
+        if (dateResetButton) {
+          dateResetButton.addEventListener('click', () => {
+            const startDateInput = document.getElementById('swal-input-start-date') as HTMLInputElement;
+            const endDateInput = document.getElementById('swal-input-end-date') as HTMLInputElement;
+            if (startDateInput) {
+              startDateInput.value = '';
+            }
+            if (endDateInput) {
+              endDateInput.value = '';
+            }
           });
         }
 
@@ -183,20 +222,59 @@ export default function SearchBox({ type, onSearch, searchOptions, setSearchOpti
         if (firstInput) {
           firstInput.focus();
         }
+
+        // 금액 입력 필드 포맷팅
+        const minAmountInput = document.getElementById('swal-input-min-amount') as HTMLInputElement;
+        const maxAmountInput = document.getElementById('swal-input-max-amount') as HTMLInputElement;
+
+        const formatInput = (inputElement: HTMLInputElement) => {
+          inputElement.addEventListener('input', (e) => {
+            const target = e.target as HTMLInputElement;
+            const value = target.value.replace(/,/g, '').replace(/[^0-9]/g, '');
+
+            if (value) {
+              const formatted = formatPrice(Number(value));
+              target.value = formatted.toString();
+            } else {
+              target.value = '';
+            }
+          });
+
+          inputElement.addEventListener('keypress', (e) => {
+            const key = e.key;
+            if (!/^\d$/.test(key)) {
+              e.preventDefault();
+            }
+          });
+        };
+
+        if (minAmountInput) {
+          formatInput(minAmountInput);
+        }
+
+        if (maxAmountInput) {
+          formatInput(maxAmountInput);
+        }
       },
       preConfirm: () => {
         const clientName = (document.getElementById('swal-input-client-name') as HTMLInputElement).value;
+        const itemName = (document.getElementById('swal-input-item-name') as HTMLInputElement).value;
         const startDate = (document.getElementById('swal-input-start-date') as HTMLInputElement).value;
         const endDate = (document.getElementById('swal-input-end-date') as HTMLInputElement).value;
-        const minAmount = (document.getElementById('swal-input-min-amount') as HTMLInputElement).value;
-        const maxAmount = (document.getElementById('swal-input-max-amount') as HTMLInputElement).value;
+        const minAmountRaw = (document.getElementById('swal-input-min-amount') as HTMLInputElement).value;
+        const maxAmountRaw = (document.getElementById('swal-input-max-amount') as HTMLInputElement).value;
+
+        // 쉼표 제거 후 숫자로 변환
+        const minAmount = minAmountRaw ? Number(minAmountRaw.replace(/,/g, '')) : undefined;
+        const maxAmount = maxAmountRaw ? Number(maxAmountRaw.replace(/,/g, '')) : undefined;
 
         return {
           clientName: clientName.trim() || undefined,
+          itemName: itemName.trim() || undefined,
           startDate: startDate || undefined,
           endDate: endDate || undefined,
-          minAmount: minAmount ? Number(minAmount) : undefined,
-          maxAmount: maxAmount ? Number(maxAmount) : undefined,
+          minAmount: minAmount !== undefined && !isNaN(minAmount) ? minAmount : undefined,
+          maxAmount: maxAmount !== undefined && !isNaN(maxAmount) ? maxAmount : undefined,
         };
       },
     }).then((result) => {
@@ -204,14 +282,19 @@ export default function SearchBox({ type, onSearch, searchOptions, setSearchOpti
         if (result.value) {
           // 상위 컴포넌트의 searchOptions 상태 업데이트
           setSearchOptions(result.value);
-          // 검색 실행
-          onSearch(input.trim(), result.value);
+          // 검색 실행 (옵션 검색)
+          onSearch('', result.value);
+          // 메인 입력 필드 초기화
+          setInput('');
         } else {
           // 검색 옵션이 없을 경우 초기화된 상태로 검색 실행
           setSearchOptions({});
-          onSearch(input.trim(), {});
+          onSearch('', {});
+          // 메인 입력 필드 초기화
+          setInput('');
         }
       }
+      // '취소' 버튼을 클릭했을 때는 아무 동작도 하지 않음
     });
   };
 
@@ -226,6 +309,9 @@ export default function SearchBox({ type, onSearch, searchOptions, setSearchOpti
         onKeyDown={handleKeyDown}
         aria-label="검색어 입력"
       />
+      <button onClick={handleSearch} className={styles.button}>
+        검색
+      </button>
       <button
         onClick={handleOptions}
         className={styles.button}
@@ -233,9 +319,6 @@ export default function SearchBox({ type, onSearch, searchOptions, setSearchOpti
         aria-controls="search-options-modal"
       >
         옵션
-      </button>
-      <button onClick={handleSearch} className={styles.button}>
-        검색
       </button>
       <button
         onClick={(event) => {

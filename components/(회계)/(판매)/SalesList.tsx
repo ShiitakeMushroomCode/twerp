@@ -26,9 +26,9 @@ export default function SalesList() {
   useEffect(() => {
     // 다른 탭에서의 변경 감지
     const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'reloadItems') {
+      if (event.key === 'reloadSalesItems') {
         setTriggerSearch((prev) => !prev);
-        localStorage.removeItem('reloadItems');
+        localStorage.removeItem('reloadSalesItems');
       }
     };
 

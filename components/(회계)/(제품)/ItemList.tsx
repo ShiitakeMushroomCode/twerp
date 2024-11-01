@@ -18,7 +18,7 @@ export default function ItemList() {
   useEffect(() => {
     // storage 이벤트를 통해 다른 탭에서 발생한 변경 감지
     const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'reloadItems') {
+      if (event.key === 'reloadProductItems') {
         setTriggerSearch((prev) => !prev);
         localStorage.removeItem('reloadItems');
       }

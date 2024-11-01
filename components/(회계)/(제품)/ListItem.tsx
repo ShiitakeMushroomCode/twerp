@@ -209,7 +209,7 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
               showConfirmButton: false,
               timer: 1250,
             });
-            localStorage.setItem('reloadItems', new Date().toString());
+            localStorage.setItem('reloadProductItems', new Date().toString());
             setTriggerSearch((prev) => !prev);
           } else {
             const errorData = await res.json();

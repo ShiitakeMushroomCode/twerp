@@ -88,7 +88,7 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
             showConfirmButton: false,
             timer: 1500,
           });
-          localStorage.setItem('reloadItems', new Date().toString());
+          localStorage.setItem('reloadProductItems', new Date().toString());
           if (window.name.startsWith('editPopup')) {
             window.close();
           } else {
@@ -186,7 +186,7 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
       if (!isEditMode) {
         clear();
       }
-      localStorage.setItem('reloadItems', new Date().toString());
+      localStorage.setItem('reloadProductItems', new Date().toString());
       if (window.name.startsWith('editPopup')) {
         window.close();
       } else {

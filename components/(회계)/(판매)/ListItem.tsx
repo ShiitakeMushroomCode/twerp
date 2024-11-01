@@ -213,7 +213,7 @@ export default function SalesListItem({
       }
     };
     fetchData();
-  }, [triggerSearch, page, searchTerm, searchOptions, sortColumn, sortOrder, pageSize]);
+  }, [triggerSearch, page, sortColumn, sortOrder, pageSize]);
 
   if (pageSize === null) {
     // pageSize가 설정되기 전에는 로딩 상태를 표시

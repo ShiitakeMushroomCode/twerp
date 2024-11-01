@@ -1,6 +1,7 @@
 import { executeQuery } from '@/lib/db';
 import { parseISO } from 'date-fns';
 import { NextRequest, NextResponse } from 'next/server';
+
 export async function POST(request: NextRequest) {
   try {
     const {
@@ -16,15 +17,20 @@ export async function POST(request: NextRequest) {
     const offset = (page - 1) * pageSize;
 
     // 검색어 처리
-    let searchCondition = '';
+    let whereCondition = '';
+    let havingCondition = '';
     let searchParams: any[] = [];
 
     if (searchTerm) {
-      searchCondition += `
+      whereCondition += `
         AND (
           c.company_name LIKE ?
-          OR s.description LIKE ?
-          OR si.product_name LIKE ?
+          OR s.client_name LIKE ?
+          OR EXISTS (
+            SELECT 1 FROM sales_items si_search
+            WHERE si_search.sales_id = s.sales_id
+              AND si_search.product_name LIKE ?
+          )
         )
       `;
       const formattedSearchTerm = `%${searchTerm.trim()}%`;
@@ -33,10 +39,10 @@ export async function POST(request: NextRequest) {
 
     // 추가 검색 옵션 처리
     if (searchOptions) {
-      const { clientName, startDate, endDate, minAmount, maxAmount } = searchOptions;
+      const { clientName, itemName, startDate, endDate, minAmount, maxAmount } = searchOptions;
 
       if (clientName) {
-        searchCondition += `
+        whereCondition += `
           AND (
             c.company_name LIKE ?
             OR s.client_name LIKE ?
@@ -46,37 +52,51 @@ export async function POST(request: NextRequest) {
         searchParams.push(formattedClientName, formattedClientName);
       }
 
+      if (itemName) {
+        // EXISTS 절을 사용하여 특정 itemName을 포함하는 sales_id만 필터링
+        whereCondition += `
+          AND EXISTS (
+            SELECT 1 FROM sales_items si_filter
+            WHERE si_filter.sales_id = s.sales_id
+              AND si_filter.product_name LIKE ?
+          )
+        `;
+        const formattedItemName = `%${itemName.trim()}%`;
+        searchParams.push(formattedItemName);
+      }
+
       if (startDate && endDate) {
         const parsedStartDate = parseISO(startDate);
         const parsedEndDate = parseISO(endDate);
-        searchCondition += `
+        whereCondition += `
           AND s.sale_date BETWEEN ? AND ?
         `;
         searchParams.push(parsedStartDate, parsedEndDate);
       } else if (startDate) {
         const parsedStartDate = parseISO(startDate);
-        searchCondition += `
+        whereCondition += `
           AND s.sale_date >= ?
         `;
         searchParams.push(parsedStartDate);
       } else if (endDate) {
         const parsedEndDate = parseISO(endDate);
-        searchCondition += `
+        whereCondition += `
           AND s.sale_date <= ?
         `;
         searchParams.push(parsedEndDate);
       }
 
-      if (minAmount !== undefined && minAmount !== null && minAmount !== '') {
-        searchCondition += `
-          AND total_amount >= ?
+      // 금액 필터는 HAVING 절에서 처리
+      if (minAmount !== undefined && minAmount !== null) {
+        havingCondition += `
+          AND SUM((si.price + si.sub_price) * si.quantity) >= ?
         `;
         searchParams.push(Number(minAmount));
       }
 
-      if (maxAmount !== undefined && maxAmount !== null && maxAmount !== '') {
-        searchCondition += `
-          AND total_amount <= ?
+      if (maxAmount !== undefined && maxAmount !== null) {
+        havingCondition += `
+          AND SUM((si.price + si.sub_price) * si.quantity) <= ?
         `;
         searchParams.push(Number(maxAmount));
       }
@@ -89,43 +109,38 @@ export async function POST(request: NextRequest) {
 
     // 총 데이터 수를 가져오기 위한 쿼리
     const countQuery = `
-      SELECT COUNT(DISTINCT s.sales_id) AS total
-      FROM sales s
-      LEFT JOIN clients c ON s.client_id = c.clients_id
-      LEFT JOIN sales_items si ON s.sales_id = si.sales_id
-      WHERE 1=1 ${searchCondition}
+      SELECT COUNT(*) AS total
+      FROM (
+        SELECT s.sales_id
+        FROM sales s
+        LEFT JOIN clients c ON s.client_id = c.clients_id
+        WHERE 1=1 ${whereCondition}
+        GROUP BY s.sales_id
+        HAVING 1=1 ${havingCondition}
+      ) AS count_subquery
     `;
 
     const countResult = await executeQuery(countQuery, searchParams);
-
     const total = countResult[0]?.total || 0;
 
     // 실제 데이터를 가져오기 위한 쿼리
     const dataQuery = `
-      SELECT * FROM (
-        SELECT
-          s.sales_id,
-          COALESCE(c.company_name, s.client_name) AS company_name,
-          s.transaction_type,
-          s.description,
-          s.sale_date,
-          s.update_at,
-          (
-            SELECT SUM((si.price + si.sub_price) * si.quantity)
-            FROM sales_items si
-            WHERE si.sales_id = s.sales_id
-          ) AS total_amount,
-          (
-            SELECT GROUP_CONCAT(si.product_name SEPARATOR ', ')
-            FROM sales_items si
-            WHERE si.sales_id = s.sales_id
-          ) AS item_names,
-          ROW_NUMBER() OVER (PARTITION BY s.sale_date ORDER BY s.update_at DESC) AS sequence_number
-        FROM sales s
-        LEFT JOIN clients c ON s.client_id = c.clients_id
-        WHERE 1=1 ${searchCondition}
-        GROUP BY s.sales_id
-      ) AS subquery
+      SELECT
+        s.sales_id,
+        COALESCE(c.company_name, s.client_name) AS company_name,
+        s.transaction_type,
+        s.description,
+        s.sale_date,
+        s.update_at,
+        SUM((si.price + si.sub_price) * si.quantity) AS total_amount,
+        GROUP_CONCAT(si.product_name SEPARATOR ', ') AS item_names,
+        ROW_NUMBER() OVER (PARTITION BY s.sale_date ORDER BY s.update_at DESC) AS sequence_number
+      FROM sales s
+      LEFT JOIN clients c ON s.client_id = c.clients_id
+      LEFT JOIN sales_items si ON s.sales_id = si.sales_id
+      WHERE 1=1 ${whereCondition}
+      GROUP BY s.sales_id
+      HAVING 1=1 ${havingCondition}
       ORDER BY ${sortColumnSafe} ${sortOrderSafe}, sale_date DESC, update_at
       LIMIT ? OFFSET ?
     `;
