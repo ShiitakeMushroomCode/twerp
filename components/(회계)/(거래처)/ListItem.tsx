@@ -35,6 +35,7 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [sortColumn, setSortColumn] = useState<string>('company_name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [newData, setNewData] = useState<Company[] | null>(null);
 
   // 각 아이템의 높이를 설정
   const itemHeight = 45;
@@ -101,7 +102,7 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [handleResize]);
 
   // 상세 페이지로 이동하는 함수
   function editRoute(clients_id: string, isNewTab: boolean) {
@@ -175,28 +176,24 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
 
   // 데이터 Fetch
   useEffect(() => {
-    if (pageSize === null) return; // pageSize가 설정되기 전에는 데이터를 가져오지 않음
-
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const requestBody = {
-          searchTerm,
-          page,
-          pageSize,
-          sortColumn,
-          sortOrder,
-        };
-
         const response = await fetch(`/api/clientListData`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify(requestBody),
+          body: JSON.stringify({
+            searchTerm,
+            page,
+            pageSize,
+            sortColumn,
+            sortOrder,
+          }),
         });
         const result = await response.json();
         if (Array.isArray(result.data)) {
-          setData(result.data);
+          setNewData(result.data); // 새 데이터를 임시로 저장
           setTotal(result.total);
         } else {
           console.error('데이터 형식이 올바르지 않습니다:', result);
@@ -208,7 +205,14 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
       }
     };
     fetchData();
-  }, [triggerSearch, page, searchTerm, sortColumn, sortOrder, pageSize]);
+  }, [triggerSearch, page, sortColumn, sortOrder, pageSize]);
+
+  useEffect(() => {
+    if (!isLoading && newData) {
+      setData(newData); // 로딩이 끝나면 기존 데이터를 새 데이터로 교체
+      setNewData(null);
+    }
+  }, [isLoading, newData]);
 
   if (pageSize === null) {
     // pageSize가 설정되기 전에는 로딩 상태를 표시
@@ -217,127 +221,121 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
 
   return (
     <div className={styles.container}>
-      {isLoading ? (
-        <Spinner />
-      ) : (
-        <>
-          <div className={styles.tableContainer}>
-            <table className={styles.table}>
-              <colgroup>
-                <col style={{ width: '15%' }} />
-                <col style={{ width: '30%' }} />
-                <col style={{ width: '15%' }} />
-                <col style={{ width: '20%' }} />
-                <col style={{ width: '20%' }} />
-              </colgroup>
-              <thead className={styles.tableHeader}>
-                <tr>
-                  <th onClick={() => handleSort('business_number')}>
-                    <span className={styles.headerCell}>
-                      <span className={styles.fakeLabel}>▲</span>
-                      사업자번호
-                      <span className={styles.sortArrow}>
-                        {sortColumn === 'business_number' && (sortOrder === 'asc' ? '▲' : '▼')}
-                      </span>
-                    </span>
-                  </th>
-                  <th onClick={() => handleSort('company_name')}>
-                    <span className={styles.headerCell}>
-                      <span className={styles.fakeLabel}>▲</span>
-                      기업명
-                      <span className={styles.sortArrow}>
-                        {sortColumn === 'company_name' && (sortOrder === 'asc' ? '▲' : '▼')}
-                      </span>
-                    </span>
-                  </th>
-                  <th onClick={() => handleSort('representative_name')}>
-                    <span className={styles.headerCell}>
-                      <span className={styles.fakeLabel}>▲</span>
-                      대표자명
-                      <span className={styles.sortArrow}>
-                        {sortColumn === 'representative_name' && (sortOrder === 'asc' ? '▲' : '▼')}
-                      </span>
-                    </span>
-                  </th>
-                  <th onClick={() => handleSort('tell_number')}>
-                    <span className={styles.headerCell}>
-                      <span className={styles.fakeLabel}>▲</span>
-                      대표번호
-                      <span className={styles.sortArrow}>
-                        {sortColumn === 'tell_number' && (sortOrder === 'asc' ? '▲' : '▼')}
-                      </span>
-                    </span>
-                  </th>
-                  <th onClick={() => handleSort('fax_number')}>
-                    <span className={styles.headerCell}>
-                      <span className={styles.fakeLabel}>▲</span>
-                      팩스번호
-                      <span className={styles.sortArrow}>
-                        {sortColumn === 'fax_number' && (sortOrder === 'asc' ? '▲' : '▼')}
-                      </span>
-                    </span>
-                  </th>
+      <div className={styles.tableContainer}>
+        <table className={styles.table}>
+          <colgroup>
+            <col style={{ width: '15%' }} />
+            <col style={{ width: '30%' }} />
+            <col style={{ width: '15%' }} />
+            <col style={{ width: '20%' }} />
+            <col style={{ width: '20%' }} />
+          </colgroup>
+          <thead className={styles.tableHeader}>
+            <tr>
+              <th onClick={() => handleSort('business_number')}>
+                <span className={styles.headerCell}>
+                  <span className={styles.fakeLabel}>▲</span>
+                  사업자번호
+                  <span className={styles.sortArrow}>
+                    {sortColumn === 'business_number' && (sortOrder === 'asc' ? '▲' : '▼')}
+                  </span>
+                </span>
+              </th>
+              <th onClick={() => handleSort('company_name')}>
+                <span className={styles.headerCell}>
+                  <span className={styles.fakeLabel}>▲</span>
+                  기업명
+                  <span className={styles.sortArrow}>
+                    {sortColumn === 'company_name' && (sortOrder === 'asc' ? '▲' : '▼')}
+                  </span>
+                </span>
+              </th>
+              <th onClick={() => handleSort('representative_name')}>
+                <span className={styles.headerCell}>
+                  <span className={styles.fakeLabel}>▲</span>
+                  대표자명
+                  <span className={styles.sortArrow}>
+                    {sortColumn === 'representative_name' && (sortOrder === 'asc' ? '▲' : '▼')}
+                  </span>
+                </span>
+              </th>
+              <th onClick={() => handleSort('tell_number')}>
+                <span className={styles.headerCell}>
+                  <span className={styles.fakeLabel}>▲</span>
+                  대표번호
+                  <span className={styles.sortArrow}>
+                    {sortColumn === 'tell_number' && (sortOrder === 'asc' ? '▲' : '▼')}
+                  </span>
+                </span>
+              </th>
+              <th onClick={() => handleSort('fax_number')}>
+                <span className={styles.headerCell}>
+                  <span className={styles.fakeLabel}>▲</span>
+                  팩스번호
+                  <span className={styles.sortArrow}>
+                    {sortColumn === 'fax_number' && (sortOrder === 'asc' ? '▲' : '▼')}
+                  </span>
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.length > 0 ? (
+              data.map((item) => (
+                <tr
+                  key={item.clients_id}
+                  className={styles.tableRow}
+                  onClick={(event) => {
+                    editRoute(item.clients_id, event.ctrlKey || event.metaKey);
+                  }}
+                  title={item.description}
+                >
+                  <td className={styles.centerAlign}>
+                    {item.business_number.replace(/(\d{3})(\d{2})(\d{5})/, '$1-$2-$3')}
+                  </td>
+                  <td className={styles.leftAlign} title={item.company_name}>
+                    {item.company_name}
+                  </td>
+                  <td className={styles.centerAlign}>{item.representative_name}</td>
+                  <td className={styles.centerAlign}>{formatPhoneNumber(item.tell_number)}</td>
+                  <td className={styles.centerAlign}>{formatPhoneNumber(item.fax_number)}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {data.length > 0 ? (
-                  data.map((item) => (
-                    <tr
-                      key={item.clients_id}
-                      className={styles.tableRow}
-                      onClick={(event) => {
-                        editRoute(item.clients_id, event.ctrlKey || event.metaKey);
-                      }}
-                      title={item.description}
-                    >
-                      <td className={styles.centerAlign}>
-                        {item.business_number.replace(/(\d{3})(\d{2})(\d{5})/, '$1-$2-$3')}
-                      </td>
-                      <td className={styles.leftAlign} title={item.company_name}>
-                        {item.company_name}
-                      </td>
-                      <td className={styles.centerAlign}>{item.representative_name}</td>
-                      <td className={styles.centerAlign}>{formatPhoneNumber(item.tell_number)}</td>
-                      <td className={styles.centerAlign}>{formatPhoneNumber(item.fax_number)}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={5} className={styles.noResult}>
-                      검색 결과가 없습니다
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-          <div className={styles.pagination}>
-            {totalPages !== 1 && <button className={styles.fakeButton}>이거는 가짜</button>}
-            <button
-              className={styles.paginationButton}
-              onClick={() => setPage(Math.max(page - 1, 1))}
-              disabled={page === 1}
-            >
-              이전
-            </button>
-            <span className={styles.pageInfo}>
-              {page} / {totalPages}
-            </span>
-            <button
-              className={styles.paginationButton}
-              onClick={() => setPage(Math.min(page + 1, totalPages))}
-              disabled={page === totalPages}
-            >
-              다음
-            </button>
-            {totalPages !== 1 && (
-              <button className={styles.paginationButton} onClick={() => handlePageJump(totalPages)}>
-                페이지 이동
-              </button>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className={styles.noResult}>
+                  검색 결과가 없습니다
+                </td>
+              </tr>
             )}
-          </div>
-        </>
-      )}
+          </tbody>
+        </table>
+      </div>
+      <div className={styles.pagination}>
+        {totalPages !== 1 && <button className={styles.fakeButton}>이거는 가짜</button>}
+        <button
+          className={styles.paginationButton}
+          onClick={() => setPage(Math.max(page - 1, 1))}
+          disabled={page === 1}
+        >
+          이전
+        </button>
+        <span className={styles.pageInfo}>
+          {page} / {totalPages}
+        </span>
+        <button
+          className={styles.paginationButton}
+          onClick={() => setPage(Math.min(page + 1, totalPages))}
+          disabled={page === totalPages}
+        >
+          다음
+        </button>
+        {totalPages !== 1 && (
+          <button className={styles.paginationButton} onClick={() => handlePageJump(totalPages)}>
+            페이지 이동
+          </button>
+        )}
+      </div>
     </div>
   );
 }

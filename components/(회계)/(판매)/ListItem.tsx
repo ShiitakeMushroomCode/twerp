@@ -43,6 +43,7 @@ export default function SalesListItem({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [sortColumn, setSortColumn] = useState<string>('sale_date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [newData, setNewData] = useState<SaleData[] | null>(null);
 
   // 각 아이템의 높이를 설정
   const itemHeight = 45;
@@ -181,8 +182,6 @@ export default function SalesListItem({
 
   // 데이터 Fetch
   useEffect(() => {
-    if (pageSize === null) return; // pageSize가 설정되기 전에는 데이터를 가져오지 않음
-
     const fetchData = async () => {
       setIsLoading(true);
       try {
@@ -192,7 +191,7 @@ export default function SalesListItem({
           credentials: 'include',
           body: JSON.stringify({
             searchTerm,
-            searchOptions, // 추가된 부분
+            searchOptions,
             page,
             pageSize,
             sortColumn,
@@ -201,7 +200,7 @@ export default function SalesListItem({
         });
         const result = await response.json();
         if (Array.isArray(result.data)) {
-          setData(result.data);
+          setNewData(result.data); // 새 데이터를 임시로 저장
           setTotal(result.total);
         } else {
           console.error('데이터 형식이 올바르지 않습니다:', result);
@@ -214,6 +213,13 @@ export default function SalesListItem({
     };
     fetchData();
   }, [triggerSearch, page, sortColumn, sortOrder, pageSize]);
+
+  useEffect(() => {
+    if (!isLoading && newData) {
+      setData(newData); // 로딩이 끝나면 기존 데이터를 새 데이터로 교체
+      setNewData(null);
+    }
+  }, [isLoading, newData]);
 
   if (pageSize === null) {
     // pageSize가 설정되기 전에는 로딩 상태를 표시
@@ -231,191 +237,185 @@ export default function SalesListItem({
 
   return (
     <div className={styles.container}>
-      {isLoading ? (
-        <Spinner />
-      ) : (
-        <>
-          <div className={styles.tableContainer}>
-            <table className={styles.table}>
-              <colgroup>
-                <col style={{ width: '8%' }} />
-                <col style={{ width: '23%' }} />
-                <col style={{ width: '23%' }} />
-                <col style={{ width: '15%' }} />
-                <col style={{ width: '15%' }} />
-                <col style={{ width: '8%' }} />
-                <col style={{ width: '8%' }} />
-              </colgroup>
-              <thead className={styles.tableHeader}>
-                <tr>
-                  <th>복사</th>
-                  <th onClick={() => handleSort('sale_date')}>
-                    <span className={styles.headerCell}>
-                      <span className={styles.fakeLabel}>▲</span>
-                      거래일자
-                      <span className={styles.sortArrow}>
-                        {sortColumn === 'sale_date' && (sortOrder === 'asc' ? '▲' : '▼')}
+      <div className={styles.tableContainer}>
+        <table className={styles.table}>
+          <colgroup>
+            <col style={{ width: '8%' }} />
+            <col style={{ width: '23%' }} />
+            <col style={{ width: '23%' }} />
+            <col style={{ width: '15%' }} />
+            <col style={{ width: '15%' }} />
+            <col style={{ width: '8%' }} />
+            <col style={{ width: '8%' }} />
+          </colgroup>
+          <thead className={styles.tableHeader}>
+            <tr>
+              <th>복사</th>
+              <th onClick={() => handleSort('sale_date')}>
+                <span className={styles.headerCell}>
+                  <span className={styles.fakeLabel}>▲</span>
+                  거래일자
+                  <span className={styles.sortArrow}>
+                    {sortColumn === 'sale_date' && (sortOrder === 'asc' ? '▲' : '▼')}
+                  </span>
+                </span>
+              </th>
+              <th onClick={() => handleSort('company_name')}>
+                <span className={styles.headerCell}>
+                  <span className={styles.fakeLabel}>▲</span>
+                  거래처명
+                  <span className={styles.sortArrow}>
+                    {sortColumn === 'company_name' && (sortOrder === 'asc' ? '▲' : '▼')}
+                  </span>
+                </span>
+              </th>
+              <th onClick={() => handleSort('item_names')}>
+                <span className={styles.headerCell}>
+                  <span className={styles.fakeLabel}>▲</span>
+                  품목명
+                  <span className={styles.sortArrow}>
+                    {sortColumn === 'item_names' && (sortOrder === 'asc' ? '▲' : '▼')}
+                  </span>
+                </span>
+              </th>
+              <th onClick={() => handleSort('total_amount')}>
+                <span className={styles.headerCell}>
+                  <span className={styles.fakeLabel}>▲</span>
+                  금액 합계
+                  <span className={styles.sortArrow}>
+                    {sortColumn === 'total_amount' && (sortOrder === 'asc' ? '▲' : '▼')}
+                  </span>
+                </span>
+              </th>
+              <th>인쇄</th>
+              <th>전표 조회</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.length > 0 ? (
+              data.map((item) => {
+                const firstItemName = item.item_names[0];
+                const remainingItemsCount = item.item_names.length - 1;
+                const formattedDate = formatDateWithSequence(item.sale_date, item.sequence_number);
+                return (
+                  <tr key={item.sales_id} className={styles.tableRow} title={item.description || ''}>
+                    <td
+                      className={styles.centerAlign}
+                      onClick={(event) => {
+                        // 복사 기능 구현 필요
+                      }}
+                    >
+                      <span className={styles.iconButton}>
+                        <FiCopy />
+                        복사
                       </span>
-                    </span>
-                  </th>
-                  <th onClick={() => handleSort('company_name')}>
-                    <span className={styles.headerCell}>
-                      <span className={styles.fakeLabel}>▲</span>
-                      거래처명
-                      <span className={styles.sortArrow}>
-                        {sortColumn === 'company_name' && (sortOrder === 'asc' ? '▲' : '▼')}
+                    </td>
+                    <td
+                      className={styles.centerAlign}
+                      onClick={(event) => {
+                        editRoute(item.sales_id, event.ctrlKey || event.metaKey);
+                      }}
+                    >
+                      {formattedDate}
+                    </td>
+                    <td
+                      className={styles.leftAlign}
+                      onClick={(event) => {
+                        editRoute(item.sales_id, event.ctrlKey || event.metaKey);
+                      }}
+                      title={item.company_name}
+                    >
+                      {item.company_name}
+                    </td>
+                    <td
+                      className={styles.leftAlign}
+                      onClick={(event) => {
+                        editRoute(item.sales_id, event.ctrlKey || event.metaKey);
+                      }}
+                      title={`${firstItemName}${
+                        remainingItemsCount > 0 ? ` 외 ${remainingItemsCount}건\n${item.item_names.join(', ')}` : ``
+                      }`}
+                    >
+                      {firstItemName}
+                      {remainingItemsCount > 0 && ` 외 ${remainingItemsCount}건`}
+                    </td>
+                    <td
+                      className={styles.rightAlign}
+                      onClick={(event) => {
+                        editRoute(item.sales_id, event.ctrlKey || event.metaKey);
+                      }}
+                      title={`${numberToKorean(item.total_amount)}원정`}
+                    >
+                      {formatPrice(item.total_amount)}원
+                    </td>
+                    <td
+                      className={styles.centerAlign}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // 인쇄 기능 호출
+                      }}
+                    >
+                      <span className={styles.iconButton}>
+                        <FiPrinter />
+                        인쇄
                       </span>
-                    </span>
-                  </th>
-                  <th onClick={() => handleSort('item_names')}>
-                    <span className={styles.headerCell}>
-                      <span className={styles.fakeLabel}>▲</span>
-                      품목명
-                      <span className={styles.sortArrow}>
-                        {sortColumn === 'item_names' && (sortOrder === 'asc' ? '▲' : '▼')}
+                    </td>
+                    <td
+                      className={styles.centerAlign}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // 전표 조회 기능 호출
+                      }}
+                    >
+                      <span className={styles.iconButton}>
+                        <FiFileText />
+                        조회
                       </span>
-                    </span>
-                  </th>
-                  <th onClick={() => handleSort('total_amount')}>
-                    <span className={styles.headerCell}>
-                      <span className={styles.fakeLabel}>▲</span>
-                      금액 합계
-                      <span className={styles.sortArrow}>
-                        {sortColumn === 'total_amount' && (sortOrder === 'asc' ? '▲' : '▼')}
-                      </span>
-                    </span>
-                  </th>
-                  <th>인쇄</th>
-                  <th>전표 조회</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.length > 0 ? (
-                  data.map((item) => {
-                    const firstItemName = item.item_names[0];
-                    const remainingItemsCount = item.item_names.length - 1;
-                    const formattedDate = formatDateWithSequence(item.sale_date, item.sequence_number);
-                    return (
-                      <tr key={item.sales_id} className={styles.tableRow} title={item.description || ''}>
-                        <td
-                          className={styles.centerAlign}
-                          onClick={(event) => {
-                            // 복사 기능 구현 필요
-                          }}
-                        >
-                          <span className={styles.iconButton}>
-                            <FiCopy />
-                            복사
-                          </span>
-                        </td>
-                        <td
-                          className={styles.centerAlign}
-                          onClick={(event) => {
-                            editRoute(item.sales_id, event.ctrlKey || event.metaKey);
-                          }}
-                        >
-                          {formattedDate}
-                        </td>
-                        <td
-                          className={styles.leftAlign}
-                          onClick={(event) => {
-                            editRoute(item.sales_id, event.ctrlKey || event.metaKey);
-                          }}
-                          title={item.company_name}
-                        >
-                          {item.company_name}
-                        </td>
-                        <td
-                          className={styles.leftAlign}
-                          onClick={(event) => {
-                            editRoute(item.sales_id, event.ctrlKey || event.metaKey);
-                          }}
-                          title={`${firstItemName}${
-                            remainingItemsCount > 0 ? ` 외 ${remainingItemsCount}건\n${item.item_names.join(', ')}` : ``
-                          }`}
-                        >
-                          {firstItemName}
-                          {remainingItemsCount > 0 && ` 외 ${remainingItemsCount}건`}
-                        </td>
-                        <td
-                          className={styles.rightAlign}
-                          onClick={(event) => {
-                            editRoute(item.sales_id, event.ctrlKey || event.metaKey);
-                          }}
-                          title={`${numberToKorean(item.total_amount)}원정`}
-                        >
-                          {formatPrice(item.total_amount)}원
-                        </td>
-                        <td
-                          className={styles.centerAlign}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // 인쇄 기능 호출
-                          }}
-                        >
-                          <span className={styles.iconButton}>
-                            <FiPrinter />
-                            인쇄
-                          </span>
-                        </td>
-                        <td
-                          className={styles.centerAlign}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // 전표 조회 기능 호출
-                          }}
-                        >
-                          <span className={styles.iconButton}>
-                            <FiFileText />
-                            조회
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan={7} className={styles.noResult}>
-                      검색 결과가 없습니다
                     </td>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-          <div className={styles.pagination}>
-            {totalPages !== 1 && <button className={styles.fakeButton}>이거는 가짜</button>}
-            <button
-              className={styles.paginationButton}
-              onClick={() => setPage(Math.max(page - 1, 1))}
-              disabled={page === 1}
-            >
-              이전
-            </button>
-            <span className={styles.pageInfo}>
-              {page} / {totalPages}
-            </span>
-            <button
-              className={styles.paginationButton}
-              onClick={() => setPage(Math.min(page + 1, totalPages))}
-              disabled={page === totalPages}
-            >
-              다음
-            </button>
-            {totalPages !== 1 && (
-              <button
-                className={styles.paginationButton}
-                onClick={() => {
-                  handlePageJump(totalPages);
-                }}
-                disabled={totalPages === 1}
-              >
-                페이지 이동
-              </button>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={7} className={styles.noResult}>
+                  검색 결과가 없습니다
+                </td>
+              </tr>
             )}
-          </div>
-        </>
-      )}
+          </tbody>
+        </table>
+      </div>
+      <div className={styles.pagination}>
+        {totalPages !== 1 && <button className={styles.fakeButton}>이거는 가짜</button>}
+        <button
+          className={styles.paginationButton}
+          onClick={() => setPage(Math.max(page - 1, 1))}
+          disabled={page === 1}
+        >
+          이전
+        </button>
+        <span className={styles.pageInfo}>
+          {page} / {totalPages}
+        </span>
+        <button
+          className={styles.paginationButton}
+          onClick={() => setPage(Math.min(page + 1, totalPages))}
+          disabled={page === totalPages}
+        >
+          다음
+        </button>
+        {totalPages !== 1 && (
+          <button
+            className={styles.paginationButton}
+            onClick={() => {
+              handlePageJump(totalPages);
+            }}
+            disabled={totalPages === 1}
+          >
+            페이지 이동
+          </button>
+        )}
+      </div>
     </div>
   );
 }
