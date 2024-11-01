@@ -308,6 +308,8 @@ export default function SearchBox({ type, onSearch, searchOptions, setSearchOpti
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
         aria-label="검색어 입력"
+        id="search"
+        name="search"
       />
       <button onClick={handleSearch} className={styles.button}>
         검색

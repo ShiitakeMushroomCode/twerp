@@ -377,6 +377,8 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
                       checkedIcon={false}
                       onColor="#499eff"
                       offColor="#ccc"
+                      id={`${item.product_id}-switch`}
+                      name="switch"
                     />
                   </td>
                 </tr>
