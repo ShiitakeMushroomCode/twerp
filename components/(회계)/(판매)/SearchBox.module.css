@@ -1,0 +1,115 @@
+.container {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.input:focus {
+  border-color: #0070f3;
+}
+
+.button {
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin-left: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  vertical-align: middle;
+}
+
+.button:hover {
+  background-color: #005bb5;
+}
+
+/* 모달 관련 CSS */
+.popupContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.popupRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.popupRow label {
+  width: 100px;
+  font-weight: bold;
+  text-align: right;
+}
+
+.swal2Input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.dateInputContainer {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.dateInput {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.presetContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.presetContainer span {
+  width: 100px;
+  margin: 0;
+  padding: 0;
+  text-align: right;
+  font-weight: bold;
+}
+
+.presetButton {
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.presetButton:hover {
+  background-color: #e0e0e0;
+  border-color: #999;
+}
+
+.resetButton {
+  background-color: #f44336;
+  color: white;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.resetButton:hover {
+  background-color: #d32f2f;
+}

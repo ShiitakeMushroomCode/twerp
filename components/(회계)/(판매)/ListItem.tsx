@@ -22,13 +22,21 @@ interface SaleData {
 
 interface ListItemProps {
   searchTerm: string;
+  searchOptions: any; // 추가된 부분
   page: number;
   setPage: (page: number) => void;
   triggerSearch: boolean;
   setTriggerSearch: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function SalesListItem({ searchTerm, page, setPage, triggerSearch, setTriggerSearch }: ListItemProps) {
+export default function SalesListItem({
+  searchTerm,
+  searchOptions,
+  page,
+  setPage,
+  triggerSearch,
+  setTriggerSearch,
+}: ListItemProps) {
   const router = useRouter();
   const [data, setData] = useState<SaleData[]>([]);
   const [total, setTotal] = useState<number>(0);
@@ -184,6 +192,7 @@ export default function SalesListItem({ searchTerm, page, setPage, triggerSearch
           credentials: 'include',
           body: JSON.stringify({
             searchTerm,
+            searchOptions, // 추가된 부분
             page,
             pageSize,
             sortColumn,
@@ -204,7 +213,7 @@ export default function SalesListItem({ searchTerm, page, setPage, triggerSearch
       }
     };
     fetchData();
-  }, [triggerSearch, page, searchTerm, sortColumn, sortOrder, pageSize]);
+  }, [triggerSearch, page, searchTerm, searchOptions, sortColumn, sortOrder, pageSize]);
 
   if (pageSize === null) {
     // pageSize가 설정되기 전에는 로딩 상태를 표시
@@ -345,7 +354,6 @@ export default function SalesListItem({ searchTerm, page, setPage, triggerSearch
                           }}
                         >
                           <span className={styles.iconButton}>
-                            {' '}
                             <FiPrinter />
                             인쇄
                           </span>
