@@ -4,6 +4,7 @@ import { hashPassword } from '@/util/password';
 import { ACT } from 'auth';
 import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 // 구버전
 // export async function StoreRefreshToken(userId: any, refreshToken: any) {
@@ -44,7 +45,36 @@ export async function getAccessToken() {
 }
 
 export async function getTokenUserData() {
-  return (await jwtVerify(cookies().get('accessToken').value, secret)).payload.data;
+  if (cookies().has('accessToken')) {
+    return (await jwtVerify(cookies().get('accessToken').value, secret)).payload.data;
+  } else if (cookies().has('refreshToken')) {
+    const refreshToken = cookies().get('refreshToken');
+    await jwtVerify(refreshToken.value, secret);
+    const res = await fetch(`${process.env.API_URL}/auth/refresh`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Cookie: cookies().toString(),
+      },
+      body: JSON.stringify({ refreshToken }),
+    });
+
+    if (res.ok) {
+      const newAccessToken = (await res.json()).accessToken;
+      // 새 액세스 토큰 설정
+      cookies().set('accessToken', newAccessToken, {
+        maxAge: 60 * 15, // 15분
+        path: '/',
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: true,
+      });
+      return (await jwtVerify(cookies().get('accessToken').value, secret)).payload.data;
+    } else {
+      redirect(`${process.env.SITE_URL}/signout`);
+    }
+  }
 }
 
 export async function generateAccessToken(data: ACT) {
