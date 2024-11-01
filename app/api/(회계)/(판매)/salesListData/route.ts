@@ -16,11 +16,17 @@ export async function POST(request: NextRequest) {
     const searchParams = searchTerm ? [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`] : [];
 
     // 정렬 가능한 컬럼 리스트 (SQL 인젝션 방지)
-    const validSortColumns = ['company_name', 'items_name', 'total_amount', 'transaction_type'];
-    const sortColumnSafe = validSortColumns.includes(sortColumn) ? sortColumn : 'company_name';
+    const validSortColumns = ['sale_date', 'company_name', 'item_names', 'total_amount'];
+    const sortColumnMapping = {
+      sale_date: 'sale_date',
+      company_name: 'company_name',
+      item_names: 'item_names',
+      total_amount: 'total_amount',
+    };
 
-    // 정렬 순서 (asc 또는 desc)
-    const sortOrderSafe = sortOrder.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+    const sortColumnSafe = validSortColumns.includes(sortColumn) ? sortColumnMapping[sortColumn] : 'sale_date';
+
+    const sortOrderSafe = sortOrder && sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'; // 기본값은 'DESC'
 
     // 총 데이터 수를 가져오기 위한 쿼리
     const countQuery = `
@@ -37,26 +43,31 @@ export async function POST(request: NextRequest) {
 
     // 실제 데이터를 가져오기 위한 쿼리
     const dataQuery = `
-      SELECT
-        s.sales_id,
-        COALESCE(c.company_name, s.client_name) AS company_name,
-        s.transaction_type,
-        s.description,
-        (
-          SELECT SUM(si.price * si.quantity)
-          FROM sales_items si
-          WHERE si.sales_id = s.sales_id
-        ) AS total_amount,
-        (
-          SELECT GROUP_CONCAT(si.product_name SEPARATOR ', ')
-          FROM sales_items si
-          WHERE si.sales_id = s.sales_id
-        ) AS item_names
-      FROM sales s
-      LEFT JOIN clients c ON s.client_id = c.clients_id
-      WHERE 1=1 ${searchCondition}
-      GROUP BY s.sales_id
-      ORDER BY ${sortColumnSafe} ${sortOrderSafe}
+      SELECT * FROM (
+        SELECT
+          s.sales_id,
+          COALESCE(c.company_name, s.client_name) AS company_name,
+          s.transaction_type,
+          s.description,
+          s.sale_date,
+          s.update_at,
+          (
+            SELECT SUM(si.price * si.quantity)
+            FROM sales_items si
+            WHERE si.sales_id = s.sales_id
+          ) AS total_amount,
+          (
+            SELECT GROUP_CONCAT(si.product_name SEPARATOR ', ')
+            FROM sales_items si
+            WHERE si.sales_id = s.sales_id
+          ) AS item_names,
+          COUNT(*) OVER (PARTITION BY s.sale_date) - ROW_NUMBER() OVER (PARTITION BY s.sale_date ORDER BY s.update_at DESC) + 1 AS sequence_number
+        FROM sales s
+        LEFT JOIN clients c ON s.client_id = c.clients_id
+        WHERE 1=1 ${searchCondition}
+        GROUP BY s.sales_id
+      ) AS subquery
+      ORDER BY ${sortColumnSafe} ${sortOrderSafe}, sale_date DESC
       LIMIT ? OFFSET ?
     `;
 
@@ -70,6 +81,9 @@ export async function POST(request: NextRequest) {
       total_amount: row.total_amount,
       transaction_type: row.transaction_type,
       description: row.description,
+      sale_date: row.sale_date,
+      update_at: row.update_at,
+      sequence_number: row.sequence_number,
     }));
 
     return NextResponse.json({ data, total });

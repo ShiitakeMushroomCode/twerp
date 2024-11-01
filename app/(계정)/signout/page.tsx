@@ -9,8 +9,10 @@ export const metadata = {
 async function SignOut() {
   'use server';
   cookies().delete('accessToken');
-  removeRefreshTokenFromDB(cookies().get('refreshToken').value);
-  cookies().delete('refreshToken');
+  if (cookies().has('refreshToken')) {
+    removeRefreshTokenFromDB(cookies().get('refreshToken')?.value);
+    cookies().delete('refreshToken');
+  }
   redirect(`${process.env.SITE_URL}/signin`);
 }
 export default async function SignOutPage() {

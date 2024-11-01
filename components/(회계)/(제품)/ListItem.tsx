@@ -2,7 +2,7 @@
 
 import Spinner from '@/components/ETC/Spinner/Spinner';
 import styles from '@/styles/ListItem.module.css';
-import { appendParticle, formatPrice } from '@/util/reform';
+import { appendParticle, formatPrice, numberToKorean } from '@/util/reform';
 import useThrottle from '@/util/useThrottle';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -332,12 +332,13 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
               <tbody>
                 {data.length > 0 ? (
                   data.map((item) => (
-                    <tr key={item.product_id} className={styles.tableRow} title={item.description}>
+                    <tr key={item.product_id} className={styles.tableRow}>
                       <td
                         className={styles.centerAlign}
                         onClick={(event) => {
                           editRoute(item.product_id, event.ctrlKey || event.metaKey);
                         }}
+                        title={item.description}
                       >
                         {item.product_name}
                       </td>
@@ -346,6 +347,7 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
                         onClick={(event) => {
                           editRoute(item.product_id, event.ctrlKey || event.metaKey);
                         }}
+                        title={item.description}
                       >
                         {item.category || '없음'}
                       </td>
@@ -354,6 +356,7 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
                         onClick={(event) => {
                           editRoute(item.product_id, event.ctrlKey || event.metaKey);
                         }}
+                        title={`${numberToKorean(item.price)}원정`}
                       >
                         {item.price === null || item.price === undefined ? '0원' : `${formatPrice(item.price)}원`}
                       </td>
@@ -362,10 +365,11 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
                         onClick={(event) => {
                           editRoute(item.product_id, event.ctrlKey || event.metaKey);
                         }}
+                        title={item.manufacturer}
                       >
                         {item.manufacturer || '없음'}
                       </td>
-                      <td className={styles.centerAlign}>
+                      <td className={styles.centerAlign} title={item.is_use}>
                         <Switch
                           onChange={(checked) => handleToggle(item, checked)}
                           checked={item.is_use === '사용'}
@@ -388,6 +392,7 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
             </table>
           </div>
           <div className={styles.pagination}>
+            {totalPages !== 1 && <button className={styles.fakeButton}>이거는 가짜</button>}
             <button
               className={styles.paginationButton}
               onClick={() => setPage(Math.max(page - 1, 1))}

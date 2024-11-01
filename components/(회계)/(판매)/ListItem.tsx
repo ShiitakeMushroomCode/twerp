@@ -1,7 +1,7 @@
 'use client';
 import Spinner from '@/components/ETC/Spinner/Spinner';
 import styles from '@/styles/ListItem.module.css';
-import { formatPrice } from '@/util/reform';
+import { formatPrice, numberToKorean } from '@/util/reform';
 import useThrottle from '@/util/useThrottle';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -15,6 +15,9 @@ interface SaleData {
   total_amount: number;
   transaction_type: string;
   description: string | null;
+  sale_date: string;
+  update_at: string;
+  sequence_number: number;
 }
 
 interface ListItemProps {
@@ -30,11 +33,11 @@ export default function SalesListItem({ searchTerm, page, setPage, triggerSearch
   const [data, setData] = useState<SaleData[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [sortColumn, setSortColumn] = useState<string>('client_name');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortColumn, setSortColumn] = useState<string>('sale_date');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   // 각 아이템의 높이를 설정
-  const itemHeight = 41;
+  const itemHeight = 45;
 
   // 헤더, 푸터 등의 고정된 요소의 높이를 설정
   const fixedHeight = 380;
@@ -64,15 +67,31 @@ export default function SalesListItem({ searchTerm, page, setPage, triggerSearch
   const handleResize = useThrottle(() => {
     const screenHeight = window.innerHeight;
     const newPageSize = calculatePageSize(screenHeight);
+    const newTotalPages = Math.max(Math.ceil(total / newPageSize), 1);
 
-    // 페이지 사이즈가 변경되었을 때만 업데이트
     setPageSize((prevPageSize) => {
       if (prevPageSize !== newPageSize) {
+        setTriggerSearch((prev) => !prev);
+        if (page > newTotalPages) {
+          setPage(newTotalPages);
+        }
         return newPageSize;
       }
       return prevPageSize;
     });
-  }, 1000); // 1초 간격으로 실행
+
+    if (newTotalPages === 1) {
+      setPage(1);
+    }
+
+    // 창 크기가 변경되면 페이지 이동 모달을 닫고 다시 열기
+    if (Swal.isVisible() && Swal.getTitle()?.textContent?.startsWith('이동할')) {
+      Swal.close();
+      if (newTotalPages > 1) {
+        handlePageJump(newTotalPages);
+      }
+    }
+  }, 1000);
 
   // 창 크기 조정 이벤트를 등록
   useEffect(() => {
@@ -82,7 +101,7 @@ export default function SalesListItem({ searchTerm, page, setPage, triggerSearch
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [handleResize]);
 
   // 상세 페이지로 이동하는 함수
   function editRoute(sales_id: string, isNewTab: boolean) {
@@ -120,6 +139,8 @@ export default function SalesListItem({ searchTerm, page, setPage, triggerSearch
   const calculateTotalPages = () => {
     return Math.max(Math.ceil(total / (pageSize || MIN_PAGE_SIZE)), 1);
   };
+
+  const totalPages = pageSize !== null ? calculateTotalPages() : 1;
 
   // 페이지 번호를 입력받아 해당 페이지로 이동하는 함수
   function handlePageJump(currentTotalPages: number) {
@@ -185,12 +206,19 @@ export default function SalesListItem({ searchTerm, page, setPage, triggerSearch
     fetchData();
   }, [triggerSearch, page, searchTerm, sortColumn, sortOrder, pageSize]);
 
-  const totalPages = pageSize !== null ? calculateTotalPages() : 1;
-
   if (pageSize === null) {
     // pageSize가 설정되기 전에는 로딩 상태를 표시
     return <Spinner />;
   }
+
+  // 날짜 형식을 "YYYY년 MM월 DD일 - N"으로 변환하는 함수
+  const formatDateWithSequence = (dateString: string, sequence: number) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    return `${year}년 ${month}월 ${day}일 - ${sequence}`;
+  };
 
   return (
     <div className={styles.container}>
@@ -212,21 +240,30 @@ export default function SalesListItem({ searchTerm, page, setPage, triggerSearch
               <thead className={styles.tableHeader}>
                 <tr>
                   <th>복사</th>
-                  <th onClick={() => handleSort('client_name')}>
+                  <th onClick={() => handleSort('sale_date')}>
+                    <span className={styles.headerCell}>
+                      <span className={styles.fakeLabel}>▲</span>
+                      거래일자
+                      <span className={styles.sortArrow}>
+                        {sortColumn === 'sale_date' && (sortOrder === 'asc' ? '▲' : '▼')}
+                      </span>
+                    </span>
+                  </th>
+                  <th onClick={() => handleSort('company_name')}>
                     <span className={styles.headerCell}>
                       <span className={styles.fakeLabel}>▲</span>
                       거래처명
                       <span className={styles.sortArrow}>
-                        {sortColumn === 'client_name' && (sortOrder === 'asc' ? '▲' : '▼')}
+                        {sortColumn === 'company_name' && (sortOrder === 'asc' ? '▲' : '▼')}
                       </span>
                     </span>
                   </th>
-                  <th onClick={() => handleSort('items_name')}>
+                  <th onClick={() => handleSort('item_names')}>
                     <span className={styles.headerCell}>
                       <span className={styles.fakeLabel}>▲</span>
                       품목명
                       <span className={styles.sortArrow}>
-                        {sortColumn === 'items_name' && (sortOrder === 'asc' ? '▲' : '▼')}
+                        {sortColumn === 'item_names' && (sortOrder === 'asc' ? '▲' : '▼')}
                       </span>
                     </span>
                   </th>
@@ -239,15 +276,6 @@ export default function SalesListItem({ searchTerm, page, setPage, triggerSearch
                       </span>
                     </span>
                   </th>
-                  <th onClick={() => handleSort('transaction_type')}>
-                    <span className={styles.headerCell}>
-                      <span className={styles.fakeLabel}>▲</span>
-                      거래유형
-                      <span className={styles.sortArrow}>
-                        {sortColumn === 'transaction_type' && (sortOrder === 'asc' ? '▲' : '▼')}
-                      </span>
-                    </span>
-                  </th>
                   <th>인쇄</th>
                   <th>전표 조회</th>
                 </tr>
@@ -257,12 +285,13 @@ export default function SalesListItem({ searchTerm, page, setPage, triggerSearch
                   data.map((item) => {
                     const firstItemName = item.item_names[0];
                     const remainingItemsCount = item.item_names.length - 1;
+                    const formattedDate = formatDateWithSequence(item.sale_date, item.sequence_number);
                     return (
                       <tr key={item.sales_id} className={styles.tableRow} title={item.description || ''}>
                         <td
                           className={styles.centerAlign}
                           onClick={(event) => {
-                            //복사 해야함
+                            // 복사 기능 구현 필요
                           }}
                         >
                           <span className={styles.iconButton}>
@@ -271,18 +300,28 @@ export default function SalesListItem({ searchTerm, page, setPage, triggerSearch
                           </span>
                         </td>
                         <td
-                          className={styles.leftAlign}
-                          onClick={(event) => {
-                            editRoute(item.sales_id, event.ctrlKey || event.metaKey);
-                          }}
-                        >
-                          {item.company_name}
-                        </td>
-                        <td
                           className={styles.centerAlign}
                           onClick={(event) => {
                             editRoute(item.sales_id, event.ctrlKey || event.metaKey);
                           }}
+                        >
+                          {formattedDate}
+                        </td>
+                        <td
+                          className={styles.leftAlign}
+                          onClick={(event) => {
+                            editRoute(item.sales_id, event.ctrlKey || event.metaKey);
+                          }}
+                          title={item.company_name}
+                        >
+                          {item.company_name}
+                        </td>
+                        <td
+                          className={styles.leftAlign}
+                          onClick={(event) => {
+                            editRoute(item.sales_id, event.ctrlKey || event.metaKey);
+                          }}
+                          title={`${firstItemName}${remainingItemsCount > 0 ? ` 외 ${remainingItemsCount}건` : ``}`}
                         >
                           {firstItemName}
                           {remainingItemsCount > 0 && ` 외 ${remainingItemsCount}건`}
@@ -292,16 +331,9 @@ export default function SalesListItem({ searchTerm, page, setPage, triggerSearch
                           onClick={(event) => {
                             editRoute(item.sales_id, event.ctrlKey || event.metaKey);
                           }}
+                          title={`${numberToKorean(item.total_amount)}원정`}
                         >
                           {formatPrice(item.total_amount)}원
-                        </td>
-                        <td
-                          className={styles.centerAlign}
-                          onClick={(event) => {
-                            editRoute(item.sales_id, event.ctrlKey || event.metaKey);
-                          }}
-                        >
-                          {item.transaction_type}
                         </td>
                         <td
                           className={styles.centerAlign}
@@ -333,7 +365,7 @@ export default function SalesListItem({ searchTerm, page, setPage, triggerSearch
                   })
                 ) : (
                   <tr>
-                    <td colSpan={6} className={styles.noResult}>
+                    <td colSpan={7} className={styles.noResult}>
                       검색 결과가 없습니다
                     </td>
                   </tr>
@@ -342,7 +374,7 @@ export default function SalesListItem({ searchTerm, page, setPage, triggerSearch
             </table>
           </div>
           <div className={styles.pagination}>
-            {totalPages !== 1 && <button className={styles.fakeButton}>이건 가짜지</button>}
+            {totalPages !== 1 && <button className={styles.fakeButton}>이거는 가짜</button>}
             <button
               className={styles.paginationButton}
               onClick={() => setPage(Math.max(page - 1, 1))}

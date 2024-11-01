@@ -28,7 +28,7 @@
 
 /* 테이블 헤더 스타일 */
 .table th {
-  padding: 12px;
+  padding: 12px 0;
   background-color: #f0f0f0;
   word-wrap: break-word;
   text-align: center;
@@ -56,8 +56,12 @@
 .table td {
   padding: 12px;
   border: 1px solid #ddd;
-  word-wrap: break-word;
   vertical-align: middle;
+
+  /* 텍스트 넘칠 때 "..." 표시 */
+  white-space: nowrap; /* 줄바꿈 방지 */
+  overflow: hidden; /* 넘치는 부분 숨기기 */
+  text-overflow: ellipsis; /* "..."으로 표시 */
 }
 
 /* 테이블 행 마우스 오버 효과 */
@@ -137,7 +141,6 @@
   background: none;
   border: none;
   color: #0070f3;
-  padding: 5px 10px;
   font-size: 0.9em;
   font-weight: 500;
   cursor: pointer;

@@ -50,6 +50,8 @@ export async function middleware(request: NextRequest) {
           secure: true,
         });
         return response;
+      } else {
+        return NextResponse.redirect(new URL('/signout', request.url));
       }
     } catch (e) {
       return NextResponse.redirect(new URL('/signout', request.url));
@@ -69,7 +71,7 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// 설정: `/api/auth`를 제외한 모든 경로에 미들웨어 적용
+// 설정을 제외한 모든 경로에 미들웨어 적용
 export const config = {
-  matcher: ['/((?!api/auth|_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!api/auth|_next/static|_next/image|favicon.ico|signout).*)'],
 };

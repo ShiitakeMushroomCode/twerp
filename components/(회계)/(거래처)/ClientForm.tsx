@@ -197,7 +197,8 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
             title: '성공',
             text: data.message,
             icon: 'success',
-            confirmButtonText: '확인',
+            showConfirmButton: false,
+            timer: 1500,
           });
           localStorage.setItem('reloadItems', new Date().toString());
           if (window.name.startsWith('editPopup')) {

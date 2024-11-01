@@ -25,9 +25,10 @@ interface ListItemProps {
   page: number;
   setPage: (page: number) => void;
   triggerSearch: boolean;
+  setTriggerSearch: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function CompanyListItem({ searchTerm, page, setPage, triggerSearch }: ListItemProps) {
+export default function CompanyListItem({ searchTerm, page, setPage, triggerSearch, setTriggerSearch }: ListItemProps) {
   const router = useRouter();
   const [data, setData] = useState<Company[]>([]);
   const [total, setTotal] = useState<number>(0);
@@ -36,17 +37,17 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   // 각 아이템의 높이를 설정
-  const itemHeight = 41;
+  const itemHeight = 45;
 
   // 헤더, 푸터 등의 고정된 요소의 높이를 설정
-  const fixedHeight = 380;
+  const fixedHeight = 400;
 
   // 최소 및 최대 페이지 사이즈를 설정
   const MIN_PAGE_SIZE = 5;
   const MAX_PAGE_SIZE = 20;
 
   // 페이지 사이즈를 동적으로 계산하는 함수
-  const calculatePageSize = (screenHeight) => {
+  const calculatePageSize = (screenHeight: number): number => {
     const availableHeight = screenHeight - fixedHeight;
     let newPageSize = Math.floor(availableHeight / itemHeight);
     return Math.max(MIN_PAGE_SIZE, Math.min(newPageSize, MAX_PAGE_SIZE));
@@ -66,15 +67,31 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
   const handleResize = useThrottle(() => {
     const screenHeight = window.innerHeight;
     const newPageSize = calculatePageSize(screenHeight);
+    const newTotalPages = Math.max(Math.ceil(total / newPageSize), 1);
 
-    // 페이지 사이즈가 변경되었을 때만 업데이트
     setPageSize((prevPageSize) => {
       if (prevPageSize !== newPageSize) {
+        setTriggerSearch((prev) => !prev);
+        if (page > newTotalPages) {
+          setPage(newTotalPages);
+        }
         return newPageSize;
       }
       return prevPageSize;
     });
-  }, 1000); // 1초 간격으로 실행
+
+    if (newTotalPages === 1) {
+      setPage(1);
+    }
+
+    // 창 크기가 변경되면 페이지 이동 모달을 닫고 다시 열기
+    if (Swal.isVisible() && Swal.getTitle()?.textContent?.startsWith('이동할')) {
+      Swal.close();
+      if (newTotalPages > 1) {
+        handlePageJump(newTotalPages);
+      }
+    }
+  }, 1000);
 
   // 창 크기 조정 이벤트를 등록
   useEffect(() => {
@@ -84,7 +101,7 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [handleResize]);
 
   // 상세 페이지로 이동하는 함수
   function editRoute(clients_id: string, isNewTab: boolean) {
@@ -119,12 +136,15 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
   }
 
   // totalPages 계산 함수
-  const calculateTotalPages = () => {
+  const calculateTotalPages = (): number => {
+    if (pageSize === null) return 1;
     return Math.max(Math.ceil(total / pageSize), 1);
   };
 
+  const totalPages = calculateTotalPages();
+
   // 페이지 번호를 입력받아 해당 페이지로 이동하는 함수
-  function handlePageJump(currentTotalPages) {
+  function handlePageJump(currentTotalPages: number) {
     // SweetAlert2 팝업을 엽니다
     Swal.fire({
       title: `이동할 페이지 번호를 입력하세요 (1 ~ ${currentTotalPages})`,
@@ -160,17 +180,19 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
     const fetchData = async () => {
       setIsLoading(true);
       try {
+        const requestBody = {
+          searchTerm,
+          page,
+          pageSize,
+          sortColumn,
+          sortOrder,
+        };
+
         const response = await fetch(`/api/clientListData`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({
-            searchTerm,
-            page,
-            pageSize,
-            sortColumn,
-            sortOrder,
-          }),
+          body: JSON.stringify(requestBody),
         });
         const result = await response.json();
         if (Array.isArray(result.data)) {
@@ -187,8 +209,6 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
     };
     fetchData();
   }, [triggerSearch, page, searchTerm, sortColumn, sortOrder, pageSize]);
-
-  const totalPages = pageSize !== null ? calculateTotalPages() : 1;
 
   if (pageSize === null) {
     // pageSize가 설정되기 전에는 로딩 상태를 표시
@@ -273,7 +293,9 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
                       <td className={styles.centerAlign}>
                         {item.business_number.replace(/(\d{3})(\d{2})(\d{5})/, '$1-$2-$3')}
                       </td>
-                      <td className={styles.leftAlign}>{item.company_name}</td>
+                      <td className={styles.leftAlign} title={item.company_name}>
+                        {item.company_name}
+                      </td>
                       <td className={styles.centerAlign}>{item.representative_name}</td>
                       <td className={styles.centerAlign}>{formatPhoneNumber(item.tell_number)}</td>
                       <td className={styles.centerAlign}>{formatPhoneNumber(item.fax_number)}</td>
@@ -290,7 +312,7 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
             </table>
           </div>
           <div className={styles.pagination}>
-            {totalPages !== 1 && <button className={styles.fakeButton}>이건 가짜지</button>}
+            {totalPages !== 1 && <button className={styles.fakeButton}>이거는 가짜</button>}
             <button
               className={styles.paginationButton}
               onClick={() => setPage(Math.max(page - 1, 1))}
@@ -309,13 +331,7 @@ export default function CompanyListItem({ searchTerm, page, setPage, triggerSear
               다음
             </button>
             {totalPages !== 1 && (
-              <button
-                className={styles.paginationButton}
-                onClick={() => {
-                  handlePageJump(totalPages);
-                }}
-                disabled={totalPages === 1}
-              >
+              <button className={styles.paginationButton} onClick={() => handlePageJump(totalPages)}>
                 페이지 이동
               </button>
             )}

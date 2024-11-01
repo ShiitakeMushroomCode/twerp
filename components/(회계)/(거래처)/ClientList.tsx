@@ -35,7 +35,13 @@ export default function ClientList() {
   return (
     <div>
       <SearchBox type="client" onSearch={handleSearch} />
-      <ListItem searchTerm={searchTerm} page={page} setPage={setPage} triggerSearch={triggerSearch} />
+      <ListItem
+        searchTerm={searchTerm}
+        page={page}
+        setPage={setPage}
+        triggerSearch={triggerSearch}
+        setTriggerSearch={setTriggerSearch}
+      />
     </div>
   );
 }
