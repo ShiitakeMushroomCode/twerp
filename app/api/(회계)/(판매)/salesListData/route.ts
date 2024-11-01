@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
           s.sale_date,
           s.update_at,
           (
-            SELECT SUM(si.price * si.quantity)
+            SELECT SUM((si.price+si.sub_price) * si.quantity)
             FROM sales_items si
             WHERE si.sales_id = s.sales_id
           ) AS total_amount,
