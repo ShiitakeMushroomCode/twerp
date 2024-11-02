@@ -20,14 +20,11 @@
   margin-left: 1rem;
   font-size: 28px;
   font-weight: bold;
-  margin-bottom: 10px;
 }
 .subTitle {
   font-size: 20px;
   font-weight: bold;
   margin-left: 10px;
-  margin-bottom: 1rem;
-  margin-top: 1rem;
 }
 
 .companyInfo {
@@ -53,11 +50,6 @@
 .details {
   border: 1px solid black;
   margin-bottom: 1rem;
-}
-
-.subdetails {
-  border: 1px solid black;
-  margin-bottom: 0.5rem;
 }
 
 .row {
@@ -91,14 +83,14 @@
 
 .amountDetails {
   display: flex;
-  margin-top: 10px;
+  margin-top: 16px;
   border: 1px solid black;
   padding: 8px;
 }
 
 .accountDetails {
   display: flex;
-  margin-top: 10px;
+  margin-top: 16px;
   border: 1px solid black;
   padding: 8px;
 }

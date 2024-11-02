@@ -1,6 +1,3 @@
-import BusinessInfoTable from '@/components/(회계)/(판매)/(인쇄내용물)/BusinessInfoTable';
-import ClientInfo from '@/components/(회계)/(판매)/(인쇄내용물)/ClientInfo';
-import { formatDateWithSequence } from '@/util/reform';
 import styles from './SalesPrintForm.module.css';
 export interface CompanyResult {
   company_id: Buffer;
@@ -15,11 +12,13 @@ export interface CompanyResult {
   business_status: string | null;
   main_item_name: string | null;
   description: string | null;
+  account: string;
 }
 
 export interface SalesResult {
   sales_id: Buffer;
   company_id: Buffer;
+  business_number: string;
   client_id: Buffer | null;
   client_name: string | null;
   client_address: string | null;
@@ -58,25 +57,79 @@ interface Props {
 
 export default function SalesPrintForm({ salesFormData }: Props) {
   const { companyResult, salesResult, salesItemsResult, sequence_number } = salesFormData;
+
   return (
     <div className={styles.container}>
-      <div className={styles.half}>
-        <ClientInfo
-          client_address={salesResult['client_address']}
-          client_fax={salesResult['client_fax']}
-          client_name={salesResult['client_name']}
-          client_tel={salesResult['client_tel']}
-        />
+      <div className={styles.header}>
+        <h1 className={styles.title}>거래명세서</h1>
       </div>
-      <div className={styles.half}>
-        <BusinessInfoTable
-          company_name={companyResult['company_name']}
-          serialDate={formatDateWithSequence(salesResult['sale_date'], Number.parseInt(sequence_number))}
-          tellNumber={companyResult['tell_number']}
-          address={companyResult['business_address']}
-          business_number={companyResult['business_number']}
-          representative_name={companyResult['representative_name']}
-        />
+      <h1 className={styles.subTitle}>판매자 정보</h1>
+      <div className={styles.subdetails}>
+        <div className={styles.row}>
+          <div className={styles.label}>사업자등록번호</div>
+          <div className={styles.value}>{companyResult['business_number']}</div>
+          <div className={styles.shortLabel}>📞TEL</div>
+          <div className={styles.value}>{companyResult['tell_number']}</div>
+        </div>
+        <div className={styles.row}>
+          <div className={styles.label}>상호</div>
+          <div className={styles.value}>{companyResult['company_name']}</div>
+          <div className={styles.shortLabel}>대표자명</div>
+          <div className={styles.value}>{companyResult['representative_name']}</div>
+        </div>
+        <div className={styles.row}>
+          <div className={styles.label}>주소</div>
+          <div className={styles.longValue}>{companyResult['business_address']}</div>
+        </div>
+      </div>
+      <h1 className={styles.subTitle}>구매자 정보</h1>
+      <div className={styles.subdetails}>
+        <div className={styles.row}>
+          <div className={styles.label}>사업자등록번호</div>
+          <div className={styles.value}>{salesResult['business_number']}</div>
+          <div className={styles.label}>📞TEL</div>
+          <div className={styles.value}>{salesResult['client_tel']}</div>
+        </div>
+        <div className={styles.row}>
+          <div className={styles.label}>상호</div>
+          <div className={styles.value}>{salesResult['client_name']}</div>
+          <div className={styles.shortLabel}>📠FAX</div>
+          <div className={styles.value}>{salesResult['client_fax']}</div>
+        </div>
+        <div className={styles.row}>
+          <div className={styles.label}>주소</div>
+          <div className={styles.longValue}>{salesResult['client_address']}</div>
+        </div>
+      </div>
+      <div className={styles.tableContainer}>
+        <table className={styles.transactionTable}>
+          <thead>
+            <tr>
+              <th>번호</th>
+              <th>품목명</th>
+              <th>수량</th>
+              <th>단가</th>
+              <th>금액</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>상품 A</td>
+              <td>10</td>
+              <td>₩100,000</td>
+              <td>₩1,000,000</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div className={styles.amountDetails}>
+        <div className={styles.longLabel}>금액 (부가가치세 포함)</div>
+        <div className={styles.longValue}>₩1,200,000</div>
+      </div>
+      <div className={styles.accountDetails}>
+        <div className={styles.longLabel}>계좌번호</div>
+        <div className={styles.longValue}>{companyResult['account']}</div>
       </div>
     </div>
   );
