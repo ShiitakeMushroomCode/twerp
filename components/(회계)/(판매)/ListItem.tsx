@@ -4,7 +4,7 @@ import styles from '@/styles/ListItem.module.css';
 import { formatDateWithSequence, formatPrice, numberToKorean } from '@/util/reform';
 import useThrottle from '@/util/useThrottle';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FiCopy, FiFileText, FiPrinter } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 
@@ -44,6 +44,7 @@ export default function SalesListItem({
   const [sortColumn, setSortColumn] = useState<string>('sale_date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [newData, setNewData] = useState<SaleData[] | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   // 각 아이템의 높이를 설정
   const itemHeight = 45;
@@ -60,6 +61,21 @@ export default function SalesListItem({
     const availableHeight = screenHeight - fixedHeight;
     let newPageSize = Math.floor(availableHeight / itemHeight);
     return Math.max(MIN_PAGE_SIZE, Math.min(newPageSize, MAX_PAGE_SIZE));
+  };
+
+  // 인쇄
+  const handlePrint = (sales_id: string) => {
+    if (iframeRef.current) {
+      // iframe에 다른 페이지 로드
+      iframeRef.current.src = `/sales-print/${sales_id}`;
+
+      // 페이지가 로드되면 인쇄 실행
+      iframeRef.current.onload = () => {
+        if (iframeRef.current?.contentWindow) {
+          iframeRef.current.contentWindow.print();
+        }
+      };
+    }
   };
 
   // pageSize의 초기값을 null로 설정
@@ -343,6 +359,7 @@ export default function SalesListItem({
                       className={styles.centerAlign}
                       onClick={(e) => {
                         e.stopPropagation();
+                        handlePrint(item.sales_id);
                         // 인쇄 기능 호출
                       }}
                     >
@@ -407,6 +424,7 @@ export default function SalesListItem({
           </button>
         )}
       </div>
+      <iframe ref={iframeRef} style={{ display: 'none' }} title="Print Frame"></iframe>
     </div>
   );
 }

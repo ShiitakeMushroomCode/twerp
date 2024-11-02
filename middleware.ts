@@ -23,6 +23,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(DEFAULT_REDIRECT, request.url));
   }
 
+  if (accessToken && !refreshToken) {
+    return NextResponse.redirect(new URL('/signout', request.url));
+  }
+
   // 로그아웃 안하면 자동로그인
   if (!accessToken && refreshToken) {
     try {
@@ -57,7 +61,6 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/signout', request.url));
     }
   }
-
   // 액세스 토큰이 유효한 경우
   if (accessToken) {
     try {

@@ -1,12 +1,15 @@
+/* 컨테이너 설정 */
 .container {
   display: flex;
   flex-direction: column;
   padding: 16px;
-  width: 800px;
+  width: 100%;
+  max-width: 1078px;
   margin: 0 auto;
   background-color: #ffffff;
 }
 
+/* 헤더 스타일 */
 .header {
   display: flex;
   justify-content: space-between;
@@ -22,52 +25,55 @@
   font-weight: bold;
   margin-bottom: 10px;
 }
+
+/* 서브 타이틀 스타일 */
 .subTitle {
   font-size: 20px;
   font-weight: bold;
-  margin-left: 10px;
+  margin: 0;
+  padding: 8px;
+  text-align: center;
+  background-color: #f0f0f0;
+}
+
+/* 정보 테이블 스타일 */
+.infoTable {
+  width: 100%;
+  border-collapse: collapse;
   margin-bottom: 1rem;
-  margin-top: 1rem;
 }
 
-.companyInfo {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+.infoTable th,
+.infoTable td {
+  border: 1px solid black;
+  padding: 8px;
+  text-align: center;
 }
 
-.companyName {
-  font-size: 18px;
+.infoTable th {
+  background-color: #f0f0f0;
   font-weight: bold;
 }
 
-.contactIcons {
-  display: flex;
-  gap: 8px;
-}
-
-.contactItem {
-  font-size: 14px;
-}
-
-.details {
-  border: 1px solid black;
-  margin-bottom: 1rem;
-}
-
-.subdetails {
-  border: 1px solid black;
-  margin-bottom: 0.5rem;
-}
-
-.row {
-  display: flex;
-  border-top: 1px solid black;
-  padding: 8px;
-}
-
+/* 레이블과 값의 스타일 */
 .label {
   width: 20%;
+  font-weight: bold;
+  text-align: center;
+}
+
+.value {
+  width: 30%;
+  text-align: left;
+}
+
+.longValue {
+  width: 80%;
+  text-align: left;
+}
+
+.LLabel {
+  padding-right: 1rem;
   font-weight: bold;
 }
 
@@ -81,36 +87,18 @@
   font-weight: bold;
 }
 
-.value {
-  width: 30%;
-}
-
-.longValue {
-  width: 80%;
-}
-
-.amountDetails {
-  display: flex;
-  margin-top: 10px;
-  border: 1px solid black;
-  padding: 8px;
-}
-
-.accountDetails {
-  display: flex;
-  margin-top: 10px;
-  border: 1px solid black;
-  padding: 8px;
-}
-
+/* 테이블 컨테이너 스타일 */
 .tableContainer {
-  margin-top: 16px;
+  margin-top: 5px;
   border: 1px solid black;
+  padding: 8px;
 }
 
+/* 거래 테이블 스타일 */
 .transactionTable {
   width: 100%;
   border-collapse: collapse;
+  margin-bottom: 1rem;
 }
 
 .transactionTable th,
@@ -123,4 +111,94 @@
 .transactionTable th {
   background-color: #f0f0f0;
   font-weight: bold;
+}
+
+/* 결과 거래 테이블 스타일 */
+.resultTransactionTable tr td {
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.resultTransactionTable tr td:nth-child(even) {
+  width: 12%;
+}
+
+.resultTransactionTable tr td:nth-child(odd) {
+  background-color: #f0f0f0;
+  width: 8%;
+}
+
+.resultTransactionTable tr td.header {
+  background-color: #f0f0f0;
+  font-weight: bold;
+}
+
+.resultTransactionTable tr td.value {
+  text-align: right;
+}
+
+/* 합계 행 스타일 */
+.footerLabel {
+  font-weight: bold;
+  background-color: #f9f9f9;
+  text-align: right;
+}
+
+.footerValue {
+  font-weight: bold;
+  background-color: #f9f9f9;
+  text-align: right;
+}
+
+/* 금액 디테일 및 계좌 디테일 스타일 */
+.amountDetails,
+.accountDetails {
+  display: flex;
+  margin-top: 10px;
+  border: 1px solid black;
+  padding: 8px;
+}
+
+/* 반응형 인쇄 스타일 */
+@media print {
+  .container {
+    width: auto;
+    margin: 0;
+    padding: 0;
+    font-size: small;
+  }
+
+  .detailsContainer,
+  .tableContainer {
+    page-break-inside: avoid;
+  }
+
+  /* 추가 인쇄 관련 스타일 */
+  .header,
+  .infoTable,
+  .transactionTable,
+  .resultTransactionTable {
+    border: none;
+  }
+
+  .header {
+    border-bottom: 1px solid black;
+    padding-bottom: 5px;
+  }
+
+  .infoTable th,
+  .infoTable td,
+  .transactionTable th,
+  .transactionTable td,
+  .resultTransactionTable tr td {
+    border: 1px solid black;
+  }
+
+  /* 합계 행 스타일 인쇄 시 유지 */
+  .footerLabel,
+  .footerValue {
+    border-top: 2px solid black;
+  }
 }

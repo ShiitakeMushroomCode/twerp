@@ -1,4 +1,6 @@
+import { format } from 'date-fns';
 import styles from './SalesPrintForm.module.css';
+
 export interface CompanyResult {
   company_id: Buffer;
   business_number: string;
@@ -18,7 +20,6 @@ export interface CompanyResult {
 export interface SalesResult {
   sales_id: Buffer;
   company_id: Buffer;
-  business_number: string;
   client_id: Buffer | null;
   client_name: string | null;
   client_address: string | null;
@@ -40,97 +41,167 @@ export interface SalesItemResult {
   product_name: string;
   standard: string | null;
   price: number;
+  unit: string;
   sub_price: number;
   quantity: number;
   description: string | null;
 }
 
-export interface SalesFormData {
+export interface SalesPrintFormData {
   companyResult: CompanyResult;
   salesResult: SalesResult;
   salesItemsResult: SalesItemResult[];
-  sequence_number: string;
 }
+
 interface Props {
-  salesFormData: SalesFormData;
+  salesFormData: SalesPrintFormData;
 }
 
 export default function SalesPrintForm({ salesFormData }: Props) {
-  const { companyResult, salesResult, salesItemsResult, sequence_number } = salesFormData;
+  const { companyResult, salesResult, salesItemsResult } = salesFormData;
+  let totalP = 0;
+  let totalPrice = 0;
+  let totalSub_price = 0;
+  let totalQuantity = 0;
+  salesItemsResult.forEach((element) => {
+    totalP += element.price;
+    totalPrice += element.price * element.quantity;
+    totalSub_price += element.sub_price * element.quantity;
+    totalQuantity += element.quantity;
+  });
+  let total = totalPrice + totalSub_price;
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <h1 className={styles.title}>거래명세서</h1>
-      </div>
-      <h1 className={styles.subTitle}>판매자 정보</h1>
-      <div className={styles.subdetails}>
-        <div className={styles.row}>
-          <div className={styles.label}>사업자등록번호</div>
-          <div className={styles.value}>{companyResult['business_number']}</div>
-          <div className={styles.shortLabel}>📞TEL</div>
-          <div className={styles.value}>{companyResult['tell_number']}</div>
-        </div>
-        <div className={styles.row}>
-          <div className={styles.label}>상호</div>
-          <div className={styles.value}>{companyResult['company_name']}</div>
-          <div className={styles.shortLabel}>대표자명</div>
-          <div className={styles.value}>{companyResult['representative_name']}</div>
-        </div>
-        <div className={styles.row}>
-          <div className={styles.label}>주소</div>
-          <div className={styles.longValue}>{companyResult['business_address']}</div>
-        </div>
-      </div>
-      <h1 className={styles.subTitle}>구매자 정보</h1>
-      <div className={styles.subdetails}>
-        <div className={styles.row}>
-          <div className={styles.label}>사업자등록번호</div>
-          <div className={styles.value}>{salesResult['business_number']}</div>
-          <div className={styles.label}>📞TEL</div>
-          <div className={styles.value}>{salesResult['client_tel']}</div>
-        </div>
-        <div className={styles.row}>
-          <div className={styles.label}>상호</div>
-          <div className={styles.value}>{salesResult['client_name']}</div>
-          <div className={styles.shortLabel}>📠FAX</div>
-          <div className={styles.value}>{salesResult['client_fax']}</div>
-        </div>
-        <div className={styles.row}>
-          <div className={styles.label}>주소</div>
-          <div className={styles.longValue}>{salesResult['client_address']}</div>
-        </div>
-      </div>
-      <div className={styles.tableContainer}>
-        <table className={styles.transactionTable}>
-          <thead>
-            <tr>
-              <th>번호</th>
-              <th>품목명</th>
-              <th>수량</th>
-              <th>단가</th>
-              <th>금액</th>
-            </tr>
-          </thead>
+        <table>
           <tbody>
             <tr>
-              <td>1</td>
-              <td>상품 A</td>
-              <td>10</td>
-              <td>₩100,000</td>
-              <td>₩1,000,000</td>
+              <td className={styles.LLabel}>거래일자</td>
+              <td>{format(new Date(salesResult.sale_date), 'yyyy년 MM월 dd일')}</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <div className={styles.amountDetails}>
-        <div className={styles.longLabel}>금액 (부가가치세 포함)</div>
-        <div className={styles.longValue}>₩1,200,000</div>
-      </div>
-      <div className={styles.accountDetails}>
-        <div className={styles.longLabel}>계좌번호</div>
-        <div className={styles.longValue}>{companyResult['account']}</div>
-      </div>
+
+      <table className={styles.infoTable}>
+        <thead>
+          <tr>
+            <th colSpan={2} className={styles.subTitle}>
+              공급받는자 정보
+            </th>
+            <th colSpan={2} className={styles.subTitle}>
+              공급자 정보
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td className={styles.label}>상호</td>
+            <td className={styles.value}>{salesResult.client_name}</td>
+            <td className={styles.label}>등록번호</td>
+            <td className={styles.value}>
+              {companyResult.business_number.replace(/(\d{3})(\d{2})(\d{5})/, '$1-$2-$3')}
+            </td>
+          </tr>
+          <tr>
+            <td className={styles.label} rowSpan={2}>
+              주소
+            </td>
+            <td className={styles.value} rowSpan={2}>
+              {salesResult.client_address}
+            </td>
+            <td className={styles.label}>상호</td>
+            <td className={styles.value}>{companyResult.company_name}</td>
+          </tr>
+          <tr>
+            <td className={styles.label}>대표자명</td>
+            <td className={styles.value}>{companyResult.representative_name}</td>
+          </tr>
+          <tr>
+            <td className={styles.label}>전화번호</td>
+            <td className={styles.value}>{salesResult.client_tel}</td>
+            <td className={styles.label}>전화번호</td>
+            <td className={styles.value}>{companyResult.tell_number}</td>
+          </tr>
+          <tr>
+            <td className={styles.label}>팩스번호</td>
+            <td className={styles.value}>{salesResult.client_fax}</td>
+            <td className={styles.label}>팩스번호</td>
+            <td className={styles.value}>{companyResult.fax_number}</td>
+          </tr>
+          <tr>
+            <td className={styles.label}>합계금액</td>
+            <td className={styles.value}>₩{total.toLocaleString()}</td>
+            <td className={styles.label}>주소</td>
+            <td className={styles.value}>{companyResult.business_address}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table className={styles.transactionTable}>
+        <thead>
+          <tr>
+            <th>번호</th>
+            <th>품목명[규격]</th>
+            <th>수량[단위]</th>
+            <th>단가</th>
+            <th>공급가액</th>
+            <th>세액</th>
+            <th>적요</th>
+          </tr>
+        </thead>
+        <tbody>
+          {salesItemsResult.map((item, index) => (
+            <tr key={item.sales_item_id.toString()}>
+              <td>{index + 1}</td>
+              <td>{`${item.product_name}${item.standard ? `[${item.standard}]` : ''}`}</td>
+              <td>{`${item.quantity}${item.unit ? `[${item.unit}]` : ''}`}</td>
+              <td>₩{item.price.toLocaleString()}</td>
+              <td>₩{(item.price * item.quantity).toLocaleString()}</td>
+              <td>₩{(item.sub_price * item.quantity).toLocaleString()}</td>
+              <td>{item.description}</td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colSpan={2} className={styles.footerLabel}>
+              합계
+            </td>
+            <td className={styles.footerValue}>{totalQuantity.toLocaleString()}</td>
+            <td className={styles.footerValue}>₩{totalPrice.toLocaleString()}</td>
+            <td className={styles.footerValue}>₩{totalPrice.toLocaleString()}</td>
+            <td className={styles.footerValue}>₩{totalSub_price.toLocaleString()}</td>
+            <td className={styles.footerValue}></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <table className={`${styles.transactionTable} ${styles.resultTransactionTable}`}>
+        <tbody>
+          <tr>
+            <td className="header">공급가액</td>
+            <td className="value">₩{totalPrice.toLocaleString()}</td>
+            <td className="header">세액</td>
+            <td className="value">₩{totalSub_price.toLocaleString()}</td>
+            <td className="header">합계금액</td>
+            <td className="value">₩{total.toLocaleString()}</td>
+            <td className="header">인수자</td>
+            <td className="value"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table className={`${styles.transactionTable} ${styles.resultTransactionTable}`}>
+        <tbody>
+          <tr>
+            <td className="header">계좌번호</td>
+            <td className="value">{companyResult.account}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 }
