@@ -127,6 +127,7 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
+  min-width: 1200px;
 }
 body {
   margin: 0 auto;
@@ -135,23 +136,5 @@ body {
   margin: 0 auto;
   padding: 1.5rem;
   padding-bottom: 80px;
-}
-/* FHD 이하 (1920px 이하) */
-@media screen and (max-width: 1920px) {
-  /* FHD 이하에서 적용될 스타일 */
-  .content {
-    max-width: 1024px;
-  }
-}
-
-/* FHD 초과 (1920px 초과) */
-@media screen and (min-width: 1921px) {
-  /* FHD 초과에서 적용될 스타일 */
-  .content {
-    max-width: 1200px;
-  }
-}
-
-title {
-  font-size: 2rem;
+  max-width: 1200px;
 }

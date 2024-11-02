@@ -1,7 +1,7 @@
 'use client';
 import Spinner from '@/components/ETC/Spinner/Spinner';
 import styles from '@/styles/ListItem.module.css';
-import { formatPrice, numberToKorean } from '@/util/reform';
+import { formatDateWithSequence, formatPrice, numberToKorean } from '@/util/reform';
 import useThrottle from '@/util/useThrottle';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -225,15 +225,6 @@ export default function SalesListItem({
     // pageSize가 설정되기 전에는 로딩 상태를 표시
     return <Spinner />;
   }
-
-  // 날짜 형식을 "YYYY년 MM월 DD일 - N"으로 변환하는 함수
-  const formatDateWithSequence = (dateString: string, sequence: number) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = ('0' + (date.getMonth() + 1)).slice(-2);
-    const day = ('0' + date.getDate()).slice(-2);
-    return `${year}년 ${month}월 ${day}일 - ${sequence}`;
-  };
 
   return (
     <div className={styles.container}>

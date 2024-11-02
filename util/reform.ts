@@ -85,3 +85,12 @@ export function numberToKorean(number: number | string | null | undefined): stri
 
   return result;
 }
+
+// 날짜 형식을 "YYYY년 MM월 DD일 - N"으로 변환하는 함수
+export function formatDateWithSequence(dateString: string, sequence: number) {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = ('0' + (date.getMonth() + 1)).slice(-2);
+  const day = ('0' + date.getDate()).slice(-2);
+  return `${year}년 ${month}월 ${day}일 - ${sequence}`;
+}

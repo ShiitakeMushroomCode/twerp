@@ -24,3 +24,5 @@ export interface Client {
   main_item_name?: string; // 주종목명 (선택 항목)
   description?: string; // 주석 (선택 항목)
 }
+
+export interface Sales {}

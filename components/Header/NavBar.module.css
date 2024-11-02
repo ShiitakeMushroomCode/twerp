@@ -10,27 +10,12 @@
   justify-content: space-between;
   align-items: center;
   z-index: 1001;
-}
-
-/* FHD 이하 (1920px 이하) */
-@media screen and (max-width: 1920px) {
-  /* FHD 이하에서 적용될 스타일 */
-  .nav {
-    max-width: 1024px;
-  }
-}
-
-/* FHD 초과 (1920px 초과) */
-@media screen and (min-width: 1921px) {
-  /* FHD 초과에서 적용될 스타일 */
-  .nav {
-    max-width: 1200px;
-  }
+  max-width: 1200px;
 }
 
 .logo {
   font-weight: bold;
-  font-size: 1.8rem;
+  font-size: 2.2rem;
   color: #ffffff;
   text-decoration: none;
   transition: color 0.3s ease;
