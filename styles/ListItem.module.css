@@ -4,6 +4,7 @@
   flex-direction: column;
   height: 100%;
   margin-top: 20px;
+  width: 100%;
 }
 
 /* 로딩 스피너 스타일 */
