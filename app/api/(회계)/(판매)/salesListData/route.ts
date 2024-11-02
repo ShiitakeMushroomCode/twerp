@@ -138,7 +138,8 @@ export async function POST(request: NextRequest) {
         s.update_at,
         SUM((si.price + si.sub_price) * si.quantity) AS total_amount,
         GROUP_CONCAT(si.product_name SEPARATOR ', ') AS item_names,
-        ROW_NUMBER() OVER (PARTITION BY s.sale_date ORDER BY s.update_at DESC) AS sequence_number
+        ROW_NUMBER() OVER (PARTITION BY s.sale_date ORDER BY s.update_at DESC) AS sequence_number,
+        s.collection
       FROM sales s
       LEFT JOIN clients c ON s.client_id = c.clients_id
       LEFT JOIN sales_items si ON s.sales_id = si.sales_id
@@ -164,6 +165,7 @@ export async function POST(request: NextRequest) {
       sale_date: row.sale_date,
       update_at: row.update_at,
       sequence_number: row.sequence_number,
+      collection: row.collection,
     }));
 
     return NextResponse.json({ data, total });

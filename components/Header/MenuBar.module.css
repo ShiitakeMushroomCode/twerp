@@ -60,3 +60,25 @@
 .active::after {
   transform: scaleX(1) translateY(-2px); /* 활성화된 상태에서도 밑줄 유지 */
 }
+
+@media screen and (max-width: 1920px) {
+  .menuContent {
+    max-width: 980px;
+  }
+  .menuItem {
+    font-size: 0.9rem;
+    padding: 6px 10px;
+  }
+}
+@media screen and (max-width: 768px) {
+  .menuContent {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  .menuItem {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+  }
+}

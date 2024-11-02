@@ -5,7 +5,7 @@ import { formatDateWithSequence, formatPrice, numberToKorean } from '@/util/refo
 import useThrottle from '@/util/useThrottle';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { FiCopy, FiFileText, FiPrinter } from 'react-icons/fi';
+import { FiCopy, FiPrinter } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 
 interface SaleData {
@@ -18,6 +18,7 @@ interface SaleData {
   sale_date: string;
   update_at: string;
   sequence_number: number;
+  collection: string;
 }
 
 interface ListItemProps {
@@ -295,7 +296,7 @@ export default function SalesListItem({
                 </span>
               </th>
               <th>인쇄</th>
-              <th>전표 조회</th>
+              <th>회계 반영</th>
             </tr>
           </thead>
           <tbody>
@@ -368,16 +369,15 @@ export default function SalesListItem({
                         인쇄
                       </span>
                     </td>
-                    <td
-                      className={styles.centerAlign}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // 전표 조회 기능 호출
-                      }}
-                    >
-                      <span className={styles.iconButton}>
-                        <FiFileText />
-                        조회
+                    <td className={styles.centerAlign}>
+                      <span
+                        className={styles.iconButton}
+                        style={{
+                          color: item.collection === '진행중' ? '#f39c12' : '#239050',
+                          fontWeight: item.collection === '진행중' ? 'bold' : 'normal',
+                        }}
+                      >
+                        {item.collection}
                       </span>
                     </td>
                   </tr>

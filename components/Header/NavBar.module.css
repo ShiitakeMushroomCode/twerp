@@ -60,3 +60,17 @@
   transform: scale(1.1);
   border-color: #d1d1d1;
 }
+
+@media screen and (max-width: 1920px) {
+  /* FHD 이하에서 적용될 스타일 */
+  .nav {
+    max-width: 980px;
+  }
+}
+/* FHD 초과 (1920px 초과) */
+@media screen and (min-width: 1921px) {
+  /* FHD 초과에서 적용될 스타일 */
+  .nav {
+    max-width: 1200px;
+  }
+}
