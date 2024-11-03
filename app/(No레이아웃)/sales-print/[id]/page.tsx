@@ -1,4 +1,4 @@
-import SalesPrintForm, { SalesPrintFormData } from '@/components/(회계)/(판매)/(인쇄내용물)/SalesPrintForm';
+import SalesPrintForm, { SalesPrintFormData } from '@/components/(회계)/(판매)/SalesPrintForm';
 import { executeQuery } from '@/lib/db';
 import { getTokenUserData } from '@/util/token';
 import { ACT } from 'auth';

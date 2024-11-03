@@ -3,7 +3,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 200px; /* 필요에 따라 조정 */
+  height: 200px;
 }
 
 .loadingText {

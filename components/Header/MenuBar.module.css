@@ -50,7 +50,7 @@
 }
 
 .menuItem:hover::after {
-  transform: scaleX(1) translateY(-2px); /* 밑줄 확장 및 살짝 올라가기 */
+  transform: scaleX(1) translateY(-2px);
 }
 
 .active {
@@ -58,7 +58,7 @@
 }
 
 .active::after {
-  transform: scaleX(1) translateY(-2px); /* 활성화된 상태에서도 밑줄 유지 */
+  transform: scaleX(1) translateY(-2px);
 }
 
 @media screen and (max-width: 1920px) {
