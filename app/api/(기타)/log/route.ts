@@ -12,13 +12,12 @@ const logger = winston.createLogger({
       return `${time} [${level.toUpperCase()}]: ${message}`;
     })
   ),
-  transports: [/*new winston.transports.Console(),*/ new winston.transports.File({ filename: 'not-found.log' })],
+  transports: [new winston.transports.File({ filename: 'not-found.log' })],
 });
 
 export async function POST(request: NextRequest) {
   const { pathname } = await request.json();
 
-  // 클라이언트의 IP 주소 가져오기
   let ip =
     request.headers.get('x-forwarded-for') ||
     request.headers.get('x-real-ip') ||
@@ -26,7 +25,15 @@ export async function POST(request: NextRequest) {
     'Unknown IP';
   ip = ip.replace(/^::ffff:/, '');
 
-  logger.info(`${ip}에서 ${decodeURI(pathname)} 경로에 접근 시도`);
+  const userAgent = request.headers.get('user-agent') || 'Unknown User Agent';
+  const referer = request.headers.get('referer') || 'No Referer';
+  const acceptLanguage = request.headers.get('accept-language') || 'No Language Info';
+
+  logger.info(
+    `${ip}에서 ${decodeURI(
+      pathname
+    )} 경로에 접근 시도 - User Agent: ${userAgent}, Referer: ${referer}, Accept-Language: ${acceptLanguage}`
+  );
 
   return NextResponse.json({ message: 'Logged' });
 }
