@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 import styles from './NavBar.module.css';
 
-export default function BS() {
+export default function HomeLink() {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -22,16 +22,14 @@ export default function BS() {
       });
 
       if (result.isConfirmed) {
-        router.push('/signin'); // 이동
+        router.push('/'); // 이동
       }
     }
   };
 
   return (
-    <div className={styles.authLinks}>
-      <Link href="/signin" className={styles.link} onClick={handleClick}>
-        로그인
-      </Link>
-    </div>
+    <Link href="/" className={styles.logo} title="홈으로 이동" onClick={handleClick}>
+      WERP
+    </Link>
   );
 }

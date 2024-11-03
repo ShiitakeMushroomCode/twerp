@@ -1,4 +1,5 @@
 'use client';
+import { useUnsavedChangesWarning } from '@/util/useUnsavedChangesWarning';
 import { FormControlLabel, Radio, RadioGroup } from '@mui/material';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
@@ -30,6 +31,7 @@ interface ProductFormProps {
 }
 
 export default function ProductForm({ initialData, onSubmit, isEditMode = false }: ProductFormProps) {
+  useUnsavedChangesWarning();
   const [formData, setFormData] = useState<ProductFormData>(() => ({
     product_id: initialData?.product_id || undefined,
     product_name: initialData?.product_name || '',
@@ -210,138 +212,136 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
   }
 
   return (
-    <div>
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <div className={styles.title}>
-          <span>{isEditMode ? '제품 수정하기' : '제품 추가하기'}</span>{' '}
-          {isEditMode && (
-            <button type="button" className={styles.delButton} onClick={handleDelete} title="제품 삭제">
-              삭제
-              <FaTrashAlt style={{ marginLeft: '0.5rem' }} />
-            </button>
-          )}
-        </div>
-
-        <div className={styles['form-row']}>
-          <label htmlFor="product_name" className={styles.label}>
-            제품명
-          </label>
-          <input
-            id="product_name"
-            name="product_name"
-            type="text"
-            className={styles.input}
-            required
-            autoComplete="off"
-            value={formData.product_name}
-            title={formData.product_name}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className={styles['form-row']}>
-          <label htmlFor="category" className={styles.label}>
-            카테고리
-          </label>
-          <input
-            id="category"
-            name="category"
-            type="text"
-            className={styles.input}
-            autoComplete="off"
-            value={formData.category}
-            title={formData.category}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className={styles['form-row']}>
-          <label htmlFor="price" className={styles.label}>
-            가격
-          </label>
-          <input
-            id="price"
-            name="price"
-            type="text"
-            inputMode="numeric"
-            pattern="^-?\d*$"
-            className={styles.input}
-            autoComplete="off"
-            value={formData.price === 0 ? '' : formData.price.toString()}
-            title={formData.price.toString()}
-            onChange={handleChange}
-            placeholder="숫자와 '-'만 입력 가능합니다."
-          />
-        </div>
-
-        <div className={styles['form-row']}>
-          <label htmlFor="manufacturer" className={styles.label}>
-            제조업체
-          </label>
-          <input
-            id="manufacturer"
-            name="manufacturer"
-            type="text"
-            className={styles.input}
-            autoComplete="off"
-            value={formData.manufacturer}
-            title={formData.manufacturer}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className={styles['form-row']}>
-          <label htmlFor="start_date" className={styles.label}>
-            시작일자
-          </label>
-          <div className={styles.dateInput}>
-            <DatePicker selectedDate={startDate} onDateChange={handleDateChange} inputId="start_date" />
-          </div>
-        </div>
-
-        <div className={styles['form-row']}>
-          <label htmlFor="is_use" className={styles.label}>
-            사용 여부
-          </label>
-          <RadioGroup
-            row
-            aria-label="is_use"
-            name="is_use"
-            value={formData.is_use}
-            onChange={handleChange}
-            className={styles.radioGroup}
-          >
-            <FormControlLabel value="사용" control={<Radio />} label="사용" />
-            <FormControlLabel value="중지" control={<Radio />} label="중지" />
-          </RadioGroup>
-        </div>
-
-        <div className={styles['form-row']}>
-          <label htmlFor="description" className={styles.label}>
-            설명
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            className={styles.textarea}
-            autoComplete="off"
-            value={formData.description}
-            title={formData.description}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className={styles['form-row']}>
-          {errors.product_name && <span className={styles.error}>{errors.product_name}</span>}
-          {errors.price && <span className={styles.error}>{errors.price}</span>}
-        </div>
-
-        <div className={styles['form-row']}>
-          <button type="submit" className={styles.button}>
-            {isEditMode ? '수정' : '등록'}
+    <form onSubmit={handleSubmit} className={styles.form}>
+      <div className={styles.title}>
+        <span>{isEditMode ? '제품 수정하기' : '제품 추가하기'}</span>{' '}
+        {isEditMode && (
+          <button type="button" className={styles.delButton} onClick={handleDelete} title="제품 삭제">
+            삭제
+            <FaTrashAlt style={{ marginLeft: '0.5rem' }} />
           </button>
+        )}
+      </div>
+
+      <div className={styles['form-row']}>
+        <label htmlFor="product_name" className={styles.label}>
+          제품명
+        </label>
+        <input
+          id="product_name"
+          name="product_name"
+          type="text"
+          className={styles.input}
+          required
+          autoComplete="off"
+          value={formData.product_name}
+          title={formData.product_name}
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className={styles['form-row']}>
+        <label htmlFor="category" className={styles.label}>
+          카테고리
+        </label>
+        <input
+          id="category"
+          name="category"
+          type="text"
+          className={styles.input}
+          autoComplete="off"
+          value={formData.category}
+          title={formData.category}
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className={styles['form-row']}>
+        <label htmlFor="price" className={styles.label}>
+          가격
+        </label>
+        <input
+          id="price"
+          name="price"
+          type="text"
+          inputMode="numeric"
+          pattern="^-?\d*$"
+          className={styles.input}
+          autoComplete="off"
+          value={formData.price === 0 ? '' : formData.price.toString()}
+          title={formData.price.toString()}
+          onChange={handleChange}
+          placeholder="숫자와 '-'만 입력 가능합니다."
+        />
+      </div>
+
+      <div className={styles['form-row']}>
+        <label htmlFor="manufacturer" className={styles.label}>
+          제조업체
+        </label>
+        <input
+          id="manufacturer"
+          name="manufacturer"
+          type="text"
+          className={styles.input}
+          autoComplete="off"
+          value={formData.manufacturer}
+          title={formData.manufacturer}
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className={styles['form-row']}>
+        <label htmlFor="start_date" className={styles.label}>
+          시작일자
+        </label>
+        <div className={styles.dateInput}>
+          <DatePicker selectedDate={startDate} onDateChange={handleDateChange} inputId="start_date" />
         </div>
-      </form>
-    </div>
+      </div>
+
+      <div className={styles['form-row']}>
+        <label htmlFor="is_use" className={styles.label}>
+          사용 여부
+        </label>
+        <RadioGroup
+          row
+          aria-label="is_use"
+          name="is_use"
+          value={formData.is_use}
+          onChange={handleChange}
+          className={styles.radioGroup}
+        >
+          <FormControlLabel value="사용" control={<Radio />} label="사용" />
+          <FormControlLabel value="중지" control={<Radio />} label="중지" />
+        </RadioGroup>
+      </div>
+
+      <div className={styles['form-row']}>
+        <label htmlFor="description" className={styles.label}>
+          설명
+        </label>
+        <textarea
+          id="description"
+          name="description"
+          className={styles.textarea}
+          autoComplete="off"
+          value={formData.description}
+          title={formData.description}
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className={styles['form-row']}>
+        {errors.product_name && <span className={styles.error}>{errors.product_name}</span>}
+        {errors.price && <span className={styles.error}>{errors.price}</span>}
+      </div>
+
+      <div className={styles['form-row']}>
+        <button type="submit" className={styles.button}>
+          {isEditMode ? '수정' : '등록'}
+        </button>
+      </div>
+    </form>
   );
 }

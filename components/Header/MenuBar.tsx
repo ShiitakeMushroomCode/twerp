@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback } from 'react';
+import Swal from 'sweetalert2';
 import styles from './MenuBar.module.css';
 
 // 메뉴 항목 정의
@@ -15,18 +16,37 @@ const erpMenuItems = [
 ];
 
 export default function MenuBar() {
-  const pathname = usePathname(); // 현재 페이지의 경로를 가져옴
-  const router = useRouter(); // 라우터 인스턴스를 가져옴
+  const pathname = usePathname();
+  const router = useRouter();
 
-  // 리프레시가 필요한 경로 목록
-  const isListRoute = (path) => path.endsWith('-list');
+  // 특정 경로가 'edit' 또는 'add'를 포함하는지 확인하는 함수
+  const isEditOrAddRoute = () => {
+    return pathname.includes('edit') || pathname.includes('add');
+  };
 
   const handleClick = useCallback(
-    (href) => (e) => {
-      // 클릭한 링크의 href가 현재 경로와 일치하고, 경로가 'list'로 끝나는 경우
-      if (href === pathname && isListRoute(pathname)) {
-        e.preventDefault();
-        window.location.reload();
+    (href) => async (e) => {
+      if (isEditOrAddRoute()) {
+        e.preventDefault(); // 기본 링크 동작을 막습니다.
+
+        const result = await Swal.fire({
+          title: '변경사항이 저장되지 않았습니다!',
+          text: '페이지를 이동하시겠습니까?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: '이동',
+          cancelButtonText: '취소',
+        });
+
+        if (result.isConfirmed) {
+          router.push(href); // 사용자가 "이동"을 선택한 경우에만 페이지 이동
+        }
+      } else {
+        // 클릭한 링크의 href가 현재 경로와 일치하고, 경로가 'list'로 끝나는 경우
+        if (href === pathname && href.endsWith('-list')) {
+          e.preventDefault();
+          window.location.reload();
+        }
       }
     },
     [pathname, router]
@@ -40,7 +60,7 @@ export default function MenuBar() {
             <Link
               key={index}
               href={item.href}
-              className={`${styles.menuItem} ${pathname === item.href ? styles.active : ''}`}
+              className={`${styles.menuItem} ${pathname.startsWith(item.href.split('-')[0]) ? styles.active : ''}`}
               onClick={handleClick(item.href)}
             >
               {item.title}

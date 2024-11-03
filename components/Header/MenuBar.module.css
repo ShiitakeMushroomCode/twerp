@@ -50,7 +50,7 @@
 }
 
 .menuItem:hover::after {
-  transform: scaleX(1) translateY(-2px);
+  transform: scaleX(1) translateY(-1px);
 }
 
 .active {
@@ -58,7 +58,7 @@
 }
 
 .active::after {
-  transform: scaleX(1) translateY(-2px);
+  transform: scaleX(1) translateY(-1px);
 }
 
 @media screen and (max-width: 1920px) {
