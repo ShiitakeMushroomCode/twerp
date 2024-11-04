@@ -221,7 +221,7 @@
 
 /** 검색 버튼 */
 .cell .searchButton {
-  padding: 6px;
+  padding: 5px;
   border: none;
   background-color: transparent;
   cursor: pointer;
@@ -233,14 +233,16 @@
   width: 100%;
   padding: 6px 10px;
   border: none;
-  outline: none;
+  /* outline: 1px solid #6dafff; */
   background-color: #f9f9f9;
   font-size: large;
   box-sizing: border-box;
 }
 
 .tableInput:focus {
-  background-color: #fff;
+  background-color: #ffffff;
+  outline-color: #6dafff;
+  outline-width: 1px;
 }
 
 .buttonContainer {

@@ -185,7 +185,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
           </button>
         </div>
         <div className={styles['form-row']}>
-          <label className={styles.label}>거래유형</label>
+          <span className={styles.label}>거래유형</span>
           <div className={styles.radioGroup}>
             {['카드결제', '현금결제', '계좌이체', '기타'].map((type) => (
               <label key={type} className={`${styles.radioLabel} ${transactionType === type ? styles.checked : ''}`}>
@@ -221,6 +221,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
             <th className={styles.headerCell}>
               <input
                 type="checkbox"
+                id="allCheckBox"
                 checked={allChecked}
                 className={styles.checkbox}
                 onChange={(e) => {
@@ -246,6 +247,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
               <td className={styles.cell}>
                 <input
                   type="checkbox"
+                  name={`checkbox`}
                   className={styles.checkbox}
                   checked={row.selected}
                   onChange={(e) => {
@@ -265,6 +267,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
                       <input
                         className={styles.tableInput}
                         type="text"
+                        name={`cell`}
                         value={cell}
                         onChange={(e) => handleInputChange(e.target.value, index, cellIndex)}
                       />
@@ -273,6 +276,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
                     <input
                       className={styles.tableInput}
                       type="text"
+                      name={`cell`}
                       value={cell}
                       onChange={(e) => handleInputChange(e.target.value, index, cellIndex)}
                     />
