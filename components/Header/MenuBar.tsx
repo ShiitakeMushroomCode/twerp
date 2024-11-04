@@ -1,19 +1,11 @@
 'use client';
 
+import { erpMenuItems } from '@/util/getErpMenuItems';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 import Swal from 'sweetalert2';
 import styles from './MenuBar.module.css';
-
-// 메뉴 항목 정의
-const erpMenuItems = [
-  { title: '거래처 목록', href: '/client-list' },
-  { title: '매출 정보', href: '/sales-list' },
-  { title: '매입 정보', href: '/purchase-list' },
-  { title: '제품 목록', href: '/items-list' },
-  // 추가 메뉴 항목이 필요하면 여기에 추가하세요
-];
 
 export default function MenuBar() {
   const pathname = usePathname();
