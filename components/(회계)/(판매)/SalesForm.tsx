@@ -341,14 +341,14 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
 
       // formData 업데이트
       setFormData(newFormData);
-      console.log(newFormData);
+      // console.log(newFormData);
       // 필요한 경우, 여기서 API 호출 등 저장 로직을 실행
       // console.log('formData:', newFormData);
 
       // // onSubmit 콜백이 있다면 호출
-      // if (onSubmit) {
-      //   onSubmit(newFormData);
-      // }
+      if (onSubmit) {
+        onSubmit(newFormData);
+      }
       // fRows가 정상적으로 생성된 경우 추가 작업 수행
       // console.log('Filtered and mapped rows:', fRows);
     } catch (error) {

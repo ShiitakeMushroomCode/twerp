@@ -2,6 +2,8 @@ import SalesForm, { SalesFormData } from '@/components/(회계)/(판매)/SalesFo
 import { executeQuery } from '@/lib/db';
 import { getTokenUserData } from '@/util/token';
 import { ACT } from 'auth';
+import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
 
 export const metadata = {
   title: '매출 정보 수정',
@@ -48,6 +50,38 @@ async function getInitialData(id: string) {
   };
 }
 
+async function onSubmit(formData: SalesFormData) {
+  try {
+    const res = await fetch(`${process.env.API_URL}/sales/update`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Cookie: cookies().toString(),
+      },
+      body: JSON.stringify(formData),
+      credentials: 'include',
+    });
+
+    if (res.ok) {
+      // 성공 시 페이지를 재검증하거나 성공 메시지를 표시할 수 있습니다.
+      revalidatePath('/sales-list');
+      return { status: 'success', message: '매출이 성공적으로 저장되었습니다.' };
+    } else {
+      const errorData = await res.json();
+      return {
+        status: 'error',
+        message: errorData.message || '매출 저장에 실패하였습니다.',
+      };
+    }
+  } catch (error) {
+    console.error('API 요청 중 에러 발생:', error);
+    return {
+      status: 'error',
+      message: 'API 요청 중 에러가 발생했습니다.',
+    };
+  }
+}
+
 export default async function Page({ params: { id } }: PageProps) {
-  return <SalesForm initialData={(await getInitialData(id)) as SalesFormData} onSubmit={''} isEditMode={true} />;
+  return <SalesForm initialData={(await getInitialData(id)) as SalesFormData} onSubmit={onSubmit} isEditMode={true} />;
 }
