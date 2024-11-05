@@ -94,7 +94,7 @@ export default function SalesListItem({
     const screenHeight = window.innerHeight;
     const newPageSize = calculatePageSize(screenHeight);
     const newTotalPages = Math.max(Math.ceil(total / newPageSize), 1);
-
+    
     setPageSize((prevPageSize) => {
       if (prevPageSize !== newPageSize) {
         setTriggerSearch((prev) => !prev);
@@ -199,36 +199,38 @@ export default function SalesListItem({
 
   // 데이터 Fetch
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(`/api/salesListData`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({
-            searchTerm,
-            searchOptions,
-            page,
-            pageSize,
-            sortColumn,
-            sortOrder,
-          }),
-        });
-        const result = await response.json();
-        if (Array.isArray(result.data)) {
-          setNewData(result.data); // 새 데이터를 임시로 저장
-          setTotal(result.total);
-        } else {
-          console.error('데이터 형식이 올바르지 않습니다:', result);
+    if (pageSize !== null) {
+      const fetchData = async () => {
+        setIsLoading(true);
+        try {
+          const response = await fetch(`/api/salesListData`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+              searchTerm,
+              searchOptions,
+              page,
+              pageSize,
+              sortColumn,
+              sortOrder,
+            }),
+          });
+          const result = await response.json();
+          if (Array.isArray(result.data)) {
+            setNewData(result.data); // 새 데이터를 임시로 저장
+            setTotal(result.total);
+          } else {
+            console.error('데이터 형식이 올바르지 않습니다:', result);
+          }
+        } catch (error) {
+          console.error('데이터를 가져오는데 실패하였습니다:', error);
+        } finally {
+          setIsLoading(false);
         }
-      } catch (error) {
-        console.error('데이터를 가져오는데 실패하였습니다:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
+      };
+      fetchData();
+    }
   }, [triggerSearch, page, sortColumn, sortOrder, pageSize]);
 
   useEffect(() => {

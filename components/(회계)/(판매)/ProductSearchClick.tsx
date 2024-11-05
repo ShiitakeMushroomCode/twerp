@@ -17,6 +17,10 @@ const productData: Product[] = [
   { id: 3, productName: 'Wireless Headphones', category: 'Accessories', price: '$199' },
   { id: 4, productName: '4K TV Ultra', category: 'Home Appliance', price: '$1499' },
   { id: 5, productName: 'Gaming Console Z', category: 'Gaming', price: '$399' },
+  { id: 6, productName: 'Gaming Console Z', category: 'Gaming', price: '$399' },
+  { id: 7, productName: 'Gaming Console Z', category: 'Gaming', price: '$399' },
+  { id: 8, productName: 'Gaming Console Z', category: 'Gaming', price: '$399' },
+  { id: 9, productName: 'Gaming Console Z', category: 'Gaming', price: '$399' },
 ];
 
 export default async function ProductSearchClick({}) {

@@ -1,6 +1,7 @@
 .productCustomSwal {
   width: 700px !important;
   max-width: 90%;
+  padding: 0;
 }
 
 .productModalContent {
@@ -13,7 +14,6 @@
 .searchFields {
   display: flex;
   gap: 8px;
-  margin-bottom: 12px;
   align-items: center;
 }
 
@@ -48,7 +48,7 @@
 }
 
 .tableContainer {
-  max-height: 320px;
+  max-height: 290px;
   overflow-y: auto;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -71,6 +71,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 150px;
 }
 
 .table th {
