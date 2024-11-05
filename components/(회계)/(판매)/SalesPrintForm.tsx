@@ -137,6 +137,12 @@ export default function SalesPrintForm({ salesFormData }: Props) {
             <td className={styles.label}>주소</td>
             <td className={styles.value}>{companyResult.business_address}</td>
           </tr>
+          <tr>
+            <td className={styles.label}>적요</td>
+            <td colSpan={3} className={styles.value}>
+              {salesResult.description}
+            </td>
+          </tr>
         </tbody>
       </table>
 

@@ -4,13 +4,13 @@ import styles from './ClientSearchClick.module.css';
 
 const MySwal = withReactContent(Swal);
 
-export default async function handleClientSearchClick({ handleInitForm }) {  
-  const { value: selectedCompany } = await MySwal.fire({
+export default async function handleClientSearchClick({ handleInitForm }) {
+  await MySwal.fire({
     title: '검색',
     html: `
       <div class="${styles.modalContent}">
         <div class="${styles.searchFields}">
-          <input type="text" id="searchInput" placeholder="검색어 입력" class="${styles.searchInput}" />
+          <input type="text" id="searchInput" placeholder="검색어 입력" autocomplete="off" class="${styles.searchInput}" />
           <button id="searchButton" class="${styles.searchButton}">
             <span class="${styles.searchIcon}">검색</span>
           </button>
@@ -51,13 +51,18 @@ export default async function handleClientSearchClick({ handleInitForm }) {
 
       const fetchData = async () => {
         try {
-          const response = await fetch(`/api/getClientList?offset=${(currentPage - 1) * itemsPerPage}&limit=${itemsPerPage}&search=${encodeURIComponent(searchTerm)}`, {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
+          const response = await fetch(
+            `/api/getClientList?offset=${
+              (currentPage - 1) * itemsPerPage
+            }&limit=${itemsPerPage}&search=${encodeURIComponent(searchTerm)}`,
+            {
+              method: 'GET',
+              credentials: 'include',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            }
+          );
 
           if (!response.ok) {
             throw new Error('데이터를 가져오는데 실패했습니다');
@@ -72,8 +77,18 @@ export default async function handleClientSearchClick({ handleInitForm }) {
           tableBody.innerHTML = data.fData
             .map(
               (company) => `
-                <tr data-id="${company.clients_id}" data-business="${company.business_number}" data-name="${company.company_name}" title="${company.company_name}">
-                  <td title="${company.business_number}">${company.business_number.replace(/(\d{3})(\d{2})(\d{5})/, '$1-$2-$3')}</td>
+                <tr 
+                  data-id="${company.clients_id}" 
+                  data-name="${company.company_name}" 
+                  data-address="${company.business_address}" 
+                  data-business="${company.business_number}" 
+                  data-tel="${company.tell_number}" 
+                  data-fax="${company.fax_number}" 
+                  title="${company.company_name}">
+                  <td title="${company.business_number}">${company.business_number.replace(
+                /(\d{3})(\d{2})(\d{5})/,
+                '$1-$2-$3'
+              )}</td>
                   <td title="${company.company_name}">${company.company_name}</td>
                 </tr>
               `
@@ -86,13 +101,24 @@ export default async function handleClientSearchClick({ handleInitForm }) {
             row.style.cursor = 'pointer';
             row.addEventListener('click', () => {
               const selected = {
-                id: row.getAttribute('data-id'),
-                businessNumber: row.getAttribute('data-business'),
-                companyName: row.getAttribute('data-name'),
+                clients_id: row.getAttribute('data-id'),
+                company_name: row.getAttribute('data-name'),
+                business_address: row.getAttribute('data-address'),
+                business_number: row.getAttribute('data-business'),
+                tell_number: row.getAttribute('data-tel'),
+                fax_number: row.getAttribute('data-fax'),
               };
+
               MySwal.close();
-              handleInitForm({ name: 'client_name', value: selected.companyName });
-              console.log('선택된 회사:', selected);
+              // 선택된 데이터를 formData에 설정
+              handleInitForm({ name: 'client_id', value: selected.clients_id });
+              handleInitForm({ name: 'client_name', value: selected.company_name });
+              handleInitForm({ name: 'client_address', value: selected.business_address });
+              handleInitForm({ name: 'business_number', value: selected.business_number });
+              handleInitForm({ name: 'client_tel', value: selected.tell_number });
+              handleInitForm({ name: 'client_fax', value: selected.fax_number });
+
+              // console.log('선택된 회사:', selected);
             });
           });
 
@@ -124,7 +150,9 @@ export default async function handleClientSearchClick({ handleInitForm }) {
 
         for (let i = startPage; i <= endPage; i++) {
           paginationHtml += `
-            <button class="${styles.paginationButton} ${i === currentPage ? styles.activePage : ''}" data-page="${i}">${i}</button>
+            <button class="${styles.paginationButton} ${
+            i === currentPage ? styles.activePage : ''
+          }" data-page="${i}">${i}</button>
           `;
         }
 

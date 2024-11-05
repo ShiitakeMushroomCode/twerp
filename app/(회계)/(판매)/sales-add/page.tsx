@@ -4,5 +4,5 @@ export const metadata = {
   title: '매출 입력',
 };
 export default async function Page() {
-  return <SalesForm initialData={''} onSubmit={''} />;
+  return <SalesForm initialData={null} onSubmit={''} />;
 }

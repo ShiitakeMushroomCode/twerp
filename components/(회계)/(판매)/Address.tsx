@@ -88,6 +88,8 @@ export default function Address({ isSearch, setIsSearch, setBusinessAddress }: A
         <div className={styles.addressDisplay}>{addr}</div>
         <div>
           <input
+            id="detailAddress"
+            name="detailAddress"
             onBlur={handleDetailAddr}
             type="text"
             placeholder="상세주소를 입력해주세요."

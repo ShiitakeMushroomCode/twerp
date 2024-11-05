@@ -7,9 +7,10 @@ import { isEmpty } from '@/util/lo';
 import { formatPhoneNumber, numberToKorean } from '@/util/reform';
 import { useUnsavedChangesWarning } from '@/util/useUnsavedChangesWarning';
 import { format } from 'date-fns';
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
 import { FiSearch } from 'react-icons/fi';
+import Swal from 'sweetalert2';
 import styles from './SalesForm.module.css';
 
 interface Row {
@@ -17,15 +18,28 @@ interface Row {
   product_name: string;
   standard: string;
   price: string;
-  supply_amount: string; // 공급가액
-  sub_price: string; // 부가세
+  supply_amount: string;
+  sub_price: string;
   quantity: string;
   unit: string;
   description: string;
   selected: boolean;
 }
+export interface SalesFormData {
+  company_id: string;
+  sale_date: string;
+  transaction_type: string;
+  collection: string;
+  client_id: string | null;
+  client_name: string;
+  client_address: string;
+  client_tel: string;
+  client_fax: string;
+  description: string;
+  sales_items: Row[];
+}
 
-type EditableField = Exclude<keyof Row, 'selected' | 'supply_amount'>; // 'sub_price'를 제외하지 않음
+type EditableField = Exclude<keyof Row, 'selected' | 'supply_amount'>;
 
 export default function SalesForm({ initialData, onSubmit, isEditMode = false }) {
   useUnsavedChangesWarning();
@@ -38,7 +52,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
   const [transactionType, setTransactionType] = useState<TransactionType>('카드결제');
 
   const [formData, setFormData] = useState(() => ({
-    company_id: '',
+    company_id: initialData?.company_id || '',
     sale_date: '',
     transaction_type: '카드결제',
     collection: '진행중',
@@ -71,6 +85,87 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
     }
     return initialRows;
   });
+
+  useEffect(() => {
+    if (initialData) {
+      const safeInitialData = {
+        ...initialData,
+        company_id: initialData.company_id || '',
+        sale_date: new Date(initialData.sale_date) || '',
+        transaction_type: initialData.transaction_type || '카드결제',
+        collection: initialData.collection || '진행중',
+        client_id: initialData.client_id || null,
+        client_name: initialData.client_name || '',
+        client_address: initialData.client_address || '',
+        client_tel: initialData.client_tel || '',
+        client_fax: initialData.client_fax || '',
+        description: initialData.description || '',
+        sales_items: initialData.sales_items || [],
+      };
+      setFormData(safeInitialData);
+
+      setRows(() => {
+        if (safeInitialData.sales_items && safeInitialData.sales_items.length > 0) {
+          return safeInitialData.sales_items.map((item) => ({
+            product_id: item.product_id || '',
+            product_name: item.product_name || '',
+            standard: item.standard || '',
+            price: item.price || '',
+            supply_amount: item.supply_amount || '',
+            sub_price: item.sub_price || '',
+            quantity: item.quantity || '',
+            unit: item.unit || '',
+            description: item.description || '',
+            selected: false,
+          }));
+        } else {
+          const initialRows: Row[] = [];
+          for (let i = 0; i < 5; i++) {
+            initialRows.push({ ...initialRow });
+          }
+          return initialRows;
+        }
+      });
+
+      if (safeInitialData.sale_date) {
+        const parsedDate = new Date(safeInitialData.sale_date);
+        if (!isNaN(parsedDate.getTime())) {
+          setStartDate(parsedDate);
+        } else {
+          setStartDate(new Date());
+        }
+      } else {
+        setStartDate(new Date());
+      }
+
+      setClientAddress(safeInitialData.client_address || '');
+      setTransactionType(safeInitialData.transaction_type as TransactionType);
+    }
+  }, [initialData]);
+
+  /**
+   * 제품 선택 시 해당 행의 데이터를 업데이트하는 함수
+   * @param index - 행의 인덱스
+   */
+  const handleProductSelect = (index: number) => {
+    ProductSearchClick({
+      handleSelectProduct: (selectedProduct) => {
+        setRows((prevRows) => {
+          const updatedRows = [...prevRows];
+          updatedRows[index] = {
+            ...updatedRows[index],
+            product_id: selectedProduct.product_id || '',
+            product_name: selectedProduct.product_name || '',
+            standard: selectedProduct.standard || '',
+            price: selectedProduct.price || '',
+            unit: selectedProduct.unit || '',
+            description: selectedProduct.description || '',
+          };
+          return updatedRows;
+        });
+      },
+    });
+  };
 
   /**
    * 숫자 값을 포맷팅하여 반환
@@ -169,32 +264,104 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
    * 저장 버튼 클릭 시 데이터 준비 및 저장 로직 호출
    */
   function handleSaveButton() {
-    const fRows = rows
-      .filter((row) => {
-        return (
-          !isEmpty(row.product_name.trim()) ||
-          !isEmpty(row.standard.trim()) ||
-          !isEmpty(row.quantity.trim()) ||
-          !isEmpty(row.unit.trim()) ||
-          !isEmpty(row.price.trim()) ||
-          !isEmpty(row.description.trim())
-        );
-      })
-      .filter((row) => {
-        return !isEmpty(row.product_name.trim()) && !isEmpty(row.quantity.trim()) && !isEmpty(row.price.trim());
-      })
-      .map((row) => ({
-        product_id: row.product_id.trim() || null,
-        product_name: row.product_name.trim(),
-        standard: row.standard.trim(),
-        price: parseInt(row.price.trim(), 10) || 0,
-        quantity: parseInt(row.quantity.trim(), 10) || 0,
-        unit: row.unit.trim(),
-        description: row.description.trim(),
-        sub_price: parseInt(row.sub_price.trim(), 10) || 0,
-      }));
-    console.log(fRows);
-    // 추가적인 저장 로직 구현 (예: API 호출)
+    // 먼저 rows에서 필요한 데이터를 필터링하고 처리
+    try {
+      const fRows = rows
+        .filter((row) => {
+          if (
+            isEmpty(row.product_name.trim()) &&
+            isEmpty(row.standard.trim()) &&
+            isEmpty(row.quantity.trim()) &&
+            isEmpty(row.unit.trim()) &&
+            isEmpty(row.price.trim()) &&
+            isEmpty(row.description.trim())
+          ) {
+            // 모든 필드가 비어있을 경우 해당 행은 제외
+            return false;
+          }
+          return true;
+        })
+        .filter((row) => {
+          if (isEmpty(row.product_name.trim())) {
+            showErrorModal('제품명이 없습니다.');
+            throw new Error('제품명이 없습니다.');
+          }
+          if (isEmpty(row.quantity.trim())) {
+            showErrorModal('수량이 없습니다.');
+            throw new Error('수량이 없습니다.');
+          }
+          if (isEmpty(row.price.trim())) {
+            showErrorModal('단가가 없습니다.');
+            throw new Error('단가가 없습니다.');
+          }
+          return true;
+        })
+        .map((row) => ({
+          product_id: row.product_id.trim() || null,
+          product_name: row.product_name.trim(),
+          standard: row.standard.trim(),
+          price: parseInt(row.price.trim().replace(/,/g, ''), 10) || 0,
+          quantity: parseInt(row.quantity.trim().replace(/,/g, ''), 10) || 0,
+          unit: row.unit.trim(),
+          description: row.description.trim(),
+          sub_price: parseInt(row.sub_price.trim().replace(/,/g, ''), 10) || 0,
+        }));
+
+      // 모든 데이터를 포함한 새로운 formData 생성
+      const newFormData = {
+        ...formData,
+        client_address: clientAddress,
+        sale_date: format(startDate, 'yyyy-MM-dd'),
+        sales_items: fRows,
+      };
+
+      // 필수 항목 체크: 거래처명, 거래일자, 거래유형, 제품 항목
+      if (isEmpty(newFormData.client_name)) {
+        showErrorModal('거래처명이 없습니다.');
+        return;
+      }
+      if (isEmpty(newFormData.sale_date)) {
+        showErrorModal('거래일자가 없습니다.');
+        return;
+      }
+      if (isEmpty(newFormData.transaction_type)) {
+        showErrorModal('거래유형이 없습니다.');
+        return;
+      }
+      if (newFormData.sales_items.length === 0) {
+        showErrorModal('제품이 하나도 없습니다.');
+        return;
+      }
+
+      // formData 업데이트
+      setFormData(newFormData);
+
+      // 필요한 경우, 여기서 API 호출 등 저장 로직을 실행
+      // console.log('formData:', newFormData);
+
+      // // onSubmit 콜백이 있다면 호출
+      // if (onSubmit) {
+      //   onSubmit(newFormData);
+      // }
+      // fRows가 정상적으로 생성된 경우 추가 작업 수행
+      // console.log('Filtered and mapped rows:', fRows);
+    } catch (error) {
+      // 오류가 발생한 경우 추가 처리
+      // console.error('Error:', error.message);
+      showErrorModal('저장 중 오류가 발생했습니다.');
+      return;
+    }
+  }
+
+  // 오류 모달 표시 함수
+  function showErrorModal(message) {
+    Swal.fire({
+      icon: 'error',
+      title: '오류',
+      text: message,
+      showConfirmButton: false,
+      timer: 1500, // 1.5초 후 자동으로 닫힘
+    });
   }
 
   /**
@@ -219,6 +386,9 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
   }
 
   function handleInitForm({ name, value }) {
+    if (name === 'client_address') {
+      setClientAddress(value);
+    }
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -324,9 +494,23 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
             type="button"
             className={styles.resetButton}
             disabled={isSearch}
-            onClick={() => setFormData((prev) => ({ ...prev, client_name: '', client_id: '', client_address: '', client_tel:'', client_fax:'',description:'' }))}
+            onClick={() => {
+              setFormData((prev) => ({
+                ...prev,
+                client_name: '',
+                client_id: '',
+                client_address: '',
+                client_tel: '',
+                client_fax: '',
+                description: '',
+              }));
+              setTransactionType('카드결제');
+              setStartDate(new Date());
+              setClientAddress('');
+            }}
+            title="거래처 정보가 모두 초기화 됩니다."
           >
-            초기화
+            모두 초기화
           </button>
         </div>
         <div className={styles['form-row']}>
@@ -348,7 +532,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
             disabled={isSearch}
             onClick={() => setStartDate(new Date())}
           >
-            초기화
+            날짜 초기화
           </button>
         </div>
         <div className={styles['form-row']}>
@@ -369,7 +553,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
           />
           {isSearch && <Address isSearch={isSearch} setIsSearch={setIsSearch} setBusinessAddress={setClientAddress} />}
           <button type="button" className={styles.resetButton} disabled={isSearch} onClick={() => setClientAddress('')}>
-            초기화
+            주소 초기화
           </button>
         </div>
 
@@ -507,9 +691,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
                     type="button"
                     className={styles.searchButton}
                     disabled={isSearch}
-                    onClick={() => {
-                      ProductSearchClick({});
-                    }}
+                    onClick={() => handleProductSelect(index)}
                   >
                     <FiSearch />
                   </button>

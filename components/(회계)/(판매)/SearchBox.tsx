@@ -67,57 +67,53 @@ export default function SearchBox({ type, onSearch, searchOptions, setSearchOpti
     MySwal.fire({
       title: '검색 옵션',
       html: `
-        <div class="${styles.popupContainer}">
-          <div class="${styles.popupRow}">
-            <label for="swal-input-client-name">거래처명 :</label>
-            <input type="text" id="swal-input-client-name" class="${styles.swal2Input}" value="${
+      <div class="${styles.popupContainer}">
+        <div class="${styles.popupRow}">
+          <label for="swal-input-client-name">거래처명 :</label>
+          <input type="text" id="swal-input-client-name" class="${styles.swal2Input}" value="${
         searchOptions.clientName || ''
       }" />
-          </div>
-          <div class="${styles.popupRow}">
-            <label for="swal-input-item-name">품목명 :</label>
-            <input type="text" id="swal-input-item-name" class="${styles.swal2Input}" value="${
+        </div>
+        <div class="${styles.popupRow}">
+          <label for="swal-input-item-name">품목명 :</label>
+          <input type="text" id="swal-input-item-name" class="${styles.swal2Input}" value="${
         searchOptions.itemName || ''
       }" />
-          </div>
+        </div>
+        <div class="${styles.popupRow}">
+          <label for="swal-input-start-date">거래일자 :</label>
           <div class="${styles.popupRow}">
-            <label>거래일자 :</label>
-            <div class="${styles.popupRow}">
-              <input type="date" id="swal-input-start-date" class="${styles.dateInput}" value="${
+            <input type="date" id="swal-input-start-date" class="${styles.dateInput}" value="${
         searchOptions.startDate || ''
       }" />  ~ 
-              <input type="date" id="swal-input-end-date" class="${styles.dateInput}" value="${
+            <input type="date" id="swal-input-end-date" class="${styles.dateInput}" value="${
         searchOptions.endDate || ''
       }" />
-              <button type="button" id="date-reset-button" class="${styles.dateResetButton}">날짜 초기화</button>
-            </div>
-          </div>
-          <div class="${styles.popupRow}">
-            <label>금액 :</label>
-            <div class="${styles.amountContainer}">
-              <input type="text" id="swal-input-min-amount" class="${
-                styles.swal2Input
-              }" placeholder="최소 금액" value="${
-        searchOptions.minAmount !== undefined ? formatPrice(searchOptions.minAmount) : ''
-      }" /> 원
-              ~ 
-              <input type="text" id="swal-input-max-amount" class="${
-                styles.swal2Input
-              }" placeholder="최대 금액" value="${
-        searchOptions.maxAmount !== undefined ? formatPrice(searchOptions.maxAmount) : ''
-      }" /> 원
-            </div>
-          </div>
-          <div class="${styles.presetContainer}">
-            <span>옵션 :</span>
-            <button type="button" class="${styles.presetButton}" data-preset="today">오늘</button>
-            <button type="button" class="${styles.presetButton}" data-preset="last7">지난 7일</button>
-            <button type="button" class="${styles.presetButton}" data-preset="last30">지난 30일</button>
-            <button type="button" class="${styles.presetButton}" data-preset="nowYear">올해</button>
-            <button type="button" class="${styles.resetButton}">초기화</button>
+            <button type="button" id="date-reset-button" class="${styles.dateResetButton}">날짜 초기화</button>
           </div>
         </div>
-      `,
+        <div class="${styles.popupRow}">
+          <label for="swal-input-min-amount">금액 :</label>
+          <div class="${styles.amountContainer}">
+            <input type="text" id="swal-input-min-amount" class="${styles.swal2Input}" placeholder="최소 금액" value="${
+        searchOptions.minAmount !== undefined ? formatPrice(searchOptions.minAmount) : ''
+      }" /> 원
+            ~ 
+            <input type="text" id="swal-input-max-amount" class="${styles.swal2Input}" placeholder="최대 금액" value="${
+        searchOptions.maxAmount !== undefined ? formatPrice(searchOptions.maxAmount) : ''
+      }" /> 원
+          </div>
+        </div>
+        <div class="${styles.presetContainer}">
+          <span>옵션 :</span>
+          <button type="button" class="${styles.presetButton}" data-preset="today">오늘</button>
+          <button type="button" class="${styles.presetButton}" data-preset="last7">지난 7일</button>
+          <button type="button" class="${styles.presetButton}" data-preset="last30">지난 30일</button>
+          <button type="button" class="${styles.presetButton}" data-preset="nowYear">올해</button>
+          <button type="button" class="${styles.resetButton}">초기화</button>
+        </div>
+      </div>
+    `,
       showCancelButton: true,
       confirmButtonText: '검색',
       cancelButtonText: '취소',

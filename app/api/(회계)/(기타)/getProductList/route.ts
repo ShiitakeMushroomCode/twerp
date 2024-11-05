@@ -15,18 +15,23 @@ export async function GET(request: Request): Promise<Response> {
   // 기본 SQL 쿼리
   let baseSql = `
     FROM
-      clients
+      product
     WHERE
       company_id = ?
+      AND is_use = '사용'
   `;
 
   const params: any[] = [companyId];
 
   if (search) {
     baseSql += `
-      AND (company_name LIKE ? OR business_number LIKE ?)
+      AND (
+        product_name LIKE ?
+        OR category LIKE ?
+        OR manufacturer LIKE ?
+      )
     `;
-    params.push(`%${search}%`, `%${search}%`);
+    params.push(`%${search}%`, `%${search}%`, `%${search}%`);
   }
 
   // 총 개수 쿼리
@@ -38,14 +43,15 @@ export async function GET(request: Request): Promise<Response> {
   // 데이터 쿼리
   const dataSql = `
     SELECT
-      clients_id,
-      company_name,
-      business_address,
-      business_number,
-      tell_number,
-      fax_number
+      product_id,
+      product_name,
+      IFNULL(category, '') AS category,
+      price,
+      IFNULL(standard, '') AS standard,
+      IFNULL(unit, '') AS unit,
+      manufacturer
     ${baseSql}
-    ORDER BY company_name
+    ORDER BY product_name
     LIMIT ?
     OFFSET ?
   `;
