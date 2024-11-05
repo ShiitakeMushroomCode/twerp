@@ -346,9 +346,9 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
       // console.log('formData:', newFormData);
 
       // // onSubmit 콜백이 있다면 호출
-      if (onSubmit) {
-        onSubmit(newFormData);
-      }
+      // if (onSubmit) {
+      //   onSubmit(newFormData);
+      // }
       // fRows가 정상적으로 생성된 경우 추가 작업 수행
       // console.log('Filtered and mapped rows:', fRows);
     } catch (error) {
@@ -513,8 +513,11 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
               setTransactionType('카드결제');
               setStartDate(new Date());
               setClientAddress('');
+              setRows((prev) => {
+                return [initialRow, initialRow, initialRow, initialRow, initialRow];
+              });
             }}
-            title="거래처 정보가 모두 초기화 됩니다."
+            title="매출 정보가 모두 초기화 됩니다."
           >
             모두 초기화
           </button>

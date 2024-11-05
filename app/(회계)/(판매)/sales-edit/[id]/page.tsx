@@ -51,6 +51,7 @@ async function getInitialData(id: string) {
 }
 
 async function onSubmit(formData: SalesFormData) {
+  'use server';
   try {
     const res = await fetch(`${process.env.API_URL}/sales/update`, {
       method: 'POST',
