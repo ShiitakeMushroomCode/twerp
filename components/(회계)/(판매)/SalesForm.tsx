@@ -6,7 +6,7 @@ import ProductSearchClick from '@/components/(회계)/(판매)/ProductSearchClic
 import { isEmpty } from '@/util/lo';
 import { formatPhoneNumber, numberToKorean } from '@/util/reform';
 import { useUnsavedChangesWarning } from '@/util/useUnsavedChangesWarning';
-import { format } from 'date-fns';
+import { addHours, format } from 'date-fns';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
 import { FiSearch } from 'react-icons/fi';
@@ -90,32 +90,37 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
     if (initialData) {
       const safeInitialData = {
         ...initialData,
-        company_id: initialData.company_id || '',
-        sale_date: new Date(initialData.sale_date) || '',
-        transaction_type: initialData.transaction_type || '카드결제',
-        collection: initialData.collection || '진행중',
-        client_id: initialData.client_id || null,
-        client_name: initialData.client_name || '',
-        client_address: initialData.client_address || '',
-        client_tel: initialData.client_tel || '',
-        client_fax: initialData.client_fax || '',
-        description: initialData.description || '',
-        sales_items: initialData.sales_items || [],
+        company_id: initialData?.['company_id']?.toString() || '',
+        sale_date: initialData?.['sale_date'] ? addHours(new Date(initialData['sale_date']), 9) : new Date(),
+        transaction_type: initialData?.['transaction_type'] || '카드결제',
+        collection: initialData?.['collection'] || '진행중',
+        client_id: initialData?.['client_id'] || null,
+        client_name: initialData?.['client_name'] || '',
+        client_address: initialData?.['client_address'] || '',
+        client_tel: initialData?.['client_tel'] || '',
+        client_fax: initialData?.['client_fax'] || '',
+        description: initialData?.['description'] || '',
+        sales_items:
+          initialData?.['sales_items']?.map((item) => ({
+            ...item,
+            supply_amount:
+              item.price && item.quantity ? (parseInt(item.price, 10) * parseInt(item.quantity, 10)).toString() : '', // 공급가액 계산
+          })) || [],
       };
-      setFormData(safeInitialData);
 
+      setFormData(safeInitialData);
       setRows(() => {
         if (safeInitialData.sales_items && safeInitialData.sales_items.length > 0) {
           return safeInitialData.sales_items.map((item) => ({
-            product_id: item.product_id || '',
-            product_name: item.product_name || '',
-            standard: item.standard || '',
-            price: item.price || '',
-            supply_amount: item.supply_amount || '',
-            sub_price: item.sub_price || '',
-            quantity: item.quantity || '',
-            unit: item.unit || '',
-            description: item.description || '',
+            product_id: item?.['product_id'] || '',
+            product_name: item?.['product_name'] || '',
+            standard: item?.['standard'] || '',
+            price: item?.['price'] || '',
+            supply_amount: item?.['supply_amount'] || '',
+            sub_price: item?.['sub_price'] || '',
+            quantity: item?.['quantity'] || '',
+            unit: item?.['unit'] || '',
+            description: item?.['description'] || '',
             selected: false,
           }));
         } else {
@@ -128,7 +133,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
       });
 
       if (safeInitialData.sale_date) {
-        const parsedDate = new Date(safeInitialData.sale_date);
+        const parsedDate = addHours(new Date(safeInitialData.sale_date), 9);
         if (!isNaN(parsedDate.getTime())) {
           setStartDate(parsedDate);
         } else {
@@ -159,6 +164,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
             standard: selectedProduct.standard || '',
             price: selectedProduct.price || '',
             unit: selectedProduct.unit || '',
+            sub_price: selectedProduct.sub_price || '',
             description: selectedProduct.description || '',
           };
           return updatedRows;
@@ -335,7 +341,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
 
       // formData 업데이트
       setFormData(newFormData);
-
+      console.log(newFormData);
       // 필요한 경우, 여기서 API 호출 등 저장 로직을 실행
       // console.log('formData:', newFormData);
 

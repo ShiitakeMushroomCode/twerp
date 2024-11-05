@@ -305,11 +305,10 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
       </div>
 
       <div className={styles['form-row']}>
-        <label htmlFor="is_use" className={styles.label}>
-          사용 여부
-        </label>
+        <span className={styles.label}>사용 여부</span>
         <RadioGroup
           row
+          id="is_use"
           aria-label="is_use"
           name="is_use"
           value={formData.is_use}

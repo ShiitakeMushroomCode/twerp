@@ -16,25 +16,24 @@ interface PageProps {
 async function getInitialData(id: string) {
   'use server';
   const data = (await getTokenUserData()) as ACT;
-  const companyIdBuffer = Buffer.from(data.companyId['data'], 'hex');
+  // console.log(data);
   const salesIdBuffer = Buffer.from(id, 'hex');
-
-  const [companyResult, salesResult, salesItemsResult] = await Promise.all([
-    executeQuery('SELECT * FROM company WHERE company_id = ?', [companyIdBuffer]),
+  const [salesR, salesItemsResult] = await Promise.all([
     executeQuery('SELECT * FROM sales WHERE sales_id = ?', [salesIdBuffer]),
     executeQuery('SELECT * FROM sales_items WHERE sales_id = ?', [salesIdBuffer]),
   ]);
+  const salesResult = salesR[0];
   return {
-    company_id: companyResult.company_id || '',
-    sale_date: salesResult?.sale_date?.toString() || '',
-    transaction_type: salesResult.transaction_type || '카드결제',
-    collection: salesResult.collection || '진행중',
-    client_id: salesResult.client_id || null,
-    client_name: salesResult.client_name || '',
-    client_address: salesResult.client_address || '',
-    client_tel: salesResult.client_tel || '',
-    client_fax: salesResult.client_fax || '',
-    description: salesResult.description || '',
+    company_id: data['companyId']['data'].toString() || '',
+    sale_date: salesResult?.['sale_date'] ? new Date(salesResult['sale_date']).toISOString().split('T')[0] : '',
+    transaction_type: salesResult?.['transaction_type'] || '카드결제',
+    collection: salesResult?.['collection'] || '진행중',
+    client_id: salesResult?.['client_id'] || null,
+    client_name: salesResult?.['client_name'] || '',
+    client_address: salesResult?.['client_address'] || '',
+    client_tel: salesResult?.['client_tel'] || '',
+    client_fax: salesResult?.['client_fax'] || '',
+    description: salesResult?.['description'] || '',
     sales_items: salesItemsResult.map((item: any) => ({
       product_id: item.product_id || '',
       product_name: item.product_name || '',
