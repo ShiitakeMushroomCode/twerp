@@ -1,0 +1,96 @@
+.productCustomSwal {
+  width: 700px !important;
+  max-width: 90%;
+}
+
+.productModalContent {
+  display: flex;
+  flex-direction: column;
+  min-width: 100%;
+  min-height: 350px;
+}
+
+.searchFields {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+.searchInput {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.searchButton {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+}
+
+.searchButton:hover {
+  background-color: #0056b3;
+}
+
+.searchIcon {
+  font-size: 1rem;
+}
+
+.tableContainer {
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+}
+
+.tableContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table th {
+  background-color: #e9ecef;
+  position: sticky;
+  top: 0;
+}
+
+.table td:nth-child(1) {
+  width: 30%; /* 제품명 */
+}
+
+.table td:nth-child(2) {
+  width: 30%; /* 카테고리 */
+}
+
+.table td:nth-child(3) {
+  width: 40%; /* 가격 */
+}
+
+.table tr:hover {
+  background-color: #f1f1f1;
+}

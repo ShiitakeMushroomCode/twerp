@@ -1,8 +1,10 @@
 'use client';
 import DatePicker from '@/components/(회계)/(공용)/DatePicker';
 import Address from '@/components/(회계)/(판매)/Address';
+import handleClientSearchClick from '@/components/(회계)/(판매)/ClientSearchButton';
+import ProductSearchClick from '@/components/(회계)/(판매)/ProductSearchClick';
 import { isEmpty } from '@/util/lo';
-import { numberToKorean } from '@/util/reform';
+import { formatPhoneNumber, numberToKorean } from '@/util/reform';
 import { useUnsavedChangesWarning } from '@/util/useUnsavedChangesWarning';
 import { format } from 'date-fns';
 import { ChangeEvent, FormEvent, useState } from 'react';
@@ -11,7 +13,6 @@ import { FiSearch } from 'react-icons/fi';
 import styles from './SalesForm.module.css';
 
 interface Row {
-  temp_id: string;
   product_id: string;
   product_name: string;
   standard: string;
@@ -24,7 +25,7 @@ interface Row {
   selected: boolean;
 }
 
-type EditableField = Exclude<keyof Row, 'selected' | 'temp_id' | 'supply_amount'>; // 'sub_price'를 제외하지 않음
+type EditableField = Exclude<keyof Row, 'selected' | 'supply_amount'>; // 'sub_price'를 제외하지 않음
 
 export default function SalesForm({ initialData, onSubmit, isEditMode = false }) {
   useUnsavedChangesWarning();
@@ -47,16 +48,10 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
     client_tel: '',
     client_fax: '',
     description: '',
-    client_staff_name: '',
-    client_staff_contact_info: '',
-    sales_items: {}, // sales_items를 객체로 관리
+    sales_items: [], // sales_items를 배열 속 객체로 관리
   }));
 
-  // 임시 식별자 생성을 위한 카운터
-  const [tempIdCounter, setTempIdCounter] = useState(5); // 초기 5개의 행을 이미 생성했으므로 5으로 설정
-
   const initialRow: Row = {
-    temp_id: '', // 임시 식별자
     product_id: '',
     product_name: '',
     standard: '',
@@ -69,11 +64,10 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
     selected: false,
   };
 
-  const [rows, setRows] = useState<{ [key: string]: Row }>(() => {
-    const initialRows: { [key: string]: Row } = {};
+  const [rows, setRows] = useState<Row[]>(() => {
+    const initialRows: Row[] = [];
     for (let i = 0; i < 5; i++) {
-      const tempId = `temp-${i}`;
-      initialRows[tempId] = { ...initialRow, temp_id: tempId };
+      initialRows.push({ ...initialRow });
     }
     return initialRows;
   });
@@ -92,16 +86,17 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
 
   /**
    * 입력 필드 변경 시 상태 업데이트 및 자동 계산 로직
-   * @param temp_id - 임시 식별자
+   * @param index - 행의 인덱스
    * @param field - 변경된 필드
    * @param value - 새로운 값
    */
-  const handleInputChange = (temp_id: string, field: EditableField, value: string) => {
+  const handleInputChange = (index: number, field: EditableField, value: string) => {
     // 숫자 입력 필드에서 쉼표 제거
     const rawValue = value.replace(/,/g, '');
 
     setRows((prevRows) => {
-      const updatedRow = { ...prevRows[temp_id] };
+      const updatedRows = [...prevRows];
+      const updatedRow = { ...updatedRows[index] };
 
       // 숫자 필드 필터링 및 길이 제한
       if (['quantity', 'price', 'sub_price'].includes(field)) {
@@ -138,10 +133,8 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
         }
       }
 
-      return {
-        ...prevRows,
-        [temp_id]: updatedRow,
-      };
+      updatedRows[index] = updatedRow;
+      return updatedRows;
     });
   };
 
@@ -176,7 +169,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
    * 저장 버튼 클릭 시 데이터 준비 및 저장 로직 호출
    */
   function handleSaveButton() {
-    const fRows = Object.values(rows)
+    const fRows = rows
       .filter((row) => {
         return (
           !isEmpty(row.product_name.trim()) ||
@@ -188,14 +181,14 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
         );
       })
       .map((row) => ({
-        product_id: row.product_id || null,
-        product_name: row.product_name,
-        standard: row.standard,
-        price: parseInt(row.price, 10) || 0,
-        quantity: parseInt(row.quantity, 10) || 0,
-        unit: row.unit,
-        description: row.description,
-        sub_price: parseInt(row.sub_price, 10) || 0, // 부가세 포함
+        product_id: row.product_id.trim() || null,
+        product_name: row.product_name.trim(),
+        standard: row.standard.trim(),
+        price: parseInt(row.price.trim(), 10) || 0,
+        quantity: parseInt(row.quantity.trim(), 10) || 0,
+        unit: row.unit.trim(),
+        description: row.description.trim(),
+        sub_price: parseInt(row.sub_price.trim(), 10) || 0,
       }));
     console.log(fRows);
     // 추가적인 저장 로직 구현 (예: API 호출)
@@ -207,6 +200,22 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
    */
   function handleChange(e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
     const { name, value } = e.target;
+    if (name === 'client_fax' || name === 'client_tel') {
+      if (value.length <= 14) {
+        setFormData((prev) => ({
+          ...prev,
+          [name]: formatPhoneNumber(value),
+        }));
+      }
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  }
+
+  function handleInitForm({ name, value }) {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -217,13 +226,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
    * 새로운 행 추가
    */
   const handleAddRow = () => {
-    const newTempId = `temp-${tempIdCounter}`;
-    setTempIdCounter((prev) => prev + 1);
-    const newRow: Row = { ...initialRow, temp_id: newTempId };
-    setRows((prevRows) => ({
-      ...prevRows,
-      [newTempId]: newRow,
-    }));
+    setRows((prevRows) => [...prevRows, { ...initialRow }]);
   };
 
   const [allChecked, setAllChecked] = useState(false);
@@ -233,23 +236,14 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
    */
   const handleDeleteSelectedRows = () => {
     setRows((prevRows) => {
-      let updatedRows = Object.values(prevRows).filter((row) => !row.selected);
+      let updatedRows = prevRows.filter((row) => !row.selected);
 
       // 최소 5개의 행이 유지되도록 빈 행 추가
       while (updatedRows.length < 5) {
-        const newTempId = `temp-${tempIdCounter + updatedRows.length}`;
-        updatedRows.push({ ...initialRow, temp_id: newTempId });
+        updatedRows.push({ ...initialRow });
       }
 
-      // 변환된 배열을 객체로 재구성
-      const newRows: { [key: string]: Row } = {};
-      updatedRows.forEach((row, index) => {
-        const tempId = `temp-${index + 1}`;
-        newRows[tempId] = { ...row, temp_id: tempId };
-      });
-
-      setTempIdCounter(updatedRows.length);
-      return newRows;
+      return updatedRows;
     });
     setAllChecked(false);
   };
@@ -269,11 +263,11 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
   /**
    * 총 공급가액, 총 부가세, 총액 계산
    */
-  const totalSupplyAmount = Object.values(rows).reduce((sum, row) => {
+  const totalSupplyAmount = rows.reduce((sum, row) => {
     return sum + (parseInt(row.supply_amount, 10) || 0);
   }, 0);
 
-  const totalSubPrice = Object.values(rows).reduce((sum, row) => {
+  const totalSubPrice = rows.reduce((sum, row) => {
     return sum + (parseInt(row.sub_price, 10) || 0);
   }, 0);
 
@@ -303,7 +297,13 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
           <label htmlFor="client_name" className={styles.label}>
             거래처명
           </label>
-          <button type="button" className={styles.searchButton}>
+          <button
+            type="button"
+            className={styles.searchButton}
+            onClick={() => {
+              handleClientSearchClick({ handleInitForm });
+            }}
+          >
             <FiSearch />
           </button>
           <input
@@ -321,7 +321,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
             type="button"
             className={styles.resetButton}
             disabled={isSearch}
-            onClick={() => setFormData((prev) => ({ ...prev, client_name: '' }))}
+            onClick={() => setFormData((prev) => ({ ...prev, client_name: '', client_id: '' }))}
           >
             초기화
           </button>
@@ -369,7 +369,56 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
             초기화
           </button>
         </div>
+
         <div className={styles['form-row']}>
+          <label htmlFor="client_tel" className={styles.label}>
+            전화번호
+          </label>
+          <input
+            id="client_tel"
+            name="client_tel"
+            type="text"
+            className={styles.input}
+            required
+            autoComplete="off"
+            value={formData.client_tel}
+            onChange={handleChange}
+            disabled={isSearch}
+          />
+          <label htmlFor="client_fax" className={styles.label} style={{ paddingLeft: '20px', width: '130px' }}>
+            팩스번호
+          </label>
+          <input
+            id="client_fax"
+            name="client_fax"
+            type="text"
+            className={styles.input}
+            required
+            autoComplete="off"
+            value={formData.client_fax}
+            onChange={handleChange}
+            disabled={isSearch}
+          />
+        </div>
+
+        <div className={styles['form-row']}>
+          <label htmlFor="description" className={styles.label}>
+            설명
+          </label>
+          <input
+            id="description"
+            name="description"
+            type="text"
+            className={styles.input}
+            required
+            autoComplete="off"
+            value={formData.description}
+            title={formData.description}
+            onChange={handleChange}
+            disabled={isSearch}
+          />
+        </div>
+        <div className={styles['form-row']} style={{ marginBottom: '0' }}>
           <span className={styles.label}>거래유형</span>
           <div className={styles.radioGroup}>
             {['카드결제', '현금결제', '계좌이체', '기타'].map((type) => (
@@ -410,12 +459,13 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
                 checked={allChecked}
                 className={styles.checkbox}
                 onChange={(e) => {
-                  const updatedRows = Object.keys(rows).reduce((acc, key) => {
-                    acc[key] = { ...rows[key], selected: e.target.checked };
-                    return acc;
-                  }, {} as { [key: string]: Row });
+                  setRows((prevRows) =>
+                    prevRows.map((row) => ({
+                      ...row,
+                      selected: e.target.checked,
+                    }))
+                  );
                   setAllChecked(e.target.checked);
-                  setRows(updatedRows);
                 }}
               />
             </th>
@@ -430,37 +480,42 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
           </tr>
         </thead>
         <tbody>
-          {Object.values(rows).map((row) => (
-            <tr key={row.temp_id} className={styles.row}>
+          {rows.map((row, index) => (
+            <tr key={index} className={styles.row}>
               <td className={styles.cell}>
                 <input
                   type="checkbox"
-                  name={`checkbox_${row.temp_id}`}
+                  name={`checkbox_${index}`}
                   className={styles.checkbox}
                   checked={row.selected}
                   onChange={(e) => {
-                    setRows((prevRows) => ({
-                      ...prevRows,
-                      [row.temp_id]: {
-                        ...prevRows[row.temp_id],
-                        selected: e.target.checked,
-                      },
-                    }));
+                    setRows((prevRows) => {
+                      const updatedRows = [...prevRows];
+                      updatedRows[index] = { ...updatedRows[index], selected: e.target.checked };
+                      return updatedRows;
+                    });
                   }}
                   disabled={isSearch}
                 />
               </td>
               <td className={styles.cell}>
                 <div className={styles.productNameContainer}>
-                  <button type="button" className={styles.searchButton} disabled={isSearch}>
+                  <button
+                    type="button"
+                    className={styles.searchButton}
+                    disabled={isSearch}
+                    onClick={() => {
+                      ProductSearchClick({});
+                    }}
+                  >
                     <FiSearch />
                   </button>
                   <input
                     className={styles.tableInput}
                     type="text"
-                    name={`product_name_${row.temp_id}`}
+                    name={`product_name_${index}`}
                     value={row.product_name}
-                    onChange={(e) => handleInputChange(row.temp_id, 'product_name', e.target.value)}
+                    onChange={(e) => handleInputChange(index, 'product_name', e.target.value)}
                     autoComplete="off"
                     disabled={isSearch}
                     title={row.product_name}
@@ -471,9 +526,9 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
                 <input
                   className={styles.tableInput}
                   type="text"
-                  name={`standard_${row.temp_id}`}
+                  name={`standard_${index}`}
                   value={row.standard}
-                  onChange={(e) => handleInputChange(row.temp_id, 'standard', e.target.value)}
+                  onChange={(e) => handleInputChange(index, 'standard', e.target.value)}
                   autoComplete="off"
                   disabled={isSearch}
                   title={row.standard}
@@ -483,9 +538,9 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
                 <input
                   className={styles.tableInput}
                   type="text"
-                  name={`quantity_${row.temp_id}`}
+                  name={`quantity_${index}`}
                   value={formatNumber(row.quantity)}
-                  onChange={(e) => handleInputChange(row.temp_id, 'quantity', e.target.value)}
+                  onChange={(e) => handleInputChange(index, 'quantity', e.target.value)}
                   autoComplete="off"
                   disabled={isSearch}
                   title={
@@ -499,9 +554,9 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
                 <input
                   className={styles.tableInput}
                   type="text"
-                  name={`unit_${row.temp_id}`}
+                  name={`unit_${index}`}
                   value={row.unit}
-                  onChange={(e) => handleInputChange(row.temp_id, 'unit', e.target.value)}
+                  onChange={(e) => handleInputChange(index, 'unit', e.target.value)}
                   autoComplete="off"
                   disabled={isSearch}
                   title={row.unit}
@@ -511,9 +566,9 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
                 <input
                   className={styles.tableInput}
                   type="text"
-                  name={`price_${row.temp_id}`}
+                  name={`price_${index}`}
                   value={formatNumber(row.price)}
-                  onChange={(e) => handleInputChange(row.temp_id, 'price', e.target.value)}
+                  onChange={(e) => handleInputChange(index, 'price', e.target.value)}
                   autoComplete="off"
                   disabled={isSearch}
                   title={
@@ -525,7 +580,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
                 <input
                   className={styles.tableInput}
                   type="text"
-                  name={`supply_amount_${row.temp_id}`}
+                  name={`supply_amount_${index}`}
                   readOnly
                   value={formatNumber(row.supply_amount)}
                   autoComplete="off"
@@ -541,9 +596,9 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
                 <input
                   className={styles.tableInput}
                   type="text"
-                  name={`sub_price_${row.temp_id}`}
+                  name={`sub_price_${index}`}
                   value={formatNumber(row.sub_price)}
-                  onChange={(e) => handleInputChange(row.temp_id, 'sub_price', e.target.value)}
+                  onChange={(e) => handleInputChange(index, 'sub_price', e.target.value)}
                   autoComplete="off"
                   disabled={isSearch}
                   title={
@@ -557,9 +612,9 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
                 <input
                   className={styles.tableInput}
                   type="text"
-                  name={`description_${row.temp_id}`}
+                  name={`description_${index}`}
                   value={row.description}
-                  onChange={(e) => handleInputChange(row.temp_id, 'description', e.target.value)}
+                  onChange={(e) => handleInputChange(index, 'description', e.target.value)}
                   autoComplete="off"
                   disabled={isSearch}
                   title={row.description}

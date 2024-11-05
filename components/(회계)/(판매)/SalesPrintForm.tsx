@@ -171,7 +171,7 @@ export default function SalesPrintForm({ salesFormData }: Props) {
               합계
             </td>
             <td className={styles.footerValue}>{totalQuantity.toLocaleString()}</td>
-            <td className={styles.footerValue}>₩{totalPrice.toLocaleString()}</td>
+            <td className={styles.footerValue}>₩{totalP.toLocaleString()}</td>
             <td className={styles.footerValue}>₩{totalPrice.toLocaleString()}</td>
             <td className={styles.footerValue}>₩{totalSub_price.toLocaleString()}</td>
             <td className={styles.footerValue}></td>

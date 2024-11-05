@@ -1,18 +1,20 @@
 'use client';
 import { useEffect } from 'react';
 
-export function useUnsavedChangesWarning() {
-  // 창 닫기나 새로고침 방지
+export function useUnsavedChangesWarning(hasUnsavedChanges = true) {
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       event.preventDefault();
     };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    if (hasUnsavedChanges) {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+    } else {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    }
 
-    // 이벤트 리스너 정리
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, []);
+  }, [hasUnsavedChanges]);
 }

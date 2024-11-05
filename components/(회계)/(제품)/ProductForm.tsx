@@ -31,7 +31,8 @@ interface ProductFormProps {
 }
 
 export default function ProductForm({ initialData, onSubmit, isEditMode = false }: ProductFormProps) {
-  useUnsavedChangesWarning();
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  useUnsavedChangesWarning(hasUnsavedChanges);
   const [formData, setFormData] = useState<ProductFormData>(() => ({
     product_id: initialData?.product_id || undefined,
     product_name: initialData?.product_name || '',
@@ -45,7 +46,7 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [startDate, setStartDate] = useState<Date | null>(
-    initialData?.start_date ? new Date(initialData.start_date) : null
+    initialData?.start_date ? new Date(initialData.start_date) : new Date()
   );
   const router = useRouter();
 
@@ -83,6 +84,7 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
         const data = await response.json();
 
         if (response.ok) {
+          setHasUnsavedChanges(false);
           await Swal.fire({
             title: '성공',
             text: data.message,
@@ -127,7 +129,8 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
   }
 
   function handleChange(e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
-    const { name, value } = e.target;
+    const { name } = e.target;
+    const value = e.target.value.trim();
 
     if (name === 'price') {
       // 음수 16자리, 양수 15자리 정규식
@@ -148,7 +151,7 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
     } else {
       setFormData((prev) => ({
         ...prev,
-        [name]: value,
+        [name]: value.trim(),
       }));
     }
   }
@@ -179,6 +182,7 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
         confirmButtonText: '확인',
       });
     } else if (response.status === 'success') {
+      setHasUnsavedChanges(false);
       await Swal.fire({
         title: '성공',
         html: response.message,

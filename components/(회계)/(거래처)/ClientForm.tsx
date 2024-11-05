@@ -50,7 +50,8 @@ interface ClientFormProps {
 }
 
 export default function ClientForm({ initialData, onSubmit, isEditMode = false }: ClientFormProps) {
-  useUnsavedChangesWarning();
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  useUnsavedChangesWarning(hasUnsavedChanges);
   const [formData, setFormData] = useState<ClientFormData>(() => ({
     business_number: initialData?.business_number ? formatBusinessNumber(initialData.business_number) : '',
     company_name: initialData?.company_name || '',
@@ -67,7 +68,7 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [startDate, setStartDate] = useState<Date | null>(
-    initialData?.start_date ? new Date(initialData.start_date) : null
+    initialData?.start_date ? new Date(initialData.start_date) : new Date()
   );
   const [isSearch, setIsSearch] = useState(false);
   const [addrNum, setAddrNum] = useState('');
@@ -88,7 +89,7 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
-    let filteredValue = value;
+    let filteredValue = value.trim();
     if (['business_number', 'tell_number', 'fax_number'].includes(name)) {
       const numericValue = value.replace(/[^0-9]/g, '');
 
@@ -143,6 +144,7 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
         confirmButtonText: '확인',
       });
     } else if (response.status === 'success') {
+      setHasUnsavedChanges(false);
       await Swal.fire({
         title: '성공',
         html: response.message,
@@ -195,6 +197,7 @@ export default function ClientForm({ initialData, onSubmit, isEditMode = false }
         const data = await response.json();
 
         if (response.ok) {
+          setHasUnsavedChanges(false);
           await Swal.fire({
             title: '성공',
             text: data.message,
