@@ -176,6 +176,18 @@
   margin: 0 auto;
 }
 
+.centerAlign {
+  text-align: center;
+}
+
+.leftAlign {
+  text-align: left;
+}
+
+.rightAlign {
+  text-align: right;
+}
+
 .colgroup col {
   border: none;
 }

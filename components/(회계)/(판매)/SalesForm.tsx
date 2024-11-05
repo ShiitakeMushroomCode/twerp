@@ -56,8 +56,8 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
     product_name: '',
     standard: '',
     price: '',
-    supply_amount: '', // 초기 공급가액
-    sub_price: '', // 초기 부가세
+    supply_amount: '',
+    sub_price: '',
     quantity: '',
     unit: '',
     description: '',
@@ -179,6 +179,9 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
           !isEmpty(row.price.trim()) ||
           !isEmpty(row.description.trim())
         );
+      })
+      .filter((row) => {
+        return !isEmpty(row.product_name.trim()) && !isEmpty(row.quantity.trim()) && !isEmpty(row.price.trim());
       })
       .map((row) => ({
         product_id: row.product_id.trim() || null,
@@ -385,7 +388,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
             onChange={handleChange}
             disabled={isSearch}
           />
-          <label htmlFor="client_fax" className={styles.label} style={{ paddingLeft: '20px', width: '130px' }}>
+          <label htmlFor="client_fax" className={styles.label} style={{ textAlign: 'center' }}>
             팩스번호
           </label>
           <input
@@ -511,7 +514,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
                     <FiSearch />
                   </button>
                   <input
-                    className={styles.tableInput}
+                    className={`${styles.tableInput} ${styles.centerAlign}`}
                     type="text"
                     name={`product_name_${index}`}
                     value={row.product_name}
@@ -524,7 +527,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
               </td>
               <td className={styles.cell}>
                 <input
-                  className={styles.tableInput}
+                  className={`${styles.tableInput} ${styles.centerAlign}`}
                   type="text"
                   name={`standard_${index}`}
                   value={row.standard}
@@ -536,7 +539,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
               </td>
               <td className={styles.cell}>
                 <input
-                  className={styles.tableInput}
+                  className={`${styles.tableInput} ${styles.centerAlign}`}
                   type="text"
                   name={`quantity_${index}`}
                   value={formatNumber(row.quantity)}
@@ -552,7 +555,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
               </td>
               <td className={styles.cell}>
                 <input
-                  className={styles.tableInput}
+                  className={`${styles.tableInput} ${styles.centerAlign}`}
                   type="text"
                   name={`unit_${index}`}
                   value={row.unit}
@@ -564,7 +567,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
               </td>
               <td className={styles.cell}>
                 <input
-                  className={styles.tableInput}
+                  className={`${styles.tableInput} ${styles.rightAlign}`}
                   type="text"
                   name={`price_${index}`}
                   value={formatNumber(row.price)}
@@ -578,7 +581,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
               </td>
               <td className={styles.cell}>
                 <input
-                  className={styles.tableInput}
+                  className={`${styles.tableInput} ${styles.rightAlign}`}
                   type="text"
                   name={`supply_amount_${index}`}
                   readOnly
@@ -594,7 +597,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
               </td>
               <td className={styles.cell}>
                 <input
-                  className={styles.tableInput}
+                  className={`${styles.tableInput} ${styles.rightAlign}`}
                   type="text"
                   name={`sub_price_${index}`}
                   value={formatNumber(row.sub_price)}
@@ -610,7 +613,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
               </td>
               <td className={styles.cell}>
                 <input
-                  className={styles.tableInput}
+                  className={`${styles.tableInput} ${styles.leftAlign}`}
                   type="text"
                   name={`description_${index}`}
                   value={row.description}
