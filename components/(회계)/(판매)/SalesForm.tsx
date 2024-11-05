@@ -1,7 +1,7 @@
 'use client';
 import DatePicker from '@/components/(회계)/(공용)/DatePicker';
 import Address from '@/components/(회계)/(판매)/Address';
-import handleClientSearchClick from '@/components/(회계)/(판매)/ClientSearchButton';
+import handleClientSearchClick from '@/components/(회계)/(판매)/ClientSearchClick';
 import ProductSearchClick from '@/components/(회계)/(판매)/ProductSearchClick';
 import { isEmpty } from '@/util/lo';
 import { formatPhoneNumber, numberToKorean } from '@/util/reform';
@@ -324,7 +324,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
             type="button"
             className={styles.resetButton}
             disabled={isSearch}
-            onClick={() => setFormData((prev) => ({ ...prev, client_name: '', client_id: '' }))}
+            onClick={() => setFormData((prev) => ({ ...prev, client_name: '', client_id: '', client_address: '', client_tel:'', client_fax:'',description:'' }))}
           >
             초기화
           </button>

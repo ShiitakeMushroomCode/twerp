@@ -75,6 +75,16 @@
   max-width: 150px;
 }
 
+.table th:nth-child(1),
+.table td:nth-child(1) {
+  width: 35%;
+}
+
+.table th:nth-child(2),
+.table td:nth-child(2) {
+  width: 65%;
+}
+
 .table th {
   background-color: #e9ecef;
   position: sticky;
@@ -83,4 +93,31 @@
 
 .table tr:hover {
   background-color: #f1f1f1;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
+.paginationButton {
+  background-color: #f1f1f1;
+  border: none;
+  color: #333;
+  padding: 6px 12px;
+  margin: 0 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.paginationButton:hover {
+  background-color: #ddd;
+}
+
+.activePage {
+  background-color: #007bff;
+  color: white;
 }
