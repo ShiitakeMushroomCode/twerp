@@ -93,14 +93,14 @@ export async function POST(request: NextRequest) {
       // 금액 필터는 HAVING 절에서 처리
       if (minAmount !== undefined && minAmount !== null) {
         havingCondition += `
-          AND SUM((si.price + si.sub_price) * si.quantity) >= ?
+          AND SUM((si.price * si.quantity) + si.sub_price) >= ?
         `;
         searchParams.push(Number(minAmount));
       }
 
       if (maxAmount !== undefined && maxAmount !== null) {
         havingCondition += `
-          AND SUM((si.price + si.sub_price) * si.quantity) <= ?
+          AND SUM((si.price * si.quantity) + si.sub_price) <= ?
         `;
         searchParams.push(Number(maxAmount));
       }
@@ -118,6 +118,7 @@ export async function POST(request: NextRequest) {
         SELECT s.sales_id
         FROM sales s
         LEFT JOIN clients c ON s.client_id = c.clients_id
+        LEFT JOIN sales_items si ON s.sales_id = si.sales_id
         WHERE 1=1 ${whereCondition}
         GROUP BY s.sales_id
         HAVING 1=1 ${havingCondition}
@@ -136,7 +137,7 @@ export async function POST(request: NextRequest) {
         s.description,
         s.sale_date,
         s.update_at,
-        SUM((si.price + si.sub_price) * si.quantity) AS total_amount,
+        SUM((si.price * si.quantity) + si.sub_price) AS total_amount,
         GROUP_CONCAT(si.product_name SEPARATOR ', ') AS item_names,
         ROW_NUMBER() OVER (PARTITION BY s.sale_date ORDER BY s.update_at DESC) AS sequence_number,
         s.collection

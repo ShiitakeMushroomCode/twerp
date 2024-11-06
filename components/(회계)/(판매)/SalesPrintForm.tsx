@@ -66,7 +66,7 @@ export default function SalesPrintForm({ salesFormData }: Props) {
   salesItemsResult.forEach((element) => {
     totalP += element.price;
     totalPrice += element.price * element.quantity;
-    totalSub_price += element.sub_price * element.quantity;
+    totalSub_price += element.sub_price;
     totalQuantity += element.quantity;
   });
   let total = totalPrice + totalSub_price;
@@ -166,7 +166,7 @@ export default function SalesPrintForm({ salesFormData }: Props) {
               <td>{`${item.quantity}${item.unit ? `[${item.unit}]` : ''}`}</td>
               <td>₩{item.price.toLocaleString()}</td>
               <td>₩{(item.price * item.quantity).toLocaleString()}</td>
-              <td>₩{(item.sub_price * item.quantity).toLocaleString()}</td>
+              <td>₩{item.sub_price.toLocaleString()}</td>
               <td>{item.description}</td>
             </tr>
           ))}

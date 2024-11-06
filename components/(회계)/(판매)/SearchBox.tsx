@@ -70,13 +70,13 @@ export default function SearchBox({ type, onSearch, searchOptions, setSearchOpti
       <div class="${styles.popupContainer}">
         <div class="${styles.popupRow}">
           <label for="swal-input-client-name">거래처명 :</label>
-          <input type="text" id="swal-input-client-name" class="${styles.swal2Input}" value="${
+          <input type="text" id="swal-input-client-name" autoComplete="off" class="${styles.swal2Input}" value="${
         searchOptions.clientName || ''
       }" />
         </div>
         <div class="${styles.popupRow}">
           <label for="swal-input-item-name">품목명 :</label>
-          <input type="text" id="swal-input-item-name" class="${styles.swal2Input}" value="${
+          <input type="text" id="swal-input-item-name" autoComplete="off" class="${styles.swal2Input}" value="${
         searchOptions.itemName || ''
       }" />
         </div>
@@ -95,11 +95,15 @@ export default function SearchBox({ type, onSearch, searchOptions, setSearchOpti
         <div class="${styles.popupRow}">
           <label for="swal-input-min-amount">금액 :</label>
           <div class="${styles.amountContainer}">
-            <input type="text" id="swal-input-min-amount" class="${styles.swal2Input}" placeholder="최소 금액" value="${
+            <input type="text" id="swal-input-min-amount" autoComplete="off" class="${
+              styles.swal2Input
+            }" placeholder="최소 금액" value="${
         searchOptions.minAmount !== undefined ? formatPrice(searchOptions.minAmount) : ''
       }" /> 원
             ~ 
-            <input type="text" id="swal-input-max-amount" class="${styles.swal2Input}" placeholder="최대 금액" value="${
+            <input type="text" id="swal-input-max-amount" autoComplete="off" class="${
+              styles.swal2Input
+            }" placeholder="최대 금액" value="${
         searchOptions.maxAmount !== undefined ? formatPrice(searchOptions.maxAmount) : ''
       }" /> 원
           </div>

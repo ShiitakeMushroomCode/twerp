@@ -185,9 +185,10 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
       setHasUnsavedChanges(false);
       await Swal.fire({
         title: '성공',
-        html: response.message,
+        text: response.message,
         icon: 'success',
-        confirmButtonText: '확인',
+        showConfirmButton: false,
+        timer: 1500,
       });
       if (!isEditMode) {
         clear();

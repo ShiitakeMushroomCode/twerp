@@ -26,6 +26,7 @@ async function getInitialData(id: string) {
   ]);
   const salesResult = salesR[0];
   return {
+    sales_id: salesResult?.['sales_id'].toString('hex') || null,
     company_id: data['companyId']['data'].toString() || '',
     sale_date: salesResult?.['sale_date'] ? new Date(salesResult['sale_date']).toISOString().split('T')[0] : '',
     transaction_type: salesResult?.['transaction_type'] || '카드결제',
@@ -53,7 +54,7 @@ async function getInitialData(id: string) {
 async function onSubmit(formData: SalesFormData) {
   'use server';
   try {
-    const res = await fetch(`${process.env.API_URL}/sales/update`, {
+    const res = await fetch(`${process.env.API_URL}/salesUpdate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -68,14 +69,13 @@ async function onSubmit(formData: SalesFormData) {
       revalidatePath('/sales-list');
       return { status: 'success', message: '매출이 성공적으로 저장되었습니다.' };
     } else {
-      const errorData = await res.json();
       return {
         status: 'error',
-        message: errorData.message || '매출 저장에 실패하였습니다.',
+        message: '매출 저장에 실패하였습니다.',
       };
     }
   } catch (error) {
-    console.error('API 요청 중 에러 발생:', error);
+    // console.error('API 요청 중 에러 발생:', error);
     return {
       status: 'error',
       message: 'API 요청 중 에러가 발생했습니다.',

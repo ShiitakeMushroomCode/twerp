@@ -7,6 +7,7 @@ import { isEmpty } from '@/util/lo';
 import { formatPhoneNumber, numberToKorean } from '@/util/reform';
 import { useUnsavedChangesWarning } from '@/util/useUnsavedChangesWarning';
 import { addHours, format } from 'date-fns';
+import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
 import { FiSearch } from 'react-icons/fi';
@@ -42,7 +43,8 @@ export interface SalesFormData {
 type EditableField = Exclude<keyof Row, 'selected' | 'supply_amount'>;
 
 export default function SalesForm({ initialData, onSubmit, isEditMode = false }) {
-  useUnsavedChangesWarning();
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  useUnsavedChangesWarning(hasUnsavedChanges);
 
   type TransactionType = '카드결제' | '현금결제' | '계좌이체' | '기타';
 
@@ -50,9 +52,11 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
   const [clientAddress, setClientAddress] = useState('');
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [transactionType, setTransactionType] = useState<TransactionType>('카드결제');
+  const router = useRouter();
 
   const [formData, setFormData] = useState(() => ({
     company_id: initialData?.company_id || '',
+    sales_id: '',
     sale_date: '',
     transaction_type: '카드결제',
     collection: '진행중',
@@ -77,6 +81,24 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
     description: '',
     selected: false,
   };
+
+  function clear() {
+    setFormData((prev) => ({
+      ...prev,
+      client_name: '',
+      client_id: '',
+      client_address: '',
+      client_tel: '',
+      client_fax: '',
+      description: '',
+    }));
+    setTransactionType('카드결제');
+    setStartDate(new Date());
+    setClientAddress('');
+    setRows((prev) => {
+      return [initialRow, initialRow, initialRow, initialRow, initialRow];
+    });
+  }
 
   const [rows, setRows] = useState<Row[]>(() => {
     const initialRows: Row[] = [];
@@ -269,7 +291,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
   /**
    * 저장 버튼 클릭 시 데이터 준비 및 저장 로직 호출
    */
-  function handleSaveButton() {
+  async function handleSaveButton() {
     // 먼저 rows에서 필요한 데이터를 필터링하고 처리
     try {
       const fRows = rows
@@ -345,10 +367,36 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
       // 필요한 경우, 여기서 API 호출 등 저장 로직을 실행
       // console.log('formData:', newFormData);
 
-      // // onSubmit 콜백이 있다면 호출
-      // if (onSubmit) {
-      //   onSubmit(newFormData);
-      // }
+      // onSubmit 콜백이 있다면 호출
+      if (onSubmit) {
+        const response = await onSubmit(newFormData);
+        if (response.status === 'error') {
+          await Swal.fire({
+            title: '오류',
+            html: response.message,
+            icon: 'error',
+            confirmButtonText: '확인',
+          });
+        } else if (response.status === 'success') {
+          setHasUnsavedChanges(false);
+          await Swal.fire({
+            title: '성공',
+            text: response.message,
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          if (!isEditMode) {
+            clear();
+          }
+          localStorage.setItem('reloadClientItems', new Date().toString());
+          if (window.name.startsWith('editPopup')) {
+            window.close();
+          } else {
+            router.push('/sales-list');
+          }
+        }
+      }
       // fRows가 정상적으로 생성된 경우 추가 작업 수행
       // console.log('Filtered and mapped rows:', fRows);
     } catch (error) {
@@ -501,21 +549,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
             className={styles.resetButton}
             disabled={isSearch}
             onClick={() => {
-              setFormData((prev) => ({
-                ...prev,
-                client_name: '',
-                client_id: '',
-                client_address: '',
-                client_tel: '',
-                client_fax: '',
-                description: '',
-              }));
-              setTransactionType('카드결제');
-              setStartDate(new Date());
-              setClientAddress('');
-              setRows((prev) => {
-                return [initialRow, initialRow, initialRow, initialRow, initialRow];
-              });
+              clear();
             }}
             title="매출 정보가 모두 초기화 됩니다."
           >
@@ -823,19 +857,28 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
               <div className={styles.resultContainer}>
                 <div className={styles.results}>
                   <span className={styles.resultTitle}>공급가액</span>
-                  <span className={styles.resultValue} title={`\\${totalSupplyAmount.toLocaleString()}`}>
+                  <span
+                    className={styles.resultValue}
+                    title={`\\${totalSupplyAmount.toLocaleString()}\n${numberToKorean(totalSupplyAmount)}원정`}
+                  >
                     \{totalSupplyAmount.toLocaleString()}
                   </span>
                 </div>
                 <div className={styles.results}>
                   <span className={styles.resultTitle}>부가세</span>
-                  <span className={styles.resultValue} title={`\\${totalSubPrice.toLocaleString()}`}>
+                  <span
+                    className={styles.resultValue}
+                    title={`\\${totalSubPrice.toLocaleString()}\n${numberToKorean(totalSubPrice)}원정`}
+                  >
                     \{totalSubPrice.toLocaleString()}
                   </span>
                 </div>
                 <div className={styles.results}>
                   <span className={styles.resultTitle}>총액</span>
-                  <span className={styles.resultValue} title={`\\${totalAmount.toLocaleString()}`}>
+                  <span
+                    className={styles.resultValue}
+                    title={`\\${totalAmount.toLocaleString()}\n${numberToKorean(totalAmount)}원정`}
+                  >
                     \{totalAmount.toLocaleString()}
                   </span>
                 </div>

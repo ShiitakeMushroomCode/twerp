@@ -6,8 +6,8 @@ import Logging from '../ETC/Logging';
 import styles from './SignInPage.module.css';
 
 export default function SigninForm({ signin }) {
-  const [phoneNumber, setPhoneNumber] = useState('010-1234-5678'); //010-1234-5678
-  const [password, setPassword] = useState('12345678'); //12345678
+  const [phoneNumber, setPhoneNumber] = useState(''); //010-1234-5678
+  const [password, setPassword] = useState(''); //12345678
   const [error, setError] = useState('');
   const router = useRouter();
 
