@@ -206,6 +206,6 @@ export default async function ProductSearchClick({ handleSelectProduct = null })
   });
 
   if (selectedProduct) {
-    console.log('Selected Product:', selectedProduct);
+    // console.log('Selected Product:', selectedProduct);
   }
 }

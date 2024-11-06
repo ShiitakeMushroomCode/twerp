@@ -35,7 +35,7 @@ export async function StoreAndGetUserData(userId: any, refreshToken: any) {
     }
     return user;
   } catch (error) {
-    console.log('사용자 데이터 저장 또는 조회에 오류남');
+    // console.log('사용자 데이터 저장 또는 조회에 오류남');
     return null;
   }
 }

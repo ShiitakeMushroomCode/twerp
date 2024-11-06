@@ -67,10 +67,10 @@ export async function deleteProduct(product_id: string | undefined): Promise<boo
     const params = [companyIdBuffer, bufferId];
     await executeQuery(sql, params);
 
-    console.log('제품 정보가 성공적으로 삭제되었습니다.');
+    // console.log('제품 정보가 성공적으로 삭제되었습니다.');
     return true;
   } else {
-    console.log('삭제할 제품이 존재하지 않습니다.');
+    // console.log('삭제할 제품이 존재하지 않습니다.');
     return false;
   }
 }
@@ -131,10 +131,10 @@ export async function insertProduct(productData: ProductData): Promise<boolean> 
 
       await executeQuery(sql, params);
 
-      console.log('제품 정보가 성공적으로 삽입되었습니다.');
+      // console.log('제품 정보가 성공적으로 삽입되었습니다.');
       return true;
     } else {
-      console.log('이미 존재하는 제품입니다.');
+      // console.log('이미 존재하는 제품입니다.');
       return false;
     }
   } catch (error) {
@@ -191,10 +191,10 @@ export async function updateProduct(productData: ProductData): Promise<boolean> 
 
       await executeQuery(sql, params);
 
-      console.log('제품 정보가 성공적으로 업데이트되었습니다.');
+      // console.log('제품 정보가 성공적으로 업데이트되었습니다.');
       return true;
     } else {
-      console.log('업데이트할 제품이 존재하지 않습니다.');
+      // console.log('업데이트할 제품이 존재하지 않습니다.');
       return false;
     }
   } catch (error) {

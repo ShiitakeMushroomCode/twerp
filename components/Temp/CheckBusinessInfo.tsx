@@ -12,7 +12,7 @@ export default async function CheckBusinessInfo() {
         },
       ],
     };
-    console.log(businesses);
+    // console.log(businesses);
     try {
       const response = await fetch(
         `https://api.odcloud.kr/api/nts-businessman/v1/validate?serviceKey=${process.env.BUSINESS_INFO_API_KEY}`,
@@ -34,7 +34,7 @@ export default async function CheckBusinessInfo() {
 
       const jsonResponse = await response.json();
       const validValue = jsonResponse.data[0].valid;
-      console.log(validValue === '01' ? true : false);
+      // console.log(validValue === '01' ? true : false);
     } catch (error) {
       console.error('Error:', error);
     }
@@ -43,7 +43,7 @@ export default async function CheckBusinessInfo() {
     const b_nos = {
       b_no: [formData.get('b_no')],
     };
-    console.log(b_nos);
+    // console.log(b_nos);
     try {
       const response = await fetch(
         `https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey=${process.env.BUSINESS_INFO_API_KEY}`,
@@ -64,7 +64,7 @@ export default async function CheckBusinessInfo() {
       }
 
       const jsonResponse = await response.json();
-      console.log(jsonResponse);
+      // console.log(jsonResponse);
     } catch (error) {
       console.error('Error:', error);
     }

@@ -35,10 +35,10 @@ export async function deleteClient(business_number: string): Promise<boolean> {
 
       await executeQuery(sql, params);
 
-      console.log('클라이언트 정보가 성공적으로 삭제되었습니다.');
+      // console.log('클라이언트 정보가 성공적으로 삭제되었습니다.');
       return true;
     } else {
-      console.log('삭제할 클라이언트가 존재하지 않습니다.');
+      // console.log('삭제할 클라이언트가 존재하지 않습니다.');
       return false;
     }
   } catch (error) {
@@ -105,13 +105,13 @@ export async function insertClient(clientData: ClientData): Promise<boolean> {
 
       await executeQuery(sql, params);
 
-      console.log('클라이언트 정보가 성공적으로 삽입되었습니다.');
+      // console.log('클라이언트 정보가 성공적으로 삽입되었습니다.');
       return true;
     } else {
       return false;
     }
   } catch (error) {
-    console.error('클라이언트 정보 삽입 중 오류 발생:', error);
+    // console.error('클라이언트 정보 삽입 중 오류 발생:', error);
     return false;
   }
 }
@@ -154,10 +154,10 @@ export async function updateClient(clientData: ClientData): Promise<boolean> {
 
       await executeQuery(sql, params);
 
-      console.log('클라이언트 정보가 성공적으로 업데이트되었습니다.');
+      // console.log('클라이언트 정보가 성공적으로 업데이트되었습니다.');
       return true;
     } else {
-      console.log('업데이트할 클라이언트가 존재하지 않습니다.');
+      // console.log('업데이트할 클라이언트가 존재하지 않습니다.');
       return false;
     }
   } catch (error) {

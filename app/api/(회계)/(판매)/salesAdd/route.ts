@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
         update_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    console.log(data);
+
     const salesValues = [
       salesId,
       companyIdBuffer,
