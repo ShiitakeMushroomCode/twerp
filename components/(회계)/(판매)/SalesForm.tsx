@@ -388,7 +388,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
           if (!isEditMode) {
             clear();
           }
-          localStorage.setItem('reloadClientItems', new Date().toString());
+          localStorage.setItem('reloadSalesItems', new Date().toString());
           if (window.name.startsWith('editPopup')) {
             window.close();
           } else {
@@ -495,6 +495,75 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
 
   const totalAmount = totalSupplyAmount + totalSubPrice;
 
+  async function handleDelete() {
+    if (!formData.sales_id) {
+      await Swal.fire({
+        title: '오류',
+        text: '삭제할 매출 기록의 ID가 필요합니다.',
+        icon: 'error',
+        confirmButtonText: '확인',
+      });
+      return;
+    }
+
+    const confirmResult = await Swal.fire({
+      title: '삭제 확인',
+      text: '정말로 매출 기록을 삭제하시겠습니까?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: '삭제',
+      cancelButtonText: '취소',
+    });
+
+    if (confirmResult.isConfirmed) {
+      try {
+        const response = await fetch(`/api/salesDelete`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({ sales_id: formData.sales_id }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setHasUnsavedChanges(false);
+          await Swal.fire({
+            title: '성공',
+            text: data.message,
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 1500,
+          });
+
+          localStorage.setItem('reloadSalesItems', new Date().toString());
+          if (window.name.startsWith('editPopup')) {
+            window.close();
+          } else {
+            router.push('/sales-list');
+          }
+        } else {
+          await Swal.fire({
+            title: '오류',
+            text: data.message,
+            icon: 'error',
+            confirmButtonText: '확인',
+          });
+        }
+      } catch (error) {
+        console.error('삭제 요청 중 오류 발생:', error);
+        await Swal.fire({
+          title: '오류',
+          text: '매출 기록 삭제 중 오류가 발생했습니다.',
+          icon: 'error',
+          confirmButtonText: '확인',
+        });
+      }
+    }
+  }
+
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
       <div className={styles.title}>
@@ -504,7 +573,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
             type="button"
             className={styles.delButton}
             onClick={() => {
-              // 삭제 로직 구현
+              handleDelete();
             }}
             disabled={isSearch}
             title="제품 삭제"

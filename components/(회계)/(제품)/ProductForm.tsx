@@ -117,6 +117,7 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
       }
     }
   }
+
   function handleDateChange(date: Date | null) {
     if (date) {
       setStartDate(date);

@@ -22,8 +22,7 @@ export async function POST(request: NextRequest) {
     // sales 테이블에 데이터 업데이트
     const salesUpdateQuery = `
       UPDATE sales
-      SET company_id = ?,
-          client_id = ?,
+      SET client_id = ?,
           client_name = ?,
           client_address = ?,
           client_tel = ?,
@@ -33,11 +32,10 @@ export async function POST(request: NextRequest) {
           transaction_type = ?,
           collection = ?,
           update_at = ?
-      WHERE sales_id = ?
+      WHERE sales_id = ?, company_id = ?
     `;
 
     const salesValues = [
-      companyIdBuffer,
       !isEmpty(data['client_id']) ? Buffer.from(data['client_id'], 'hex') : null,
       data['client_name'],
       data['client_address'] || null,
@@ -49,6 +47,7 @@ export async function POST(request: NextRequest) {
       data['collection'],
       new Date(),
       salesIdBuffer,
+      companyIdBuffer,
     ];
 
     await executeQuery(salesUpdateQuery, salesValues);

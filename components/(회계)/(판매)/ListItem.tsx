@@ -94,7 +94,7 @@ export default function SalesListItem({
     const screenHeight = window.innerHeight;
     const newPageSize = calculatePageSize(screenHeight);
     const newTotalPages = Math.max(Math.ceil(total / newPageSize), 1);
-    
+
     setPageSize((prevPageSize) => {
       if (prevPageSize !== newPageSize) {
         setTriggerSearch((prev) => !prev);
@@ -150,6 +150,25 @@ export default function SalesListItem({
     }
   }
 
+  function addRoute(sales_id: string, isNewTab: boolean) {
+    if (isNewTab) {
+      const width = 600;
+      const height = 400;
+      const left = (window.innerWidth - width) / 2;
+      const top = (window.innerHeight - height) / 2;
+      const popupWindow = window.open(
+        `/sales-add/${sales_id}`,
+        `editPopup-${sales_id}`,
+        `width=${width},height=${height},top=${top},left=${left}`
+      );
+      if (popupWindow) {
+        popupWindow.focus();
+        popupWindow.name = `addPopup-${sales_id}`;
+      }
+    } else {
+      router.push(`/sales-add/${sales_id}`);
+    }
+  }
   // 정렬을 처리하는 함수
   function handleSort(column: string) {
     if (sortColumn === column) {
@@ -312,7 +331,7 @@ export default function SalesListItem({
                     <td
                       className={styles.centerAlign}
                       onClick={(event) => {
-                        // 복사 기능 구현 필요
+                        addRoute(item.sales_id, event.ctrlKey || event.metaKey);
                       }}
                     >
                       <span className={styles.iconButton}>
