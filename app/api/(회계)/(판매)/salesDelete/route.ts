@@ -1,5 +1,4 @@
 import { executeQuery } from '@/lib/db';
-import { isEmpty } from '@/util/lo';
 import { getTokenUserData } from '@/util/token';
 import { ACT } from 'auth';
 import { NextRequest, NextResponse } from 'next/server';
@@ -31,14 +30,13 @@ export async function POST(request: NextRequest) {
           sale_date = ?,
           description = ?,
           transaction_type = ?,
-          collection = ?,
-          update_at = ?
+          collection = ?
       WHERE sales_id = ?
     `;
 
     const salesValues = [
       companyIdBuffer,
-      !isEmpty(data['client_id']) ? Buffer.from(data['client_id'], 'hex') : null,
+      data['client_id'] ? Buffer.from(data['client_id'], 'hex') : null,
       data['client_name'],
       data['client_address'] || null,
       data['client_tel'] || null,
@@ -47,7 +45,6 @@ export async function POST(request: NextRequest) {
       data['description'] || null,
       data['transaction_type'],
       data['collection'],
-      new Date(),
       salesIdBuffer,
     ];
 
@@ -78,7 +75,7 @@ export async function POST(request: NextRequest) {
     `;
 
     for (const item of salesItems) {
-      const productIdBuffer = !isEmpty(item['product_id']) ? Buffer.from(item['product_id'], 'hex') : null;
+      const productIdBuffer = item['product_id'] ? Buffer.from(item['product_id'], 'hex') : null;
 
       const salesItemValues = [
         salesIdBuffer,

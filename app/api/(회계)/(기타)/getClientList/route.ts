@@ -58,8 +58,11 @@ export async function GET(request: Request): Promise<Response> {
     const totalCount = countResult[0].totalCount;
 
     // 데이터 가져오기
-    const fData = await executeQuery(dataSql, params);
-
+    const Data = await executeQuery(dataSql, params);
+    const fData = Data.map((item: any) => ({
+      ...item,
+      clients_id: item.clients_id.toString('hex'),
+    }));
     return new Response(JSON.stringify({ fData, totalCount }), {
       status: 200,
       headers: {

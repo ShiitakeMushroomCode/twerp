@@ -31,14 +31,14 @@ async function getInitialData(id: string) {
     sale_date: salesResult?.['sale_date'] ? new Date(salesResult['sale_date']).toISOString().split('T')[0] : '',
     transaction_type: salesResult?.['transaction_type'] || '카드결제',
     collection: salesResult?.['collection'] || '진행중',
-    client_id: salesResult?.['client_id'] || null,
+    client_id: salesResult?.['client_id'] ? salesResult?.['client_id'].toString('hex') : null,
     client_name: salesResult?.['client_name'] || '',
     client_address: salesResult?.['client_address'] || '',
     client_tel: salesResult?.['client_tel'] || '',
     client_fax: salesResult?.['client_fax'] || '',
     description: salesResult?.['description'] || '',
     sales_items: salesItemsResult.map((item: any) => ({
-      product_id: item.product_id || '',
+      product_id: item.product_id ? item.product_id.toString('hex') : null,
       product_name: item.product_name || '',
       standard: item.standard || '',
       price: item.price?.toString() || '',
@@ -67,11 +67,11 @@ async function onSubmit(formData: SalesFormData) {
     if (res.ok) {
       // 성공 시 페이지를 재검증하거나 성공 메시지를 표시할 수 있습니다.
       revalidatePath('/sales-list');
-      return { status: 'success', message: '매출이 성공적으로 저장되었습니다.' };
+      return { status: 'success', message: '매출 기록이 성공적으로 저장되었습니다.' };
     } else {
       return {
         status: 'error',
-        message: '매출 저장에 실패하였습니다.',
+        message: '매출 기록 저장에 실패하였습니다.',
       };
     }
   } catch (error) {

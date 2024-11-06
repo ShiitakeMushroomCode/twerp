@@ -3,6 +3,7 @@ import { isEmpty } from '@/util/lo';
 import { getTokenUserData } from '@/util/token';
 import { ACT } from 'auth';
 import { NextRequest, NextResponse } from 'next/server';
+import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,27 +17,33 @@ export async function POST(request: NextRequest) {
     }
 
     const companyIdBuffer = Buffer.from(tokenUserData['companyId']['data'], 'hex');
-    const salesIdBuffer = Buffer.from(data['sales_id'], 'hex');
-    // console.log(salesIdBuffer);
-    // console.log(companyIdBuffer);
-    // sales 테이블에 데이터 업데이트
-    const salesUpdateQuery = `
-      UPDATE sales
-      SET company_id = ?,
-          client_id = ?,
-          client_name = ?,
-          client_address = ?,
-          client_tel = ?,
-          client_fax = ?,
-          sale_date = ?,
-          description = ?,
-          transaction_type = ?,
-          collection = ?,
-          update_at = ?
-      WHERE sales_id = ?
-    `;
 
+    // sales_id 생성
+    const salesId = Buffer.from(uuidv4().replace(/-/g, ''), 'hex');
+
+    // 트랜잭션 시작
+    await executeQuery('BEGIN');
+
+    // sales 테이블에 데이터 삽입
+    const salesInsertQuery = `
+      INSERT INTO sales (
+        sales_id,
+        company_id,
+        client_id,
+        client_name,
+        client_address,
+        client_tel,
+        client_fax,
+        sale_date,
+        description,
+        transaction_type,
+        collection,
+        update_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    console.log(data);
     const salesValues = [
+      salesId,
       companyIdBuffer,
       !isEmpty(data['client_id']) ? Buffer.from(data['client_id'], 'hex') : null,
       data['client_name'],
@@ -48,19 +55,12 @@ export async function POST(request: NextRequest) {
       data['transaction_type'],
       data['collection'],
       new Date(),
-      salesIdBuffer,
     ];
 
-    await executeQuery(salesUpdateQuery, salesValues);
+    await executeQuery(salesInsertQuery, salesValues);
 
-    // sales_items 테이블의 기존 항목 삭제 (sales_id 기준)
-    const deleteSalesItemsQuery = `
-      DELETE FROM sales_items WHERE sales_id = ?
-    `;
-    await executeQuery(deleteSalesItemsQuery, [salesIdBuffer]);
-
-    // 새로운 sales_items 삽입
-    const salesItems = data['sales_items'] || [];
+    // sales_items 테이블에 데이터 삽입
+    const salesItems = data.sales_items || [];
 
     const salesItemsInsertQuery = `
       INSERT INTO sales_items (
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
       const productIdBuffer = !isEmpty(item['product_id']) ? Buffer.from(item['product_id'], 'hex') : null;
 
       const salesItemValues = [
-        salesIdBuffer,
+        salesId,
         productIdBuffer,
         item['product_name'],
         item['standard'] || null,
@@ -95,9 +95,14 @@ export async function POST(request: NextRequest) {
       await executeQuery(salesItemsInsertQuery, salesItemValues);
     }
 
-    return NextResponse.json({ message: '판매 기록이 성공적으로 업데이트되었습니다.' }, { status: 200 });
+    // 트랜잭션 커밋
+    await executeQuery('COMMIT');
+
+    return NextResponse.json({ message: '성공적으로 추가됨' }, { status: 200 });
   } catch (error) {
-    console.error('판매 기록 업데이트 실패:', error);
-    return NextResponse.json({ message: '서버 오류가 발생했습니다.' }, { status: 500 });
+    console.error('오류남:', error);
+    // 트랜잭션 롤백
+    await executeQuery('ROLLBACK');
+    return NextResponse.json({ message: '서버 오류' }, { status: 500 });
   }
 }

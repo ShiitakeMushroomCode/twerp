@@ -132,26 +132,25 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
 
       setFormData(safeInitialData);
       setRows(() => {
-        if (safeInitialData.sales_items && safeInitialData.sales_items.length > 0) {
-          return safeInitialData.sales_items.map((item) => ({
-            product_id: item?.['product_id'] || '',
-            product_name: item?.['product_name'] || '',
-            standard: item?.['standard'] || '',
-            price: item?.['price'] || '',
-            supply_amount: item?.['supply_amount'] || '',
-            sub_price: item?.['sub_price'] || '',
-            quantity: item?.['quantity'] || '',
-            unit: item?.['unit'] || '',
-            description: item?.['description'] || '',
-            selected: false,
-          }));
-        } else {
-          const initialRows: Row[] = [];
-          for (let i = 0; i < 5; i++) {
-            initialRows.push({ ...initialRow });
-          }
-          return initialRows;
+        const mappedRows = safeInitialData.sales_items.map((item) => ({
+          product_id: item?.['product_id'] || '',
+          product_name: item?.['product_name'] || '',
+          standard: item?.['standard'] || '',
+          price: item?.['price'] || '',
+          supply_amount: item?.['supply_amount'] || '',
+          sub_price: item?.['sub_price'] || '',
+          quantity: item?.['quantity'] || '',
+          unit: item?.['unit'] || '',
+          description: item?.['description'] || '',
+          selected: false,
+        }));
+
+        // 행의 수가 5개 미만이면 빈 행을 추가하여 5개로 만듭니다.
+        while (mappedRows.length < 5) {
+          mappedRows.push({ ...initialRow });
         }
+
+        return mappedRows;
       });
 
       if (safeInitialData.sale_date) {
@@ -481,10 +480,6 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false })
    */
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    handleSaveButton();
-    if (onSubmit) {
-      onSubmit(formData);
-    }
   }
 
   /**

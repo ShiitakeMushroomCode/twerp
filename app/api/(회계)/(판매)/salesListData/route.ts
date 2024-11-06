@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
         s.update_at,
         SUM((si.price * si.quantity) + si.sub_price) AS total_amount,
         GROUP_CONCAT(si.product_name SEPARATOR ', ') AS item_names,
-        ROW_NUMBER() OVER (PARTITION BY s.sale_date ORDER BY s.update_at DESC) AS sequence_number,
+        ROW_NUMBER() OVER (PARTITION BY s.sale_date ORDER BY s.update_at ASC) AS sequence_number,
         s.collection
       FROM sales s
       LEFT JOIN clients c ON s.client_id = c.clients_id
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
       WHERE 1=1 ${whereCondition}
       GROUP BY s.sales_id
       HAVING 1=1 ${havingCondition}
-      ORDER BY ${sortColumnSafe} ${sortOrderSafe}, sale_date DESC, update_at
+      ORDER BY ${sortColumnSafe} ${sortOrderSafe}, sale_date DESC, update_at DESC
       LIMIT ? OFFSET ?
     `;
 

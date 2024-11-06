@@ -72,7 +72,6 @@ export default async function handleClientSearchClick({ handleInitForm }) {
 
           totalCount = data.totalCount;
           totalPages = Math.ceil(totalCount / itemsPerPage);
-
           // 테이블 데이터 렌더링
           tableBody.innerHTML = data.fData
             .map(
