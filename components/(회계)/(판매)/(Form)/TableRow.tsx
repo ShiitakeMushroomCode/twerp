@@ -81,13 +81,13 @@ export default function TableRow({
           className={`${styles.tableInput} ${styles.centerAlign}`}
           type="text"
           name={`quantity_${index}`}
-          value={formatNumber(row.quantity)}
+          value={formatNumber(row.quantity.toString())}
           onChange={(e) => handleInputChange(index, 'quantity', e.target.value)}
           autoComplete="off"
           disabled={isSearch}
           title={
             !isEmpty(row.quantity)
-              ? `${formatNumber(row.quantity)}${row.unit}\n${numberToKorean(row.quantity)}${row.unit}`
+              ? `${formatNumber(row.quantity.toString())}${row.unit}\n${numberToKorean(row.quantity)}${row.unit}`
               : undefined
           }
         />
@@ -109,11 +109,11 @@ export default function TableRow({
           className={`${styles.tableInput} ${styles.rightAlign}`}
           type="text"
           name={`price_${index}`}
-          value={formatNumber(row.price)}
+          value={formatNumber(row.price.toString())}
           onChange={(e) => handleInputChange(index, 'price', e.target.value)}
           autoComplete="off"
           disabled={isSearch}
-          title={!isEmpty(row.price) ? `\\${formatNumber(row.price)}\n${numberToKorean(row.price)}원정` : undefined}
+          title={!isEmpty(row.price) ? `\\${formatNumber(row.price.toString())}\n${numberToKorean(row.price)}원정` : undefined}
         />
       </td>
       <td className={styles.cell}>
@@ -122,12 +122,12 @@ export default function TableRow({
           type="text"
           name={`supply_amount_${index}`}
           readOnly
-          value={formatNumber(row.supply_amount)}
+          value={formatNumber(row.supply_amount.toString())}
           autoComplete="off"
           disabled={isSearch}
           title={
             !isEmpty(row.supply_amount)
-              ? `\\${formatNumber(row.supply_amount)}\n${numberToKorean(row.supply_amount)}원정`
+              ? `\\${formatNumber(row.supply_amount.toString())}\n${numberToKorean(row.supply_amount)}원정`
               : undefined
           }
         />
@@ -137,13 +137,13 @@ export default function TableRow({
           className={`${styles.tableInput} ${styles.rightAlign}`}
           type="text"
           name={`sub_price_${index}`}
-          value={formatNumber(row.sub_price)}
+          value={formatNumber(row.sub_price.toString())}
           onChange={(e) => handleInputChange(index, 'sub_price', e.target.value)}
           autoComplete="off"
           disabled={isSearch}
           title={
             !isEmpty(row.sub_price)
-              ? `\\${formatNumber(row.sub_price)}\n${numberToKorean(row.sub_price)}원정`
+              ? `\\${formatNumber(row.sub_price.toString())}\n${numberToKorean(row.sub_price)}원정`
               : undefined
           }
         />

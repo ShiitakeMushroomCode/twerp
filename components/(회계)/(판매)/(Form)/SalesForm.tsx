@@ -463,6 +463,9 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
 
   const totalAmount = totalSupplyAmount + totalSubPrice;
 
+  /**
+   * 삭제
+   */
   async function handleDelete() {
     if (!formData['sales_id']) {
       await Swal.fire({
@@ -532,17 +535,23 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
     }
   }
 
+  
+  /**
+   * 메일보내기
+   */
+  async function handleSendMailButton() { }
+    
   return (
     <form className={styles['form']} onSubmit={handleSubmit}>
       <div className={styles['title']}>
         <span>{isEditMode ? '매출 정보 수정하기' : '매출 정보 추가하기'}</span>
         {isEditMode && (
           <button
-            type="button"
+            type='button'
             className={styles['delButton']}
             onClick={handleDelete}
             disabled={isSearch}
-            title="제품 삭제"
+            title='제품 삭제'
           >
             삭제
             <FaTrashAlt style={{ marginLeft: '0.5rem' }} />
@@ -552,40 +561,40 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
       <div className={styles['subForm']}>
         {/* 거래처명 */}
         <div className={styles['form-row']}>
-          <label htmlFor="client_name" className={styles['label']}>
+          <label htmlFor='client_name' className={styles['label']}>
             거래처명
           </label>
           <button
-            type="button"
+            type='button'
             className={styles['searchButton']}
             onClick={() => handleClientSearchClick({ handleInitForm })}
           >
             <FiSearch />
           </button>
           <input
-            id="client_name"
-            name="client_name"
-            type="text"
+            id='client_name'
+            name='client_name'
+            type='text'
             className={styles['input']}
             required
-            autoComplete="off"
+            autoComplete='off'
             value={formData['client_name']}
             onChange={handleChange}
             disabled={isSearch}
           />
           <button
-            type="button"
+            type='button'
             className={styles['resetButton']}
             disabled={isSearch}
             onClick={clear}
-            title="매출 정보가 모두 초기화 됩니다."
+            title='매출 정보가 모두 초기화 됩니다.'
           >
             모두 초기화
           </button>
         </div>
         {/* 거래일자 */}
         <div className={styles['form-row']}>
-          <label htmlFor="sale_date" className={styles['label']}>
+          <label htmlFor='sale_date' className={styles['label']}>
             거래일자
           </label>
           <div className={styles['dateInput']}>
@@ -593,12 +602,12 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
               selectedDate={startDate}
               onDateChange={handleDateChange}
               disabled={isSearch}
-              inputId="sale_date"
+              inputId='sale_date'
               maxDate={new Date(new Date().setFullYear(new Date().getFullYear() + 5, 11, 31))}
             />
           </div>
           <button
-            type="button"
+            type='button'
             className={styles['resetButton']}
             disabled={isSearch}
             onClick={() => setStartDate(new Date())}
@@ -608,15 +617,15 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
         </div>
         {/* 주소 */}
         <div className={styles['form-row']}>
-          <label htmlFor="client_address" className={styles['label']}>
+          <label htmlFor='client_address' className={styles['label']}>
             주소
           </label>
           <input
-            id="client_address"
-            name="client_address"
-            type="text"
+            id='client_address'
+            name='client_address'
+            type='text'
             className={`${styles['input']} ${styles['hover']}`}
-            autoComplete="off"
+            autoComplete='off'
             value={clientAddress}
             title={clientAddress}
             readOnly
@@ -625,7 +634,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
           />
           {isSearch && <Address isSearch={isSearch} setIsSearch={setIsSearch} setBusinessAddress={setClientAddress} />}
           <button
-            type="button"
+            type='button'
             className={styles['resetButton']}
             disabled={isSearch}
             onClick={() => setClientAddress('')}
@@ -635,30 +644,30 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
         </div>
         {/* 전화번호 및 팩스번호 */}
         <div className={styles['form-row']}>
-          <label htmlFor="client_tel" className={styles['label']}>
+          <label htmlFor='client_tel' className={styles['label']}>
             전화번호
           </label>
           <input
-            id="client_tel"
-            name="client_tel"
-            type="text"
+            id='client_tel'
+            name='client_tel'
+            type='text'
             className={styles['input']}
             required
-            autoComplete="off"
+            autoComplete='off'
             value={formData['client_tel']}
             onChange={handleChange}
             disabled={isSearch}
           />
-          <label htmlFor="client_fax" className={styles['label']} style={{ textAlign: 'center' }}>
+          <label htmlFor='client_fax' className={styles['label']} style={{ textAlign: 'center' }}>
             팩스번호
           </label>
           <input
-            id="client_fax"
-            name="client_fax"
-            type="text"
+            id='client_fax'
+            name='client_fax'
+            type='text'
             className={styles['input']}
             required
-            autoComplete="off"
+            autoComplete='off'
             value={formData['client_fax']}
             onChange={handleChange}
             disabled={isSearch}
@@ -666,16 +675,16 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
         </div>
         {/* 설명 */}
         <div className={styles['form-row']}>
-          <label htmlFor="description" className={styles['label']}>
+          <label htmlFor='description' className={styles['label']}>
             설명
           </label>
           <input
-            id="description"
-            name="description"
-            type="text"
+            id='description'
+            name='description'
+            type='text'
             className={styles['input']}
             required
-            autoComplete="off"
+            autoComplete='off'
             value={formData['description']}
             title={formData['description']}
             onChange={handleChange}
@@ -692,8 +701,8 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
                 className={`${styles['radioLabel']} ${transactionType === type ? styles['checked'] : ''}`}
               >
                 <input
-                  type="radio"
-                  name="transaction_type"
+                  type='radio'
+                  name='transaction_type'
                   value={type}
                   checked={transactionType === type}
                   onChange={handleTransactionTypeChange}
@@ -708,6 +717,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
       </div>
       {/* 제품 테이블 */}
       <ProductTable
+        isEditMode={isEditMode}
         rows={rows}
         setRows={setRows}
         isSearch={isSearch}
@@ -722,6 +732,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
         setAllChecked={setAllChecked}
         formatNumber={formatNumber}
         handleSaveButton={handleSaveButton}
+        handleSendMailButton={handleSendMailButton}
       />
     </form>
   );

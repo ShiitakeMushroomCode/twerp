@@ -94,7 +94,10 @@ export async function POST(request: NextRequest) {
       await executeQuery(salesItemsInsertQuery, salesItemValues);
     }
 
-    return NextResponse.json({ message: '판매 기록이 성공적으로 업데이트되었습니다.' }, { status: 200 });
+    return NextResponse.json(
+      { message: '판매 기록이 성공적으로 업데이트되었습니다.', id: data['sales_id'] },
+      { status: 200 }
+    );
   } catch (error) {
     console.error('판매 기록 업데이트 실패:', error);
     return NextResponse.json({ message: '서버 오류가 발생했습니다.' }, { status: 500 });

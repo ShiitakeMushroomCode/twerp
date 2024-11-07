@@ -22,7 +22,8 @@ async function onSubmit(formData: SalesFormData) {
     if (res.ok) {
       // 성공 시 페이지를 재검증하거나 성공 메시지를 표시할 수 있습니다.
       revalidatePath('/sales-list');
-      return { status: 'success', message: '매출 기록이 성공적으로 생성되었습니다.' };
+      const data = await res.json();
+      return { status: 'success', message: '매출 기록이 성공적으로 생성되었습니다.', id: data['id'] };
     } else {
       return {
         status: 'error',

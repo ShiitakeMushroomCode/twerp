@@ -5,6 +5,7 @@ import styles from './SalesForm.module.css';
 import TableRow from './TableRow';
 
 interface ProductTableProps {
+  isEditMode: boolean;
   rows: Row[];
   setRows: Dispatch<SetStateAction<Row[]>>;
   isSearch: boolean;
@@ -19,9 +20,11 @@ interface ProductTableProps {
   setAllChecked: Dispatch<SetStateAction<boolean>>;
   formatNumber: (value: string) => string;
   handleSaveButton: () => Promise<void>;
+  handleSendMailButton: () => Promise<void>;
 }
 
 export default function ProductTable({
+  isEditMode,
   rows,
   setRows,
   isSearch,
@@ -36,6 +39,7 @@ export default function ProductTable({
   setAllChecked,
   formatNumber,
   handleSaveButton,
+  handleSendMailButton,
 }: ProductTableProps) {
   return (
     <table className={styles.table}>
@@ -158,26 +162,15 @@ export default function ProductTable({
                 >
                   저장
                 </button>
+                {isEditMode &&
                 <button
                   type="button"
-                  onClick={() => {
-                    // 저장 및 출력 로직 구현
-                  }}
-                  className={`${styles.addButton} ${styles.savePrintButton}`}
-                  disabled={isSearch}
-                >
-                  저장 및 출력
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    // 메일 보내기 로직 구현
-                  }}
+                  onClick={handleSendMailButton}
                   className={`${styles.addButton} ${styles.emailButton}`}
                   disabled={isSearch}
                 >
                   메일 보내기
-                </button>
+                </button>}
               </div>
             </div>
           </td>

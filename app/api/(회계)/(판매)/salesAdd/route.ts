@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     // 트랜잭션 커밋
     await executeQuery('COMMIT');
 
-    return NextResponse.json({ message: '성공적으로 추가됨' }, { status: 200 });
+    return NextResponse.json({ message: '성공적으로 추가됨', id: salesId['data'].toString('hex') }, { status: 200 });
   } catch (error) {
     console.error('오류남:', error);
     // 트랜잭션 롤백

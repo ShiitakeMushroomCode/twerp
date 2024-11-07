@@ -70,7 +70,6 @@ export default function SalesPrintForm({ salesFormData }: Props) {
     totalQuantity += element.quantity;
   });
   let total = totalPrice + totalSub_price;
-
   return (
     <div className={styles.container}>
       <div className={styles.header}>
