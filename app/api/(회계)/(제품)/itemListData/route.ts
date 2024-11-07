@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     const safeOffset = Number(offset);
 
     // 토큰에서 companyId를 가져와서 Buffer로 변환
-    const tokenUserData = await getTokenUserData();
+    const tokenUserData = await getTokenUserData();    
     const companyId = tokenUserData['companyId'];
     const companyIdBuffer = Buffer.from(companyId['data'], 'hex');
 

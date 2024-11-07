@@ -12,6 +12,9 @@ export function openPhoneVerificationModal(): Promise<string | null> {
     showCancelButton: true,
     confirmButtonText: '확인',
     cancelButtonText: '취소',
+    inputAttributes: {
+      autocomplete: 'off',
+    },
     inputValidator: (value) => {
       if (!value) {
         return '인증 코드를 입력해야 합니다.';
@@ -38,6 +41,9 @@ export function openEmailVerificationModal(): Promise<string | null> {
     showCancelButton: true,
     confirmButtonText: '확인',
     cancelButtonText: '취소',
+    inputAttributes: {
+      autocomplete: 'off',
+    },
     inputValidator: (value) => {
       if (!value) {
         return '인증 코드를 입력해야 합니다.';
@@ -53,7 +59,7 @@ export function openEmailVerificationModal(): Promise<string | null> {
 }
 
 /**
- * 비밀번호 인증 모달을 열고 사용자가 입력한 코드를
+ * 비밀번호 인증 모달을 열고 사용자가 입력한 코드를 반환
  * @returns Promise<string | null>
  */
 export function openPasswordVerificationModal(): Promise<string | null> {
@@ -65,6 +71,7 @@ export function openPasswordVerificationModal(): Promise<string | null> {
     confirmButtonText: '확인',
     cancelButtonText: '취소',
     inputAttributes: {
+      autocomplete: 'off',
       autocapitalize: 'off',
     },
     inputValidator: (value) => {

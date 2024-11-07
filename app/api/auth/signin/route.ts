@@ -1,6 +1,6 @@
 import { isAuthenticated } from '@/util/password';
-import { generateAccessToken, generateRefreshToken, getInnerData, StoreAndGetUserData } from '@/util/token';
-import { ACT } from 'auth';
+import { generateAccessToken, generateRefreshToken, StoreAndGetUserData } from '@/util/token';
+import { verifyRefreshToken } from 'app/api/auth/refresh/route';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -10,12 +10,9 @@ export async function POST(request: NextRequest) {
   // 사용자 인증 로직 (예: 비밀번호 비교)
   if (await isAuthenticated(id, password)) {
     const refreshToken = await generateRefreshToken(id);
-
-    const data = (await StoreAndGetUserData(id, refreshToken))[0];
-
-    const innerData: ACT = await getInnerData(data);
-
-    const accessToken = await generateAccessToken(innerData);
+    const data = await StoreAndGetUserData(refreshToken);
+    
+    const accessToken = await generateAccessToken(data);
 
     const response = NextResponse.json({
       accessToken: accessToken,

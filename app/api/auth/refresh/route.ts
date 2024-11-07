@@ -5,7 +5,7 @@ import { jwtVerify } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-async function verifyRefreshToken(refreshToken: string) {
+export async function verifyRefreshToken(refreshToken: string) {
   try {
     const { payload } = await jwtVerify(refreshToken, secret);
     return payload;

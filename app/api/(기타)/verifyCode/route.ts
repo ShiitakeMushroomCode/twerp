@@ -9,6 +9,8 @@ import {
 } from '@/util/token';
 import { ACT } from 'auth';
 import { jwtVerify } from 'jose';
+import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 const secretKey = new TextEncoder().encode(process.env.JWT_SECRET!);
@@ -45,19 +47,21 @@ export async function POST(request: NextRequest) {
       // 인증 성공, 이메일 업데이트
       switch (type) {
         case '이메일':
-          await updateEmail(userId, newData);
+          await updateEmail(newData);
           break;
         case '전화번호':
-          await updatePhoneNumber(userId, newData);
+          await updatePhoneNumber(newData);
           break;
         case '비밀번호':
-          await updatePassword(userId, newData);
+          await updatePassword(newData);
           break;
         default:
           return NextResponse.json({ error: '잘못된 입력입니다.' }, { status: 400 });
       }
       // 사용된 토큰 삭제
       await deleteVerificationToken(userId);
+      cookies().delete('accessToken');
+      revalidatePath('/mypage');
       switch (type) {
         case '이메일':
           return NextResponse.json({ message: `${type}이 성공적으로 변경되었습니다.` }, { status: 200 });

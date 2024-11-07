@@ -1,37 +1,29 @@
 import { executeQuery } from '@/lib/db';
 import { isEmpty } from '@/util/lo';
 import { hashPassword } from '@/util/password';
+import { verifyRefreshToken } from 'app/api/auth/refresh/route';
 import { ACT } from 'auth';
 import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-// 구버전
-// export async function StoreRefreshToken(userId: any, refreshToken: any) {
-//   try {
-//     await executeQuery('UPDATE employee SET ref_token = ? WHERE phone_number = ?;', [refreshToken, userId]);
-//     return true;
-//   } catch (error) {
-//     console.log('토큰 저장에 오류남');
-//     return false;
-//   }
-// }
-
 const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
-export async function StoreAndGetUserData(userId: any, refreshToken: any) {
+export async function StoreAndGetUserData(refreshToken: any) {
   let user;
+
   try {
+    const r = await verifyRefreshToken(refreshToken);
+    const employeeId = Buffer.from(r['employee_id'] as string, 'hex');
     // 한번에 필요한 데이터 조회
-    user = await executeQuery('SELECT * FROM employee WHERE phone_number = ?', [userId]);
+    user = await executeQuery('SELECT * FROM employee WHERE employee_id = ?', [employeeId]);
     if (user) {
-      //이거 왜 이렇게 안하면 안되냐 짜증나게 ㅋㅋ
       user[0] = {
         ...user[0],
         hire_date: new Date(user[0].hire_date.getTime() + 32400000),
       };
       // 리프레시 토큰 업데이트
-      await executeQuery('UPDATE employee SET ref_token = ? WHERE phone_number = ?', [refreshToken, userId]);
+      await executeQuery('UPDATE employee SET ref_token = ? WHERE employee_id = ?', [refreshToken, employeeId]);
     }
     return user;
   } catch (error) {
@@ -78,7 +70,7 @@ export async function getTokenUserData() {
 }
 
 export async function generateAccessToken(data: ACT) {
-  return new SignJWT({ data })
+  return new SignJWT({ data: await getInnerData(data[0]) })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(process.env.JWT_EXPIRATION) // Access token은 15분동안 지속 process.env.JWT_EXPIRATION
@@ -86,23 +78,17 @@ export async function generateAccessToken(data: ACT) {
 }
 
 export async function generateRefreshToken(userId: any) {
-  return new SignJWT({ userId })
+  const employee_id = ((await executeQuery('SELECT employee_id FROM employee WHERE phone_number = ?', [userId]))[0]).employee_id.toString('hex');  
+  return new SignJWT({ userId, employee_id })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(process.env.REFRESH_TOKEN_EXPIRATION) // Refresh token 30일동안 지속
     .sign(secret);
 }
 
-//안씀
-// export async function checkRefreshTokenInDB(userId: any, refreshToken: any) {
-//   return await executeQuery('SELECT ref_token FROM employee WHERE phone_number=? AND ref_token=?;', [
-//     userId,
-//     refreshToken,
-//   ]);
-// }
-
 export async function getInnerData(data) {
   const innerData: ACT = {
+    employee_id: await data?.employee_id, // 사원 ID
     companyId: await data?.company_id, // 회사 ID
     userId: await data?.phone_number, // 휴대전화 번호
     department: await data?.department, // 부서명
@@ -110,7 +96,7 @@ export async function getInnerData(data) {
     tellNumber: await data?.tellNumber, // 전화번호
     position: await data?.position, // 직급
     email: await data?.email, // 이메일
-    hireDate: await data?.hire_date.toISOString().split('T')[0], // 입사일
+    hireDate: await data?.hire_date ? new Date(await data.hire_date).toISOString().split('T')[0] : null, // 입사일
     status: await data?.status, // 현상태
   };
   return innerData;
@@ -145,16 +131,19 @@ export async function generateCertificationToken({ userId, cn }) {
 }
 
 // 전화번호 업데이트 함수
-export async function updatePhoneNumber(userId: string, newPhoneNumber: string): Promise<boolean> {
+export async function updatePhoneNumber(newPhoneNumber: string): Promise<boolean> {
   // 값 검증
-  if (isEmpty(userId) || isEmpty(newPhoneNumber)) {
-    console.error('유효하지 않은 userId 또는 newPhoneNumber 값입니다.');
+  if (isEmpty(newPhoneNumber)) {
+    console.error('유효하지 않은 newPhoneNumber 값입니다.');
     return false;
   }
 
   try {
     // 전화번호 업데이트
-    await executeQuery('UPDATE employee SET phone_number = ? WHERE phone_number = ?;', [newPhoneNumber, userId]);
+    await executeQuery('UPDATE employee SET phone_number = ? WHERE employee_id = ?;', [
+      newPhoneNumber,
+      await getEmployeeId(),
+    ]);
     return true;
   } catch (error) {
     console.error(error.message);
@@ -163,16 +152,16 @@ export async function updatePhoneNumber(userId: string, newPhoneNumber: string):
 }
 
 // 이메일 업데이트 함수
-export async function updateEmail(userId: string, newEmail: string): Promise<boolean> {
+export async function updateEmail(newEmail: string): Promise<boolean> {
   // 값 검증
-  if (isEmpty(userId) || isEmpty(newEmail)) {
-    console.error('유효하지 않은 userId 또는 newPhoneNumber 값입니다.');
+  if (isEmpty(newEmail)) {
+    console.error('유효하지 않은 newPhoneNumber 값입니다.');
     return false;
   }
 
   try {
     // 이메일 업데이트
-    await executeQuery('UPDATE employee SET email = ? WHERE phone_number = ?;', [newEmail, userId]);
+    await executeQuery('UPDATE employee SET email = ? WHERE employee_id = ?;', [newEmail, await getEmployeeId()]);
     return true;
   } catch (error) {
     console.error(error.message);
@@ -181,18 +170,18 @@ export async function updateEmail(userId: string, newEmail: string): Promise<boo
 }
 
 // 비밀번호 업데이트 함수
-export async function updatePassword(userId: string, newPassword: string): Promise<boolean> {
+export async function updatePassword(newPassword: string): Promise<boolean> {
   // 값 검증
-  if (isEmpty(userId) || isEmpty(newPassword)) {
-    console.error('유효하지 않은 userId 또는 newPassword 값입니다.');
+  if (isEmpty(newPassword)) {
+    console.error('유효하지 않은 newPassword 값입니다.');
     return false;
   }
 
   try {
     // 전화번호 업데이트
-    await executeQuery('UPDATE employee SET password = ? WHERE phone_number = ?;', [
+    await executeQuery('UPDATE employee SET password = ? WHERE employee_id = ?;', [
       await hashPassword(newPassword),
-      userId,
+      await getEmployeeId(),
     ]);
     return true;
   } catch (error) {
@@ -202,16 +191,16 @@ export async function updatePassword(userId: string, newPassword: string): Promi
 }
 
 // 인증 토큰 저장 함수
-export async function saveVerificationToken(userId: string, token: string): Promise<boolean> {
+export async function saveVerificationToken(token: string): Promise<boolean> {
   // 값 검증
-  if (isEmpty(userId) || isEmpty(token)) {
-    console.error('유효하지 않은 userId 또는 token 값입니다.');
+  if (isEmpty(token)) {
+    console.error('유효하지 않은 token 값입니다.');
     return false;
   }
 
   try {
     // 데이터베이스에 토큰 저장
-    await executeQuery('UPDATE employee SET cer_code = ? WHERE phone_number = ?;', [token, userId]);
+    await executeQuery('UPDATE employee SET cer_code = ? WHERE employee_id = ?;', [token, await getEmployeeId()]);
     return true;
   } catch (error) {
     console.error(error.message);
@@ -229,7 +218,7 @@ export async function getVerificationToken(userId: string): Promise<string | nul
 
   try {
     // 데이터베이스에서 토큰 가져오기
-    const result = await executeQuery('SELECT cer_code FROM employee WHERE phone_number = ?', [userId]);
+    const result = await executeQuery('SELECT cer_code FROM employee WHERE employee_id = ?', [await getEmployeeId()]);
     const token = result[0]?.cer_code || null;
     return token;
   } catch (error) {
@@ -248,10 +237,14 @@ export async function deleteVerificationToken(userId: string): Promise<boolean> 
 
   try {
     // 데이터베이스에서 토큰 삭제
-    await executeQuery('UPDATE employee SET cer_code = NULL WHERE phone_number = ?', [userId]);
+    await executeQuery('UPDATE employee SET cer_code = NULL WHERE employee_id = ?', [await getEmployeeId()]);
     return true;
   } catch (error) {
     console.error(error.message);
     return false;
   }
+}
+
+export async function getEmployeeId() {
+  return Buffer.from(await verifyRefreshToken(cookies().get('refreshToken').value)['employee_id'], 'hex');
 }

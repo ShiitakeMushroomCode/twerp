@@ -1,4 +1,5 @@
 export interface ACT {
+  employee_id: Buffer;
   companyId: Buffer;
   userId: string; // 휴대전화 번호
   department?: string; // 부서명
