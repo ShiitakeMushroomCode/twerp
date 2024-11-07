@@ -1,17 +1,6 @@
 import { executeQuery } from '@/lib/db';
-import { generateAccessToken } from '@/util/token';
-import { jwtVerify } from 'jose';
+import { generateAccessToken, verifyRefreshToken } from '@/util/token';
 import { NextRequest, NextResponse } from 'next/server';
-
-const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-export async function verifyRefreshToken(refreshToken: string) {
-  try {
-    const { payload } = await jwtVerify(refreshToken, secret);
-    return payload;
-  } catch (e) {
-    return null;
-  }
-}
 
 export async function POST(request: NextRequest) {
   const d = await request.json();
@@ -29,7 +18,7 @@ export async function POST(request: NextRequest) {
 
   const employeeId = Buffer.from(refPayload['employee_id'] as string, 'hex');
 
-  const data = (await executeQuery('SELECT * FROM employee WHERE employee_id = ?;', [employeeId]));
+  const data = await executeQuery('SELECT * FROM employee WHERE employee_id = ?;', [employeeId]);
   // DB에서 리프레시 토큰 유효성 확인
   // const isStored = await checkRefreshTokenInDB(refPayload?.userId.toString(), await refreshToken.toString());
 

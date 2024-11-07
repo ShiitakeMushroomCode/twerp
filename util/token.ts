@@ -1,9 +1,8 @@
 import { executeQuery } from '@/lib/db';
 import { isEmpty } from '@/util/lo';
 import { hashPassword } from '@/util/password';
-import { verifyRefreshToken } from 'app/api/auth/refresh/route';
 import { ACT } from 'auth';
-import { jwtVerify, SignJWT } from 'jose';
+import { JWTPayload, jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -78,7 +77,9 @@ export async function generateAccessToken(data: ACT) {
 }
 
 export async function generateRefreshToken(userId: any) {
-  const employee_id = ((await executeQuery('SELECT employee_id FROM employee WHERE phone_number = ?', [userId]))[0]).employee_id.toString('hex');  
+  const employee_id = (
+    await executeQuery('SELECT employee_id FROM employee WHERE phone_number = ?', [userId])
+  )[0].employee_id.toString('hex');
   return new SignJWT({ employee_id })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
@@ -96,7 +97,7 @@ export async function getInnerData(data) {
     tellNumber: await data?.tellNumber, // 전화번호
     position: await data?.position, // 직급
     email: await data?.email, // 이메일
-    hireDate: await data?.hire_date ? new Date(await data.hire_date).toISOString().split('T')[0] : null, // 입사일
+    hireDate: (await data?.hire_date) ? new Date(await data.hire_date).toISOString().split('T')[0] : null, // 입사일
     status: await data?.status, // 현상태
   };
   return innerData;
@@ -246,6 +247,19 @@ export async function deleteVerificationToken(userId: string): Promise<boolean> 
 }
 
 export async function getEmployeeId() {
-  const data = await verifyRefreshToken(cookies().get('refreshToken').value);  
+  const data = await verifyRefreshToken(cookies().get('refreshToken').value);
   return Buffer.from(data?.employee_id.toString(), 'hex');
+}
+
+interface CustomJWTPayload extends JWTPayload {
+  employee_id?: string;
+}
+
+export async function verifyRefreshToken(refreshToken: string): Promise<CustomJWTPayload | null> {
+  try {
+    const { payload } = await jwtVerify(refreshToken, secret);
+    return payload as CustomJWTPayload;
+  } catch (e) {
+    return null;
+  }
 }
