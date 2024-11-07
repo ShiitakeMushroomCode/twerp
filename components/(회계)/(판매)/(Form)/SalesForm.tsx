@@ -539,7 +539,9 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
   /**
    * 메일보내기
    */
-  async function handleSendMailButton() { }
+  async function handleSendMailButton() { 
+    
+  }
     
   return (
     <form className={styles['form']} onSubmit={handleSubmit}>
