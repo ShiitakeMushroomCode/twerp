@@ -28,7 +28,7 @@ async function getInitialData(id: string) {
   return {
     sales_id: null,
     company_id: data['companyId']['data'].toString() || '',
-    sale_date: salesResult?.['sale_date'] ? new Date(salesResult['sale_date']).toISOString().split('T')[0] : '',
+    sale_date: new Date().toISOString().split('T')[0],
     transaction_type: salesResult?.['transaction_type'] || '카드결제',
     collection: salesResult?.['collection'] || '진행중',
     client_id: salesResult?.['client_id'] ? salesResult?.['client_id'].toString('hex') : null,

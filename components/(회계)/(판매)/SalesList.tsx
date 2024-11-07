@@ -1,9 +1,9 @@
 'use client';
 
+import SalesListItem from '@/components/(회계)/(판매)/(ListItem)/SalesListItem';
 import SearchBox from '@/components/(회계)/(판매)/(ListItem)/SearchBox';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import ListItem from './(ListItem)/ListItem';
 
 export default function SalesList() {
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -48,7 +48,7 @@ export default function SalesList() {
         setSearchOptions={setSearchOptions}
         onResetOptions={handleResetOptions}
       />
-      <ListItem
+      <SalesListItem
         searchTerm={searchTerm}
         searchOptions={searchOptions}
         page={page}

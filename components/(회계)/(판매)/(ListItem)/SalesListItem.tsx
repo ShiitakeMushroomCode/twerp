@@ -164,7 +164,7 @@ export default function SalesListItem({
       );
       if (popupWindow) {
         popupWindow.focus();
-        popupWindow.name = `addPopup-${sales_id}`;
+        popupWindow.name = `editPopup-${sales_id}`;
       }
     } else {
       router.push(`/sales-add/${sales_id}`);
