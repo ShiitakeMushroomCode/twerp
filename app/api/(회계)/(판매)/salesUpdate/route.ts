@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
           transaction_type = ?,
           collection = ?,
           update_at = ?
-      WHERE sales_id = ?, company_id = ?
+      WHERE sales_id = ? AND company_id = ?
     `;
 
     const salesValues = [

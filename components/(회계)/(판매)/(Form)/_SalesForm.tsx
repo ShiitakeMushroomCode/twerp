@@ -12,7 +12,7 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
 import { FiSearch } from 'react-icons/fi';
 import Swal from 'sweetalert2';
-import styles from './SalesForm.module.css';
+import styles from './(Form)/SalesForm.module.css';
 
 interface Row {
   product_id: string;
