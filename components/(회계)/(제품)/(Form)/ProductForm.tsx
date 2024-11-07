@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
 import Swal from 'sweetalert2';
-import DatePicker from '../(공용)/DatePicker';
+import DatePicker from '../../(공용)/DatePicker';
 import styles from './ProductForm.module.css';
 
 export interface ProductFormData {

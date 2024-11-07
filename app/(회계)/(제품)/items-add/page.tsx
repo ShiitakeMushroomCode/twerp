@@ -1,4 +1,4 @@
-import ProductForm, { ProductFormData } from '@/components/(회계)/(제품)/ProductForm';
+import ProductForm, { ProductFormData } from '@/components/(회계)/(제품)/(Form)/ProductForm';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 

@@ -1,9 +1,9 @@
 'use client';
 
 import SearchBox from '@/components/(회계)/(공용)/SearchBox';
+import ProductListItem from '@/components/(회계)/(제품)/(ListItem)/ProductListItem';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import ListItem from './ListItem';
 
 export default function ItemList() {
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -36,13 +36,20 @@ export default function ItemList() {
   return (
     <div>
       <SearchBox type="items" onSearch={handleSearch} />
-      <ListItem
+      <ProductListItem
         searchTerm={searchTerm}
         page={page}
         setPage={setPage}
         triggerSearch={triggerSearch}
         setTriggerSearch={setTriggerSearch}
       />
+      {/* <ListItem
+        searchTerm={searchTerm}
+        page={page}
+        setPage={setPage}
+        triggerSearch={triggerSearch}
+        setTriggerSearch={setTriggerSearch}
+      /> */}
     </div>
   );
 }

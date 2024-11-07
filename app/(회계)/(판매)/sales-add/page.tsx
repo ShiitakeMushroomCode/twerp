@@ -1,4 +1,4 @@
-import SalesForm, { SalesFormData } from '@/components/(회계)/(판매)/SalesForm';
+import SalesForm, { SalesFormData } from '@/components/(회계)/(판매)/(Form)/SalesForm';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 

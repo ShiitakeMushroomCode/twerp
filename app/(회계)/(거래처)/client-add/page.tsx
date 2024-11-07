@@ -1,4 +1,4 @@
-import ClientForm, { ClientFormData } from '@/components/(회계)/(거래처)/ClientForm';
+import ClientForm, { ClientFormData } from '@/components/(회계)/(거래처)/(Form)/ClientForm';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 

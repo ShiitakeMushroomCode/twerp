@@ -1,9 +1,9 @@
 'use client';
 
-import SearchBox from '@/components/(회계)/(판매)/SearchBox';
+import SearchBox from '@/components/(회계)/(판매)/(ListItem)/SearchBox';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import ListItem from './ListItem';
+import ListItem from './(ListItem)/ListItem';
 
 export default function SalesList() {
   const [searchTerm, setSearchTerm] = useState<string>('');

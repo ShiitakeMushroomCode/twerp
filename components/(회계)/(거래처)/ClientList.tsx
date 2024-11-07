@@ -1,8 +1,8 @@
 'use client';
+import ClientListItem from '@/components/(회계)/(거래처)/(ListItem)/ClientListItem';
 import SearchBox from '@/components/(회계)/(공용)/SearchBox';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import ListItem from './ListItem';
 
 export default function ClientList() {
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -35,13 +35,20 @@ export default function ClientList() {
   return (
     <div>
       <SearchBox type="client" onSearch={handleSearch} />
-      <ListItem
+      <ClientListItem
         searchTerm={searchTerm}
         page={page}
         setPage={setPage}
         triggerSearch={triggerSearch}
         setTriggerSearch={setTriggerSearch}
       />
+      {/* <ListItem
+        searchTerm={searchTerm}
+        page={page}
+        setPage={setPage}
+        triggerSearch={triggerSearch}
+        setTriggerSearch={setTriggerSearch}
+      /> */}
     </div>
   );
 }
