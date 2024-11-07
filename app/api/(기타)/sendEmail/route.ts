@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   if (option === 'MyPage') {
     try {
       await transporter.sendMail(mailOptions);
-      await saveVerificationToken(userId, await generateCertificationToken({ userId: userId, cn: cn }));
+      await saveVerificationToken(await generateCertificationToken({ userId: userId, cn: cn }));
       return NextResponse.json({ message: '이메일이 성공적으로 전송되었습니다..' }, { status: 200 });
     } catch (error) {
       console.error(error);

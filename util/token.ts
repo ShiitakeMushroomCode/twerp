@@ -79,7 +79,7 @@ export async function generateAccessToken(data: ACT) {
 
 export async function generateRefreshToken(userId: any) {
   const employee_id = ((await executeQuery('SELECT employee_id FROM employee WHERE phone_number = ?', [userId]))[0]).employee_id.toString('hex');  
-  return new SignJWT({ userId, employee_id })
+  return new SignJWT({ employee_id })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(process.env.REFRESH_TOKEN_EXPIRATION) // Refresh token 30일동안 지속
@@ -246,5 +246,6 @@ export async function deleteVerificationToken(userId: string): Promise<boolean> 
 }
 
 export async function getEmployeeId() {
-  return Buffer.from(await verifyRefreshToken(cookies().get('refreshToken').value)['employee_id'], 'hex');
+  const data = await verifyRefreshToken(cookies().get('refreshToken').value);  
+  return Buffer.from(data?.employee_id.toString(), 'hex');
 }

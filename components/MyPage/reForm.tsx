@@ -54,6 +54,9 @@ export default function ReForm({ sendMail }: ReFormProps) {
           showConfirmButton: false,
           timer: 1000,
         });
+        setNewPhoneNumber('');
+        setNewEmail('');
+        setNewPassword('');
         setTimeout(() => router.refresh(), 1000);
       } else {
         throw new Error((await res.json()).message || '알 수 없는 오류가 발생했습니다.');
