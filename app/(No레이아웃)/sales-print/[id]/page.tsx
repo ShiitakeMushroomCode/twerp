@@ -12,9 +12,9 @@ interface PageProps {
   };
 }
 
-
 export default async function Page({ params: { id } }: PageProps) {
   const salesFormData = await fetchSalesData(id);
   return <SalesPrintFormComponent salesFormData={salesFormData} />;
-  // return <EmailSalesInvoice salesFormData={salesFormData} />;
+
+  // return <Invoice fetchSalesData={await fetchSalesData(id)}/>
 }

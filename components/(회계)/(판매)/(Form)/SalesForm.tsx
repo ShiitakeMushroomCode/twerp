@@ -4,7 +4,6 @@ import Address from '@/components/(회계)/(판매)/(Form)/Address';
 import handleClientSearchClick from '@/components/(회계)/(판매)/(Form)/ClientSearchClick';
 import ProductSearchClick from '@/components/(회계)/(판매)/(Form)/ProductSearchClick';
 import ProductTable from '@/components/(회계)/(판매)/(Form)/ProductTable';
-import { generateSalesPrintHtml } from '@/util/fetchSalesData';
 import { isEmpty } from '@/util/lo';
 import { formatPhoneNumber } from '@/util/reform';
 import { sendMailUtil } from '@/util/sendmail';
@@ -607,64 +606,20 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
       });
 
       if (formValues) {
-        // 거래명세표 HTML 생성 후 이메일 본문으로 포함
-        const salesPrintHtml = await generateSalesPrintHtml(formData.sales_id);
-        const emailHtml = generateEmailHtml(formValues.subject, formValues.content, salesPrintHtml);
-        console.log(salesPrintHtml);
         if (
           await sendMailUtil({
             subject: formValues.subject,
             to: 'chlrjs0913@gmail.com',
-            html: salesPrintHtml,
-            option: 'SendClient',
+            text: formValues.content,
+            option: 'SalesTransactionStatement',
+            id: formData.sales_id,
+            html: null,
           })
         ) {
         } else {
         }
       }
     }
-  }
-
-  function generateEmailHtml(subject, content, salesPrintHtml) {
-    return `
-      <!DOCTYPE html>
-      <html lang="ko">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${subject}</title>
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-            color: #333;
-          }
-          .containers {
-            max-width: 800px;
-            margin: auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-          }
-          .contents {
-            margin-bottom: 20px;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="containers">
-          <h1>${subject}</h1>
-          <div class="contents">
-            <p>${content}</p>
-          </div>
-          ${salesPrintHtml} 
-        </div>
-      </body>
-      </html>
-    `;
   }
 
   return (
