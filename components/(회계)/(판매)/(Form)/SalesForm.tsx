@@ -4,8 +4,11 @@ import Address from '@/components/(회계)/(판매)/(Form)/Address';
 import handleClientSearchClick from '@/components/(회계)/(판매)/(Form)/ClientSearchClick';
 import ProductSearchClick from '@/components/(회계)/(판매)/(Form)/ProductSearchClick';
 import ProductTable from '@/components/(회계)/(판매)/(Form)/ProductTable';
+import { generateSalesPrintHtml } from '@/util/fetchSalesData';
 import { isEmpty } from '@/util/lo';
 import { formatPhoneNumber } from '@/util/reform';
+import { sendMailUtil } from '@/util/sendmail';
+import { showErrorAlert } from '@/util/swalHelpers';
 import { useUnsavedChangesWarning } from '@/util/useUnsavedChangesWarning';
 import { addHours, format } from 'date-fns';
 import { useRouter } from 'next/navigation';
@@ -535,14 +538,135 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
     }
   }
 
-  
   /**
    * 메일보내기
    */
-  async function handleSendMailButton() { 
+  async function handleSendMailButton() {
+    if (isEmpty(formData.sales_id)) {
+      showErrorAlert('메일보내기 실패', '현재 메일을 보낼 수 없는 기록입니다.');
+    } else {
+      const { value: formValues } = await Swal.fire({
+        title: '거래명세표 메일 보내기',
+        html: `
+        <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; align-items: center;">
+          
+          <div style="display: flex; align-items: center; width: 100%; max-width: 500px; gap: 10px;">
+            <label for="swal-input-recipient" style="font-size: 14px; color: #333; width: 80px; text-align: right; margin: 0;">
+              받는 이
+            </label>
+            <input 
+              id="swal-input-recipient" 
+              type="email" 
+              placeholder="example@test.com" 
+              value="recipient@example.com" 
+              autocomplete="off" 
+              style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; transition: border-color 0.3s, box-shadow 0.3s;"
+            >
+          </div>
     
+          <div style="display: flex; align-items: center; width: 100%; max-width: 500px; gap: 10px;">
+            <label for="swal-input-subject" style="font-size: 14px; color: #333; width: 80px; text-align: right; margin: 0;">
+              제목
+            </label>
+            <input 
+              id="swal-input-subject" 
+              type="text" 
+              placeholder="메일 제목" 
+              value="거래명세표 확인" 
+              autocomplete="off" 
+              style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; transition: border-color 0.3s, box-shadow 0.3s;"
+            >
+          </div>
+    
+          <div style="display: flex; align-items: center; width: 100%; max-width: 500px; gap: 10px;">
+            <label for="swal-input-content" style="font-size: 14px; color: #333; width: 80px; text-align: right; margin: 0;">
+              내용
+            </label>
+            <textarea 
+              id="swal-input-content" 
+              placeholder="메일 내용을 입력하세요" 
+              autocomplete="off" 
+              rows="3" 
+              style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; transition: border-color 0.3s, box-shadow 0.3s;"
+            ></textarea>
+          </div>
+        </div>
+      `,
+        focusConfirm: false,
+        preConfirm: () => {
+          const recipient = document.getElementById('swal-input-recipient')['value'];
+          const subject = document.getElementById('swal-input-subject')['value'];
+          const content = document.getElementById('swal-input-content')['value'];
+
+          if (!recipient || !subject) {
+            Swal.showValidationMessage('받는 이와 제목은 필수 입력 항목입니다.');
+            return false;
+          }
+          return { recipient, subject, content };
+        },
+      });
+
+      if (formValues) {
+        // 거래명세표 HTML 생성 후 이메일 본문으로 포함
+        const salesPrintHtml = await generateSalesPrintHtml(formData.sales_id);
+        const emailHtml = generateEmailHtml(formValues.subject, formValues.content, salesPrintHtml);
+        console.log(salesPrintHtml);
+        if (
+          await sendMailUtil({
+            subject: formValues.subject,
+            to: 'chlrjs0913@gmail.com',
+            html: salesPrintHtml,
+            option: 'SendClient',
+          })
+        ) {
+        } else {
+        }
+      }
+    }
   }
-    
+
+  function generateEmailHtml(subject, content, salesPrintHtml) {
+    return `
+      <!DOCTYPE html>
+      <html lang="ko">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${subject}</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+          }
+          .containers {
+            max-width: 800px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          }
+          .contents {
+            margin-bottom: 20px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="containers">
+          <h1>${subject}</h1>
+          <div class="contents">
+            <p>${content}</p>
+          </div>
+          ${salesPrintHtml} 
+        </div>
+      </body>
+      </html>
+    `;
+  }
+
   return (
     <form className={styles['form']} onSubmit={handleSubmit}>
       <div className={styles['title']}>

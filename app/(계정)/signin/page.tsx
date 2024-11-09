@@ -32,6 +32,7 @@ async function signin(formData: FormData) {
         path: '/',
         sameSite: 'strict',
         secure: true,
+        domain:process.env.DOMAIN_URL || 'werp.p-e.kr'
       });
       cookies().set({
         name: 'refreshToken',
@@ -41,6 +42,7 @@ async function signin(formData: FormData) {
         path: '/',
         sameSite: 'strict',
         secure: true,
+        domain:process.env.DOMAIN_URL || 'werp.p-e.kr'
       });
       return await data;
     } else {

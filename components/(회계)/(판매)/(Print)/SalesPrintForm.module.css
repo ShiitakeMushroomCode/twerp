@@ -7,6 +7,12 @@
   max-width: 1078px;
   margin: 0 auto;
   background-color: #ffffff;
+
+  /* 프린트 시 적용되던 스타일을 상시 적용 */
+  width: auto;
+  margin: 0;
+  padding: 0;
+  font-size: small;
 }
 
 /* 헤더 스타일 */
@@ -17,8 +23,13 @@
   border-bottom: 2px solid black;
   padding-bottom: 8px;
   margin-bottom: 16px;
+
+  /* 프린트 시 적용되던 스타일을 상시 적용 */
+  border-bottom: 1px solid black;
+  padding-bottom: 5px;
 }
 
+/* 제목 스타일 */
 .title {
   margin-left: 1rem;
   font-size: 28px;
@@ -41,6 +52,9 @@
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 1rem;
+
+  /* 프린트 시 적용되던 스타일을 상시 적용 */
+  border: 1px solid black;
 }
 
 .infoTable th,
@@ -99,6 +113,9 @@
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 1rem;
+
+  /* 프린트 시 적용되던 스타일을 상시 적용 */
+  border: 1px solid black;
 }
 
 .transactionTable th,
@@ -144,12 +161,18 @@
   font-weight: bold;
   background-color: #f9f9f9;
   text-align: right;
+
+  /* 프린트 시 적용되던 스타일을 상시 적용 */
+  border-top: 2px solid black;
 }
 
 .footerValue {
   font-weight: bold;
   background-color: #f9f9f9;
   text-align: right;
+
+  /* 프린트 시 적용되던 스타일을 상시 적용 */
+  border-top: 2px solid black;
 }
 
 /* 금액 디테일 및 계좌 디테일 스타일 */
@@ -159,46 +182,4 @@
   margin-top: 10px;
   border: 1px solid black;
   padding: 8px;
-}
-
-/* 반응형 인쇄 스타일 */
-@media print {
-  .container {
-    width: auto;
-    margin: 0;
-    padding: 0;
-    font-size: small;
-  }
-
-  .detailsContainer,
-  .tableContainer {
-    page-break-inside: avoid;
-  }
-
-  /* 추가 인쇄 관련 스타일 */
-  .header,
-  .infoTable,
-  .transactionTable,
-  .resultTransactionTable {
-    border: none;
-  }
-
-  .header {
-    border-bottom: 1px solid black;
-    padding-bottom: 5px;
-  }
-
-  .infoTable th,
-  .infoTable td,
-  .transactionTable th,
-  .transactionTable td,
-  .resultTransactionTable tr td {
-    border: 1px solid black;
-  }
-
-  /* 합계 행 스타일 인쇄 시 유지 */
-  .footerLabel,
-  .footerValue {
-    border-top: 2px solid black;
-  }
 }

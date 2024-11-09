@@ -28,6 +28,14 @@ export async function POST(request: NextRequest) {
       console.error(error);
       return NextResponse.json({ message: '이메일 전송에 실패하였습니다.' }, { status: 500 });
     }
+  } else if (option === 'SendClient') {
+    try {
+      await transporter.sendMail(mailOptions);
+      return NextResponse.json({ message: '이메일이 성공적으로 전송되었습니다..' }, { status: 200 });
+    } catch (error) {
+      console.error(error);
+      return NextResponse.json({ message: '이메일 전송에 실패하였습니다.' }, { status: 500 });
+    }
   } else {
     return NextResponse.json({ message: '잘못 된 옵션입니다.' }, { status: 500 });
   }

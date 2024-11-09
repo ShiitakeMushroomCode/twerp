@@ -57,7 +57,7 @@ interface Props {
   salesFormData: SalesPrintFormData;
 }
 
-export default function SalesPrintForm({ salesFormData }: Props) {
+export default function SalesPrintFormComponent({ salesFormData }: Props) {
   const { companyResult, salesResult, salesItemsResult } = salesFormData;
   let totalP = 0;
   let totalPrice = 0;
@@ -78,7 +78,9 @@ export default function SalesPrintForm({ salesFormData }: Props) {
           <tbody>
             <tr>
               <td className={styles.LLabel}>거래일자</td>
-              <td>{format(new Date(salesResult.sale_date), 'yyyy년 MM월 dd일')}</td>
+              <td>
+                {salesResult?.sale_date ? format(new Date(salesResult.sale_date), 'yyyy년 MM월 dd일') : '날짜 없음'}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -162,7 +164,7 @@ export default function SalesPrintForm({ salesFormData }: Props) {
             <tr key={item.sales_item_id.toString()}>
               <td>{index + 1}</td>
               <td>{`${item.product_name}${item.standard ? `[${item.standard}]` : ''}`}</td>
-              <td>{`${item.quantity}${item.unit ? `[${item.unit}]` : ''}`}</td>
+              <td>{`${item.quantity.toLocaleString()}${item.unit ? `[${item.unit}]` : ''}`}</td>
               <td>₩{item.price.toLocaleString()}</td>
               <td>₩{(item.price * item.quantity).toLocaleString()}</td>
               <td>₩{item.sub_price.toLocaleString()}</td>
@@ -187,14 +189,14 @@ export default function SalesPrintForm({ salesFormData }: Props) {
       <table className={`${styles.transactionTable} ${styles.resultTransactionTable}`}>
         <tbody>
           <tr>
-            <td className="header">공급가액</td>
-            <td className="value">₩{totalPrice.toLocaleString()}</td>
-            <td className="header">세액</td>
-            <td className="value">₩{totalSub_price.toLocaleString()}</td>
-            <td className="header">합계금액</td>
-            <td className="value">₩{total.toLocaleString()}</td>
-            <td className="header">인수자</td>
-            <td className="value"></td>
+            <td className='header'>공급가액</td>
+            <td className='value'>₩{totalPrice.toLocaleString()}</td>
+            <td className='header'>세액</td>
+            <td className='value'>₩{totalSub_price.toLocaleString()}</td>
+            <td className='header'>합계금액</td>
+            <td className='value'>₩{total.toLocaleString()}</td>
+            <td className='header'>인수자</td>
+            <td className='value'></td>
           </tr>
         </tbody>
       </table>
@@ -202,8 +204,8 @@ export default function SalesPrintForm({ salesFormData }: Props) {
       <table className={`${styles.transactionTable} ${styles.resultTransactionTable}`}>
         <tbody>
           <tr>
-            <td className="header">계좌번호</td>
-            <td className="value">{companyResult.account}</td>
+            <td className='header'>계좌번호</td>
+            <td className='value'>{companyResult.account}</td>
           </tr>
         </tbody>
       </table>

@@ -60,6 +60,7 @@ export async function getTokenUserData() {
         httpOnly: true,
         sameSite: 'strict',
         secure: true,
+        domain: process.env.DOMAIN_URL || 'werp.p-e.kr',
       });
       return (await jwtVerify(cookies().get('accessToken').value, secret)).payload.data;
     } else {

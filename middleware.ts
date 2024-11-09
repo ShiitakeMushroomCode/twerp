@@ -52,6 +52,7 @@ export async function middleware(request: NextRequest) {
           httpOnly: true,
           sameSite: 'strict',
           secure: true,
+          domain: process.env.DOMAIN_URL || 'werp.p-e.kr',
         });
         return response;
       } else {
