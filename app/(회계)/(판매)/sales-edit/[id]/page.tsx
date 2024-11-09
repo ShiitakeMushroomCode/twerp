@@ -1,9 +1,13 @@
 import SalesForm, { SalesFormData } from '@/components/(회계)/(판매)/(Form)/SalesForm';
+import SalesPrintFormComponent from '@/components/(회계)/(판매)/(Print)/SalesPrintForm';
 import { executeQuery } from '@/lib/db';
+import { fetchSalesData } from '@/util/fetchSalesData';
 import { getTokenUserData } from '@/util/token';
+import { render } from '@react-email/render';
 import { ACT } from 'auth';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
+import path from 'path';
 
 export const metadata = {
   title: '매출 정보 수정',
@@ -84,6 +88,25 @@ async function onSubmit(formData: SalesFormData) {
   }
 }
 
+async function generateSalesPrintHtml(id: string): Promise<string> {
+  'use server';
+  const cssPath = path.resolve(process.cwd(), 'components/(회계)/(판매)/(Print)/SalesPrintForm.module.css');
+  
+  const fs = await import('fs').then(mod => mod.promises);
+  const cssContent = await fs.readFile(cssPath, 'utf8');
+  // 판매 양식 데이터 가져오기
+  const salesFormData = await fetchSalesData(id);
+
+  // React 컴포넌트를 HTML 문자열로 렌더링
+  const htmlContent = render(<SalesPrintFormComponent salesFormData={salesFormData} />);
+
+  // juice를 사용하여 CSS 인라인 처리
+  // const inlinedHtmlContent = juice(await htmlContent);
+
+  return htmlContent;
+}
+
+
 export default async function Page({ params: { id } }: PageProps) {
-  return <SalesForm initialData={(await getInitialData(id)) as SalesFormData} onSubmit={onSubmit} isEditMode={true} />;
+  return <SalesForm initialData={(await getInitialData(id)) as SalesFormData} generateSalesPrintHtml={generateSalesPrintHtml} onSubmit={onSubmit} isEditMode={true} />;
 }

@@ -4,7 +4,6 @@ import { SalesPrintFormData } from '@/components/(회계)/(판매)/(Print)/Sales
 import { executeQuery } from '@/lib/db';
 import { getTokenUserData } from '@/util/token';
 import { ACT } from 'auth';
-import { cookies as nextCookies } from 'next/headers';
 
 export async function fetchSalesData(id: string): Promise<SalesPrintFormData> {
   const data = (await getTokenUserData()) as ACT;
@@ -17,34 +16,17 @@ export async function fetchSalesData(id: string): Promise<SalesPrintFormData> {
     executeQuery('SELECT * FROM sales_items WHERE sales_id = ?', [salesIdBuffer]),
   ]);
   return {
-    companyResult: companyResult[0],
-    salesResult: salesResult[0],
-    salesItemsResult,
+    companyResult: transformBufferFields(companyResult[0]),
+    salesResult: transformBufferFields(salesResult[0]),
+    salesItemsResult: salesItemsResult.map((item) => transformBufferFields(item)),
   };
 }
 
-export async function generateSalesPrintHtml(id: string): Promise<string> {
-  const puppeteer = (await import('puppeteer')).default;
-  // Puppeteer 브라우저 실행
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.setCookie(
-    { ...nextCookies().get('accessToken'), domain: process.env.DOMAIN_URL, secure: true, httpOnly: true },
-    { ...nextCookies().get('refreshToken'), domain: process.env.DOMAIN_URL, secure: true, httpOnly: true }
-  );
-
-  // 페이지 URL로 이동
-  const url = `${process.env.SITE_URL}/sales-print-email/${id}`;
-  await page.goto(url, { waitUntil: 'networkidle0' });
-
-  // const puppeteerCookies = await page.cookies();
-  // console.log('Puppeteer에 설정된 쿠키:', puppeteerCookies);
-
-  // 페이지의 HTML 콘텐츠 추출
-  const html = await page.content();
-
-  // 브라우저 종료
-  await browser.close();
-
-  return html;
+// Buffer 필드를 hex 문자열로 변환하는 함수
+function transformBufferFields(data: Record<string, any>): Record<string, any> {
+  const transformedData: Record<string, any> = {};
+  for (const key in data) {
+    transformedData[key] = Buffer.isBuffer(data[key]) ? data[key].toString('hex') : data[key];
+  }
+  return transformedData;
 }

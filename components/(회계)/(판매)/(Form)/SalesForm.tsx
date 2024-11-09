@@ -4,10 +4,8 @@ import Address from '@/components/(회계)/(판매)/(Form)/Address';
 import handleClientSearchClick from '@/components/(회계)/(판매)/(Form)/ClientSearchClick';
 import ProductSearchClick from '@/components/(회계)/(판매)/(Form)/ProductSearchClick';
 import ProductTable from '@/components/(회계)/(판매)/(Form)/ProductTable';
-import { generateSalesPrintHtml } from '@/util/fetchSalesData';
 import { isEmpty } from '@/util/lo';
 import { formatPhoneNumber } from '@/util/reform';
-import { sendMailUtil } from '@/util/sendmail';
 import { showErrorAlert } from '@/util/swalHelpers';
 import { useUnsavedChangesWarning } from '@/util/useUnsavedChangesWarning';
 import { addHours, format } from 'date-fns';
@@ -68,9 +66,10 @@ interface SalesFormProps {
   initialData?: SalesFormData;
   onSubmit?: (data: SalesFormData) => Promise<{ status: string; message: string }>;
   isEditMode?: boolean;
+  generateSalesPrintHtml?: any;
 }
 
-export default function SalesForm({ initialData, onSubmit, isEditMode = false }: SalesFormProps) {
+export default function SalesForm({ initialData, onSubmit, isEditMode = false, generateSalesPrintHtml=null }: SalesFormProps) {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   useUnsavedChangesWarning(hasUnsavedChanges);
 
@@ -606,21 +605,9 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
         },
       });
 
-      if (formValues) {
-        // 거래명세표 HTML 생성 후 이메일 본문으로 포함
-        const salesPrintHtml = await generateSalesPrintHtml(formData.sales_id);
-        const emailHtml = generateEmailHtml(formValues.subject, formValues.content, salesPrintHtml);
-        console.log(salesPrintHtml);
-        if (
-          await sendMailUtil({
-            subject: formValues.subject,
-            to: 'chlrjs0913@gmail.com',
-            html: salesPrintHtml,
-            option: 'SendClient',
-          })
-        ) {
-        } else {
-        }
+      if (formValues && generateSalesPrintHtml) {
+        // 거래명세표 HTML 생성 후 이메일 본문으로 포함d
+        console.log(await generateSalesPrintHtml(formData.sales_id));
       }
     }
   }
