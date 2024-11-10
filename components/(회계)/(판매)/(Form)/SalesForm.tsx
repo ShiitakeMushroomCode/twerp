@@ -606,17 +606,32 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
       });
 
       if (formValues) {
-        if (
-          await sendMailUtil({
-            subject: formValues.subject,
-            to: 'chlrjs0913@gmail.com',
-            text: formValues.content,
-            option: 'SalesTransactionStatement',
-            id: formData.sales_id,
-            html: null,
-          })
-        ) {
+        Swal.fire({
+          title: '메일 전송 중...',
+          text: '잠시만 기다려주세요.',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+        const success = await sendMailUtil({
+          subject: formValues.subject,
+          to: 'chlrjs0913@gmail.com',
+          text: formValues.content,
+          option: 'SalesTransactionStatement',
+          id: formData.sales_id,
+          html: null,
+        });
+        if (success) {
+          Swal.fire({
+            icon: 'success',
+            title: '메일 전송 성공',
+            text: '메일이 성공적으로 전송되었습니다.',
+            timer: 1500,
+            showConfirmButton: false,
+          });
         } else {
+          showErrorAlert('메일 보내기 실패', '메일 보내기에 실패했습니다.');
         }
       }
     }

@@ -2,6 +2,7 @@ import SalesForm, { SalesFormData } from '@/components/(회계)/(판매)/(Form)/
 import { executeQuery } from '@/lib/db';
 import { getTokenUserData } from '@/util/token';
 import { ACT } from 'auth';
+import { addHours } from 'date-fns';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
@@ -28,7 +29,7 @@ async function getInitialData(id: string) {
   return {
     sales_id: null,
     company_id: data['companyId']['data'].toString() || '',
-    sale_date: new Date().toISOString().split('T')[0],
+    sale_date: addHours(new Date(), -9).toISOString().split('T')[0],
     transaction_type: salesResult?.['transaction_type'] || '카드결제',
     collection: salesResult?.['collection'] || '진행중',
     client_id: salesResult?.['client_id'] ? salesResult?.['client_id'].toString('hex') : null,

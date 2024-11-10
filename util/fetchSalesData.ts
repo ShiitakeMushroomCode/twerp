@@ -7,13 +7,10 @@ import {
   SalesResult,
 } from '@/components/(회계)/(판매)/(Print)/SalesPrintForm';
 import { executeQuery } from '@/lib/db';
-import { getTokenUserData } from '@/util/token';
-import { ACT } from 'auth';
 import puppeteer from 'puppeteer';
 
-export async function fetchSalesData(id: string): Promise<SalesPrintFormData> {
-  const data = (await getTokenUserData()) as ACT;
-  const companyIdBuffer = Buffer.from(data.companyId['data'], 'hex');
+export async function fetchSalesData(id: string, companyIdData: string): Promise<SalesPrintFormData> {
+  const companyIdBuffer = Buffer.from(companyIdData, 'hex');
   const salesIdBuffer = Buffer.from(id, 'hex');
 
   const [companyResult, salesResult, salesItemsResult] = await Promise.all([
@@ -36,14 +33,14 @@ function transformBufferFields<T>(data: Record<string, any>): T {
   return transformedData as T;
 }
 
-export async function generatePdf(id: string): Promise<Buffer> {
+export async function generatePdf(id: string, companyIdData = null): Promise<Buffer> {
   const browser = await puppeteer.launch({
     headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
   const page = await browser.newPage();
 
-  await page.setContent(generateEmailHtml(await fetchSalesData(id)), {
+  await page.setContent(generateEmailHtml(await fetchSalesData(id, companyIdData)), {
     waitUntil: 'networkidle2',
     timeout: 3000,
   });
@@ -59,8 +56,8 @@ export async function generatePdf(id: string): Promise<Buffer> {
   return pdfBuffer;
 }
 
-export async function generatePdfBase64(id: string): Promise<string> {
-  const pdfBase64 = (await generatePdf(id)) as Buffer;
+export async function generatePdfBase64(id: string, companyIdData = null): Promise<string> {
+  const pdfBase64 = (await generatePdf(id, companyIdData)) as Buffer;
   return pdfBase64.toString('base64');
 }
 
