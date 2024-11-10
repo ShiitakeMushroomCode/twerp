@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
   const { userId, to, subject, cn, html, option, id, text } = await request.json();
   const companyIdData = ((await getTokenUserData()) as ACT)['companyId']['data'];
+
   try {
     // Bull 큐에 작업 추가
     await emailQueue.add({
