@@ -18,8 +18,11 @@ export async function POST(request: NextRequest) {
 
     const companyIdBuffer = Buffer.from(tokenUserData['companyId']['data'], 'hex');
 
-    // sales_id 생성
-    const salesId = Buffer.from(uuidv4().replace(/-/g, ''), 'hex');
+    // sales_id 생성// sales_id 생성
+    const salesIdString = uuidv4().replace(/-/g, '');
+
+    // 이후 처리 시 salesId를 Buffer로 변환하여 사용
+    const salesId = Buffer.from(salesIdString, 'hex');
 
     // 트랜잭션 시작
     await executeQuery('BEGIN');
@@ -98,7 +101,7 @@ export async function POST(request: NextRequest) {
     // 트랜잭션 커밋
     await executeQuery('COMMIT');
 
-    return NextResponse.json({ message: '성공적으로 추가됨', id: salesId['data'].toString('hex') }, { status: 200 });
+    return NextResponse.json({ message: '성공적으로 추가됨', id: salesIdString }, { status: 200 });
   } catch (error) {
     console.error('오류남:', error);
     // 트랜잭션 롤백

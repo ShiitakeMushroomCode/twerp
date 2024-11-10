@@ -1,3 +1,4 @@
+'use server';
 import { executeQuery } from '@/lib/db';
 import { getTokenUserData } from './token';
 
@@ -164,4 +165,8 @@ export async function updateClient(clientData: ClientData): Promise<boolean> {
     console.error('클라이언트 정보 업데이트 중 오류 발생:', error);
     return false;
   }
+}
+export async function fetchClientEmail(id: string) {
+  const data = await executeQuery('SELECT billing_email FROM clients WHERE clients_id = ?', [Buffer.from(id, 'hex')]);
+  return data[0]?.billing_email;
 }

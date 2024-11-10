@@ -4,6 +4,7 @@ import Address from '@/components/(회계)/(판매)/(Form)/Address';
 import handleClientSearchClick from '@/components/(회계)/(판매)/(Form)/ClientSearchClick';
 import ProductSearchClick from '@/components/(회계)/(판매)/(Form)/ProductSearchClick';
 import ProductTable from '@/components/(회계)/(판매)/(Form)/ProductTable';
+import { fetchClientEmail } from '@/util/Client';
 import { isEmpty } from '@/util/lo';
 import { formatPhoneNumber } from '@/util/reform';
 import { sendMailUtil } from '@/util/sendmail';
@@ -543,7 +544,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
   async function handleSendMailButton() {
     if (isEmpty(formData.sales_id)) {
       showErrorAlert('메일보내기 실패', '현재 메일을 보낼 수 없는 기록입니다.');
-    } else {
+    } else {      
       const { value: formValues } = await Swal.fire({
         title: '거래명세표 메일 보내기',
         html: `
@@ -557,7 +558,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
               id="swal-input-recipient" 
               type="email" 
               placeholder="example@test.com" 
-              value="recipient@example.com" 
+              value="${await fetchClientEmail(formData.client_id)}" 
               autocomplete="off" 
               style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; transition: border-color 0.3s, box-shadow 0.3s;"
             >
@@ -616,7 +617,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
         });
         const success = await sendMailUtil({
           subject: formValues.subject,
-          to: 'chlrjs0913@gmail.com',
+          to: formValues.recipient,
           text: formValues.content,
           option: 'SalesTransactionStatement',
           id: formData.sales_id,
