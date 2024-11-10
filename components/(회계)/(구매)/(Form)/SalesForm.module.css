@@ -1,0 +1,353 @@
+.form {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.5rem;
+  border: #ffffff 1px solid;
+  border-radius: 3%;
+  background-color: #ffffff;
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1);
+  min-width: 600px;
+}
+
+.subForm {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0rem auto;
+  padding: 2rem;
+  border: #ffffff 1px solid;
+  border-radius: 3%;
+  background-color: #ffffff;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+  font-size: xx-large;
+  font-weight: bold;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.searchButton {
+  padding: 7px 12px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  vertical-align: middle;
+  font-size: large;
+  background-color: white;
+  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+.searchButton:hover {
+  cursor: pointer;
+  background-color: #f0f0f0;
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.searchButton:active {
+  transform: scale(1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.delButton {
+  background-color: #f44336;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: large;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.delButton:hover {
+  background-color: #d32f2f;
+}
+
+.resetButton {
+  background-color: #f44336;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  margin-left: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: large;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.resetButton:hover {
+  background-color: #d32f2f;
+}
+
+.label {
+  width: 150px;
+  text-align: left;
+  margin-right: 10px;
+  font-weight: bold;
+  font-size: large;
+  white-space: nowrap;
+}
+
+.input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: large;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.dateInput {
+  flex: 1;
+  padding: 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: large;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.radioGroup {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  border: 2px solid #ddd;
+  border-radius: 20px;
+  background-color: #f8f9fa;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.4s ease, border-color 0.4s ease, transform 0.3s ease;
+  font-size: 16px;
+  font-weight: 500;
+  user-select: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.radioInput {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.checked {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.radioLabel:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/** 테이블 스타일 */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 auto;
+}
+
+.centerAlign {
+  text-align: center;
+}
+
+.leftAlign {
+  text-align: left;
+}
+
+.rightAlign {
+  text-align: right;
+}
+
+.colgroup col {
+  border: none;
+}
+
+.headerCell {
+  background-color: #f5f5f5;
+  padding: 8px;
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 2px solid #ddd;
+}
+
+.tableHead {
+  border: 1px solid #ddd;
+}
+
+.cell {
+  background-color: #f9f9f9;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+.checkbox {
+  margin: 0;
+  transform: scale(1.2);
+}
+
+.productNameContainer {
+  display: flex;
+  align-items: center;
+}
+
+.cell .searchButton {
+  padding: 5px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+.tableInput {
+  width: 100%;
+  padding: 6px 10px;
+  border: none;
+  background-color: #f9f9f9;
+  font-size: large;
+  box-sizing: border-box;
+}
+
+.tableInput:focus {
+  background-color: #ffffff;
+  outline-color: #6dafff;
+  outline-width: 1px;
+}
+
+.resultContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  margin: 0 auto;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.results {
+  display: flex;
+  border: 1px solid #ddd;
+}
+
+.resultTitle {
+  width: 25%;
+  padding: 10px;
+  text-align: center;
+  border-right: 2px solid #ddd;
+  background-color: #6dafff;
+  color: white;
+}
+
+.resultValue {
+  flex: 1;
+  text-align: right;
+  padding: 10px;
+  background-color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.buttonContainer .buttons:nth-child(odd) .addButton {
+  margin-right: 0.7rem;
+}
+
+.buttonContainer .buttons:nth-child(even) .addButton {
+  margin-left: 0.7rem;
+}
+
+.addButton {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+  text-align: center;
+}
+
+/* 색상 설정 */
+.addRowButton {
+  background-color: #007bff; /* 파란색 */
+  color: white;
+}
+
+.addRowButton:hover {
+  background-color: #0056b3; /* 파란색 어두운 톤 */
+}
+
+.deleteButton {
+  background-color: #ff4d4d; /* 빨간색 */
+  color: white;
+}
+
+.deleteButton:hover {
+  background-color: #cc0000; /* 빨간색 어두운 톤 */
+}
+
+.saveButton {
+  background-color: #28a745; /* 녹색 */
+  color: white;
+}
+
+.saveButton:hover {
+  background-color: #1e7e34; /* 녹색 어두운 톤 */
+}
+
+.savePrintButton {
+  background-color: #ffc107; /* 노란색 */
+  color: black;
+}
+
+.savePrintButton:hover {
+  background-color: #e0a800; /* 노란색 어두운 톤 */
+}
+
+.emailButton {
+  background-color: #17a2b8; /* 청록색 */
+  color: white;
+}
+
+.emailButton:hover {
+  background-color: #117a8b; /* 청록색 어두운 톤 */
+}
+
+/* 총합계 행 스타일 */
+.row:last-of-type {
+  font-weight: bold;
+}

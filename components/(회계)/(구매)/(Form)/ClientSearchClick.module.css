@@ -1,0 +1,123 @@
+.customSwal {
+  width: 600px !important;
+  max-width: 90%;
+  padding: 0;
+}
+
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  min-width: 100%;
+  min-height: 370px;
+}
+
+.searchFields {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.searchInput {
+  flex: 1;
+  font-size: 1rem;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.searchButton {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+}
+
+.searchButton:hover {
+  background-color: #0056b3;
+}
+
+.searchIcon {
+  font-size: 1rem;
+}
+
+.tableContainer {
+  max-height: 290px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+}
+
+.tableContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.table th:nth-child(1),
+.table td:nth-child(1) {
+  width: 35%;
+}
+
+.table th:nth-child(2),
+.table td:nth-child(2) {
+  width: 65%;
+}
+
+.table th {
+  background-color: #e9ecef;
+  position: sticky;
+  top: 0;
+}
+
+.table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
+.paginationButton {
+  background-color: #f1f1f1;
+  border: none;
+  color: #333;
+  padding: 6px 12px;
+  margin: 0 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.paginationButton:hover {
+  background-color: #ddd;
+}
+
+.activePage {
+  background-color: #007bff;
+  color: white;
+}
