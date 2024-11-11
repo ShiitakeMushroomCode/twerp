@@ -1,6 +1,6 @@
 'use client';
 
-import SalesListItem from '@/components/(회계)/(구매)/(ListItem)/PurchaseListItem';
+import PurchaseListItem from '@/components/(회계)/(구매)/(ListItem)/PurchaseListItem';
 import SearchBox from '@/components/(회계)/(구매)/(ListItem)/SearchBox';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -48,7 +48,7 @@ export default function PurchaseList() {
         setSearchOptions={setSearchOptions}
         onResetOptions={handleResetOptions}
       />
-      <SalesListItem
+      <PurchaseListItem
         searchTerm={searchTerm}
         searchOptions={searchOptions}
         page={page}

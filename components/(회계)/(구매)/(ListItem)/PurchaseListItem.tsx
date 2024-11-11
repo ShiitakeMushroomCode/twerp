@@ -9,8 +9,8 @@ import Pagination from './Pagination';
 import TableHeader from './TableHeader';
 import TableRow from './TableRow';
 
-export interface SaleData {
-  sales_id: string;
+export interface PurchaseData {
+  purchase_id: string;
   company_name: string;
   item_names: string[];
   total_amount: number;
@@ -31,7 +31,7 @@ interface ListItemProps {
   setTriggerSearch: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function SalesListItem({
+export default function PurchaseListItem({
   searchTerm,
   searchOptions,
   page,
@@ -40,12 +40,12 @@ export default function SalesListItem({
   setTriggerSearch,
 }: ListItemProps) {
   const router = useRouter();
-  const [data, setData] = useState<SaleData[]>([]);
+  const [data, setData] = useState<PurchaseData[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [sortColumn, setSortColumn] = useState<string>('sale_date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [newData, setNewData] = useState<SaleData[] | null>(null);
+  const [newData, setNewData] = useState<PurchaseData[] | null>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   // 각 아이템의 높이를 설정
@@ -66,10 +66,10 @@ export default function SalesListItem({
   };
 
   // 인쇄
-  const handlePrint = (sales_id: string) => {
+  const handlePrint = (purchase_id: string) => {
     if (iframeRef.current) {
       // iframe에 다른 페이지 로드
-      iframeRef.current.src = `/sales-print/${sales_id}`;
+      iframeRef.current.src = `/purchase-print/${purchase_id}`;
 
       // 페이지가 로드되면 인쇄 실행
       iframeRef.current.onload = () => {
@@ -131,43 +131,43 @@ export default function SalesListItem({
   }, [handleResize]);
 
   // 상세 페이지로 이동하는 함수
-  function editRoute(sales_id: string, isNewTab: boolean) {
+  function editRoute(purchase_id: string, isNewTab: boolean) {
     if (isNewTab) {
       const width = 600;
       const height = 400;
       const left = (window.innerWidth - width) / 2;
       const top = (window.innerHeight - height) / 2;
       const popupWindow = window.open(
-        `/sales-edit/${sales_id}`,
-        `editPopup-${sales_id}`,
+        `/purchase-edit/${purchase_id}`,
+        `editPopup-${purchase_id}`,
         `width=${width},height=${height},top=${top},left=${left}`
       );
       if (popupWindow) {
         popupWindow.focus();
-        popupWindow.name = `editPopup-${sales_id}`;
+        popupWindow.name = `editPopup-${purchase_id}`;
       }
     } else {
-      router.push(`/sales-edit/${sales_id}`);
+      router.push(`/purchase-edit/${purchase_id}`);
     }
   }
 
-  function addRoute(sales_id: string, isNewTab: boolean) {
+  function addRoute(purchase_id: string, isNewTab: boolean) {
     if (isNewTab) {
       const width = 600;
       const height = 400;
       const left = (window.innerWidth - width) / 2;
       const top = (window.innerHeight - height) / 2;
       const popupWindow = window.open(
-        `/sales-add/${sales_id}`,
-        `editPopup-${sales_id}`,
+        `/purchase-add/${purchase_id}`,
+        `editPopup-${purchase_id}`,
         `width=${width},height=${height},top=${top},left=${left}`
       );
       if (popupWindow) {
         popupWindow.focus();
-        popupWindow.name = `editPopup-${sales_id}`;
+        popupWindow.name = `editPopup-${purchase_id}`;
       }
     } else {
-      router.push(`/sales-add/${sales_id}`);
+      router.push(`/purchase-add/${purchase_id}`);
     }
   }
 
@@ -224,7 +224,7 @@ export default function SalesListItem({
       const fetchData = async () => {
         setIsLoading(true);
         try {
-          const response = await fetch(`/api/salesListData`, {
+          const response = await fetch(`/api/purchaseListData`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -284,7 +284,7 @@ export default function SalesListItem({
             {data.length > 0 ? (
               data.map((item) => (
                 <TableRow
-                  key={item.sales_id}
+                  key={item.purchase_id}
                   item={item}
                   editRoute={editRoute}
                   addRoute={addRoute}

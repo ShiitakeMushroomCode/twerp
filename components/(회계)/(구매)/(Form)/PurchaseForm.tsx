@@ -16,9 +16,9 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
 import { FiSearch } from 'react-icons/fi';
 import Swal from 'sweetalert2';
-import styles from './SalesForm.module.css';
+import styles from './PurchaseForm.module.css';
 
-// UI 상태를 위한 Row 인터페이스 (string 타입)
+// UI 상태를 위한 Row 인터페이스
 export interface Row {
   product_id: string;
   product_name: string;
@@ -32,8 +32,8 @@ export interface Row {
   selected: boolean; // 선택적으로 변경
 }
 
-// 실제 데이터 전송을 위한 SalesItem 인터페이스 (number 타입)
-export interface SalesItem {
+// 실제 데이터 전송을 위한 PurchaseItem 인터페이스
+export interface PurchaseItem {
   product_id: string | null;
   product_name: string;
   standard: string;
@@ -44,20 +44,20 @@ export interface SalesItem {
   sub_price: string | number;
 }
 
-// SalesFormData 인터페이스 수정
-export interface SalesFormData {
+// PurchaseFormData 인터페이스
+export interface PurchaseFormData {
   company_id: string;
-  sales_id: string;
-  sale_date: Date | string | null;
+  purchase_id: string;
+  purchase_date: Date | string | null;
   transaction_type: string;
   collection: string;
-  client_id: string | null;
-  client_name: string;
-  client_address: string;
-  client_tel: string;
-  client_fax: string;
+  supplier_id: string | null;
+  supplier_name: string;
+  supplier_address: string;
+  supplier_tel: string;
+  supplier_fax: string;
   description: string;
-  sales_items: SalesItem[]; // SalesItem[]로 변경
+  purchase_items: PurchaseItem[]; // SalesItem[]로 변경
 }
 
 type EditableField = Exclude<keyof Row, 'selected' | 'supply_amount'>;
@@ -65,34 +65,34 @@ type EditableField = Exclude<keyof Row, 'selected' | 'supply_amount'>;
 type TransactionType = '카드결제' | '현금결제' | '계좌이체' | '기타';
 
 interface SalesFormProps {
-  initialData?: SalesFormData;
-  onSubmit?: (data: SalesFormData) => Promise<{ status: string; message: string }>;
+  initialData?: PurchaseFormData;
+  onSubmit?: (data: PurchaseFormData) => Promise<{ status: string; message: string }>;
   isEditMode?: boolean;
 }
 
-export default function SalesForm({ initialData, onSubmit, isEditMode = false }: SalesFormProps) {
+export default function PurchaseForm({ initialData, onSubmit, isEditMode = false }: SalesFormProps) {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   useUnsavedChangesWarning(hasUnsavedChanges);
 
   const [isSearch, setIsSearch] = useState(false);
-  const [clientAddress, setClientAddress] = useState('');
+  const [supplierAddress, setSupplierAddress] = useState('');
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [transactionType, setTransactionType] = useState<TransactionType>('카드결제');
   const router = useRouter();
 
-  const [formData, setFormData] = useState<SalesFormData>(() => ({
+  const [formData, setFormData] = useState<PurchaseFormData>(() => ({
     company_id: initialData?.['company_id'] || '',
-    sales_id: initialData?.['sales_id'] || '',
-    sale_date: initialData?.['sale_date'] || '',
+    purchase_id: initialData?.['purchase_id'] || '',
+    purchase_date: initialData?.['purchase_date'] || '',
     transaction_type: initialData?.['transaction_type'] || '카드결제',
     collection: initialData?.['collection'] || '진행중',
-    client_id: initialData?.['client_id'] || null,
-    client_name: initialData?.['client_name'] || '',
-    client_address: initialData?.['client_address'] || '',
-    client_tel: initialData?.['client_tel'] || '',
-    client_fax: initialData?.['client_fax'] || '',
+    supplier_id: initialData?.['supplier_id'] || null,
+    supplier_name: initialData?.['supplier_name'] || '',
+    supplier_address: initialData?.['supplier_address'] || '',
+    supplier_tel: initialData?.['supplier_tel'] || '',
+    supplier_fax: initialData?.['supplier_fax'] || '',
     description: initialData?.['description'] || '',
-    sales_items: initialData?.['sales_items'] || [],
+    purchase_items: initialData?.['purchase_items'] || [],
   }));
 
   const initialRow = {
@@ -113,16 +113,16 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
   function clear() {
     setFormData((prev) => ({
       ...prev,
-      ['client_name']: '',
-      ['client_id']: '',
-      ['client_address']: '',
-      ['client_tel']: '',
-      ['client_fax']: '',
+      ['supplier_name']: '',
+      ['supplier_id']: '',
+      ['supplier_address']: '',
+      ['supplier_tel']: '',
+      ['supplier_fax']: '',
       ['description']: '',
     }));
     setTransactionType('카드결제');
     setStartDate(new Date());
-    setClientAddress('');
+    setSupplierAddress('');
     setRows(() => Array(5).fill({ ...initialRow }));
   }
 
@@ -131,17 +131,17 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
       const safeInitialData = {
         ...initialData,
         company_id: initialData?.['company_id']?.toString() || '',
-        sale_date: initialData?.['sale_date'] ? addHours(new Date(initialData['sale_date']), 9) : new Date(),
+        sale_date: initialData?.['purchase_date'] ? addHours(new Date(initialData['purchase_date']), 9) : new Date(),
         transaction_type: initialData?.['transaction_type'] || '카드결제',
         collection: initialData?.['collection'] || '진행중',
-        client_id: initialData?.['client_id'] || null,
-        client_name: initialData?.['client_name'] || '',
-        client_address: initialData?.['client_address'] || '',
-        client_tel: initialData?.['client_tel'] || '',
-        client_fax: initialData?.['client_fax'] || '',
+        client_id: initialData?.['supplier_id'] || null,
+        client_name: initialData?.['supplier_name'] || '',
+        client_address: initialData?.['supplier_address'] || '',
+        client_tel: initialData?.['supplier_tel'] || '',
+        client_fax: initialData?.['supplier_fax'] || '',
         description: initialData?.['description'] || '',
         sales_items:
-          initialData?.['sales_items']?.map((item) => ({
+          initialData?.['purchase_items']?.map((item) => ({
             ...item,
             supply_amount:
               item['price'] && item['quantity']
@@ -183,7 +183,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
         setStartDate(new Date());
       }
 
-      setClientAddress(safeInitialData['client_address'] || '');
+      setSupplierAddress(safeInitialData['client_address'] || '');
       setTransactionType(safeInitialData['transaction_type'] as TransactionType);
     }
   }, [initialData]);
@@ -270,7 +270,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
       setStartDate(date);
       setFormData((prev) => ({
         ...prev,
-        ['sale_date']: format(date, 'yyyy-MM-dd'),
+        ['purchase_date']: format(date, 'yyyy-MM-dd'),
       }));
     }
   }
@@ -323,18 +323,18 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
           sub_price: row['sub_price']?.toString().trim().replace(/,/g, '') || 0,
         }));
 
-      const newFormData: SalesFormData = {
+      const newFormData: PurchaseFormData = {
         ...formData,
-        ['client_address']: clientAddress,
-        ['sale_date']: format(startDate, 'yyyy-MM-dd'),
-        ['sales_items']: fRows,
+        ['supplier_address']: supplierAddress,
+        ['purchase_date']: format(startDate, 'yyyy-MM-dd'),
+        ['purchase_items']: fRows,
       };
 
-      if (isEmpty(newFormData['client_name'])) {
+      if (isEmpty(newFormData['supplier_name'])) {
         showErrorModal('거래처명이 없습니다.');
         return;
       }
-      if (isEmpty(newFormData['sale_date'])) {
+      if (isEmpty(newFormData['purchase_date'])) {
         showErrorModal('거래일자가 없습니다.');
         return;
       }
@@ -342,7 +342,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
         showErrorModal('거래유형이 없습니다.');
         return;
       }
-      if (newFormData['sales_items'].length === 0) {
+      if (newFormData['purchase_items'].length === 0) {
         showErrorModal('제품이 하나도 없습니다.');
         return;
       }
@@ -370,11 +370,11 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
           if (!isEditMode) {
             clear();
           }
-          localStorage.setItem('reloadSalesItems', new Date().toString());
+          localStorage.setItem('reloadPurchaseItems', new Date().toString());
           if (window.name.startsWith('editPopup')) {
             window.close();
           } else {
-            router.push('/sales-list');
+            router.push('/purchase-list');
           }
         }
       }
@@ -400,7 +400,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
    */
   function handleChange(e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
     const { name, value } = e.target;
-    if (['client_fax', 'client_tel'].includes(name)) {
+    if (['supplier_fax', 'supplier_tel'].includes(name)) {
       if (value.length <= 14) {
         setFormData((prev) => ({
           ...prev,
@@ -416,8 +416,8 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
   }
 
   function handleInitForm({ name, value }: { name: string; value: string }) {
-    if (name === 'client_address') {
-      setClientAddress(value);
+    if (name === 'supplier_address') {
+      setSupplierAddress(value);
     }
     setFormData((prev) => ({
       ...prev,
@@ -470,7 +470,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
    * 삭제
    */
   async function handleDelete() {
-    if (!formData['sales_id']) {
+    if (!formData['purchase_id']) {
       await Swal.fire({
         title: '오류',
         text: '삭제할 매출 기록의 ID가 필요합니다.',
@@ -491,13 +491,13 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
 
     if (confirmResult.isConfirmed) {
       try {
-        const response = await fetch(`/api/salesDelete`, {
+        const response = await fetch(`/api/purchaseDelete`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
           },
           credentials: 'include',
-          body: JSON.stringify({ sales_id: formData['sales_id'] }),
+          body: JSON.stringify({ purchase_id: formData['purchase_id'] }),
         });
 
         const data = await response.json();
@@ -512,11 +512,11 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
             timer: 1500,
           });
 
-          localStorage.setItem('reloadSalesItems', new Date().toString());
+          localStorage.setItem('reloadPurchaseItems', new Date().toString());
           if (window.name.startsWith('editPopup')) {
             window.close();
           } else {
-            router.push('/sales-list');
+            router.push('/purchase-list');
           }
         } else {
           await Swal.fire({
@@ -542,7 +542,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
    * 메일보내기
    */
   async function handleSendMailButton() {
-    if (isEmpty(formData.sales_id)) {
+    if (isEmpty(formData.purchase_id)) {
       showErrorAlert('메일보내기 실패', '현재 메일을 보낼 수 없는 기록입니다.');
     } else {      
       const { value: formValues } = await Swal.fire({
@@ -558,7 +558,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
               id="swal-input-recipient" 
               type="email" 
               placeholder="example@test.com" 
-              value="${await fetchClientEmail(formData.client_id)}" 
+              value="${await fetchClientEmail(formData.supplier_id)}" 
               autocomplete="off" 
               style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; transition: border-color 0.3s, box-shadow 0.3s;"
             >
@@ -620,7 +620,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
           to: formValues.recipient,
           text: formValues.content,
           option: 'SalesTransactionStatement',
-          id: formData.sales_id,
+          id: formData.purchase_id,
           html: null,
         });
         if (success) {
@@ -658,7 +658,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
       <div className={styles['subForm']}>
         {/* 거래처명 */}
         <div className={styles['form-row']}>
-          <label htmlFor='client_name' className={styles['label']}>
+          <label htmlFor='supplier_name' className={styles['label']}>
             거래처명
           </label>
           <button
@@ -669,13 +669,13 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
             <FiSearch />
           </button>
           <input
-            id='client_name'
-            name='client_name'
+            id='supplier_name'
+            name='supplier_name'
             type='text'
             className={styles['input']}
             required
             autoComplete='off'
-            value={formData['client_name']}
+            value={formData['supplier_name']}
             onChange={handleChange}
             disabled={isSearch}
           />
@@ -691,7 +691,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
         </div>
         {/* 거래일자 */}
         <div className={styles['form-row']}>
-          <label htmlFor='sale_date' className={styles['label']}>
+          <label htmlFor='purchase_date' className={styles['label']}>
             거래일자
           </label>
           <div className={styles['dateInput']}>
@@ -699,7 +699,7 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
               selectedDate={startDate}
               onDateChange={handleDateChange}
               disabled={isSearch}
-              inputId='sale_date'
+              inputId='purchase_date'
               maxDate={new Date(new Date().setFullYear(new Date().getFullYear() + 5, 11, 31))}
             />
           </div>
@@ -714,58 +714,58 @@ export default function SalesForm({ initialData, onSubmit, isEditMode = false }:
         </div>
         {/* 주소 */}
         <div className={styles['form-row']}>
-          <label htmlFor='client_address' className={styles['label']}>
+          <label htmlFor='supplier_address' className={styles['label']}>
             주소
           </label>
           <input
-            id='client_address'
-            name='client_address'
+            id='supplier_address'
+            name='supplier_address'
             type='text'
             className={`${styles['input']} ${styles['hover']}`}
             autoComplete='off'
-            value={clientAddress}
-            title={clientAddress}
+            value={supplierAddress}
+            title={supplierAddress}
             readOnly
             onClick={() => setIsSearch(true)}
             disabled={isSearch}
           />
-          {isSearch && <Address isSearch={isSearch} setIsSearch={setIsSearch} setBusinessAddress={setClientAddress} />}
+          {isSearch && <Address isSearch={isSearch} setIsSearch={setIsSearch} setBusinessAddress={setSupplierAddress} />}
           <button
             type='button'
             className={styles['resetButton']}
             disabled={isSearch}
-            onClick={() => setClientAddress('')}
+            onClick={() => setSupplierAddress('')}
           >
             주소 초기화
           </button>
         </div>
         {/* 전화번호 및 팩스번호 */}
         <div className={styles['form-row']}>
-          <label htmlFor='client_tel' className={styles['label']}>
+          <label htmlFor='supplier_tel' className={styles['label']}>
             전화번호
           </label>
           <input
-            id='client_tel'
-            name='client_tel'
+            id='supplier_tel'
+            name='supplier_tel'
             type='text'
             className={styles['input']}
             required
             autoComplete='off'
-            value={formData['client_tel']}
+            value={formData['supplier_tel']}
             onChange={handleChange}
             disabled={isSearch}
           />
-          <label htmlFor='client_fax' className={styles['label']} style={{ textAlign: 'center' }}>
+          <label htmlFor='supplier_fax' className={styles['label']} style={{ textAlign: 'center' }}>
             팩스번호
           </label>
           <input
-            id='client_fax'
-            name='client_fax'
+            id='supplier_fax'
+            name='supplier_fax'
             type='text'
             className={styles['input']}
             required
             autoComplete='off'
-            value={formData['client_fax']}
+            value={formData['supplier_fax']}
             onChange={handleChange}
             disabled={isSearch}
           />

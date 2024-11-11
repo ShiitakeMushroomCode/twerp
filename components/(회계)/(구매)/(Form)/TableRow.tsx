@@ -2,7 +2,7 @@ import { isEmpty } from '@/util/lo';
 import { numberToKorean } from '@/util/reform';
 import { Dispatch, SetStateAction } from 'react';
 import { FiSearch } from 'react-icons/fi';
-import { Row } from './SalesForm';
+import { Row } from './PurchaseForm';
 import styles from './SalesForm.module.css';
 
 interface TableRowProps {

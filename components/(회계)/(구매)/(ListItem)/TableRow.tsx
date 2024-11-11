@@ -1,10 +1,10 @@
 import styles from '@/styles/ListItem.module.css';
 import { formatDateWithSequence, formatPrice, numberToKorean } from '@/util/reform';
 import { FiCopy, FiPrinter } from 'react-icons/fi';
-import { SaleData } from './PurchaseListItem';
+import { PurchaseData } from './PurchaseListItem';
 
 interface TableRowProps {
-  item: SaleData;
+  item: PurchaseData;
   editRoute: (sales_id: string, isNewTab: boolean) => void;
   addRoute: (sales_id: string, isNewTab: boolean) => void;
   handlePrint: (sales_id: string) => void;
@@ -16,11 +16,11 @@ export default function TableRow({ item, editRoute, addRoute, handlePrint }: Tab
   const formattedDate = formatDateWithSequence(item.sale_date, item.sequence_number);
 
   return (
-    <tr key={item.sales_id} className={styles.tableRow} title={item.description || ''}>
+    <tr key={item.purchase_id} className={styles.tableRow} title={item.description || ''}>
       <td
         className={styles.centerAlign}
         onClick={(event) => {
-          addRoute(item.sales_id, event.ctrlKey || event.metaKey);
+          addRoute(item.purchase_id, event.ctrlKey || event.metaKey);
         }}
       >
         <span className={styles.iconButton}>
@@ -31,7 +31,7 @@ export default function TableRow({ item, editRoute, addRoute, handlePrint }: Tab
       <td
         className={styles.centerAlign}
         onClick={(event) => {
-          editRoute(item.sales_id, event.ctrlKey || event.metaKey);
+          editRoute(item.purchase_id, event.ctrlKey || event.metaKey);
         }}
       >
         {formattedDate}
@@ -39,7 +39,7 @@ export default function TableRow({ item, editRoute, addRoute, handlePrint }: Tab
       <td
         className={styles.leftAlign}
         onClick={(event) => {
-          editRoute(item.sales_id, event.ctrlKey || event.metaKey);
+          editRoute(item.purchase_id, event.ctrlKey || event.metaKey);
         }}
         title={item.company_name}
       >
@@ -48,7 +48,7 @@ export default function TableRow({ item, editRoute, addRoute, handlePrint }: Tab
       <td
         className={styles.leftAlign}
         onClick={(event) => {
-          editRoute(item.sales_id, event.ctrlKey || event.metaKey);
+          editRoute(item.purchase_id, event.ctrlKey || event.metaKey);
         }}
         title={`${firstItemName}${
           remainingItemsCount > 0 ? ` 외 ${remainingItemsCount}건\n${item.item_names.join(', ')}` : ``
@@ -60,7 +60,7 @@ export default function TableRow({ item, editRoute, addRoute, handlePrint }: Tab
       <td
         className={styles.rightAlign}
         onClick={(event) => {
-          editRoute(item.sales_id, event.ctrlKey || event.metaKey);
+          editRoute(item.purchase_id, event.ctrlKey || event.metaKey);
         }}
         title={`${numberToKorean(item.total_amount)}원정`}
       >
@@ -70,7 +70,7 @@ export default function TableRow({ item, editRoute, addRoute, handlePrint }: Tab
         className={styles.centerAlign}
         onClick={(e) => {
           e.stopPropagation();
-          handlePrint(item.sales_id);
+          handlePrint(item.purchase_id);
         }}
       >
         <span className={styles.iconButton}>
