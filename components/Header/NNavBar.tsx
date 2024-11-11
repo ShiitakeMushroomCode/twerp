@@ -2,7 +2,7 @@ import HomeLink from '@/components/Header/HomeLink';
 import BS from './BeforeSignIn';
 import styles from './NavBar.module.css';
 
-export default async function NNavBar() {
+export default function NNavBar() {
   return (
     <div className={styles.navWrapper}>
       <nav className={styles.nav}>
