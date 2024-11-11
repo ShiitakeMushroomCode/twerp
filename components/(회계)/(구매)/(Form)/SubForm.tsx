@@ -1,9 +1,9 @@
 import DatePicker from '@/components/(회계)/(공용)/DatePicker';
-import Address from '@/components/(회계)/(판매)/(Form)/Address';
-import handleClientSearchClick from '@/components/(회계)/(판매)/(Form)/ClientSearchClick';
+import Address from '@/components/(회계)/(구매)/(Form)/Address';
+import handleClientSearchClick from '@/components/(회계)/(구매)/(Form)/ClientSearchClick';
 import { ChangeEvent } from 'react';
 import { FiSearch } from 'react-icons/fi';
-import styles from './SalesForm.module.css';
+import styles from './PurchaseForm.module.css';
 
 interface SubFormProps {
   formData: any;
@@ -32,7 +32,7 @@ export default function SubForm({
   setStartDate,
   transactionType,
   clientAddress,
-  setClientAddress,
+  setClientAddress: setSupplierAddress,
   isSearch,
   setIsSearch,
 }: SubFormProps) {
@@ -69,13 +69,13 @@ export default function SubForm({
           onClick={() => {
             clear();
           }}
-          title="매출 정보가 모두 초기화 됩니다."
+          title="매입 정보가 모두 초기화 됩니다."
         >
           모두 초기화
         </button>
       </div>
       <div className={styles['form-row']}>
-        <label htmlFor="sale_date" className={styles.label}>
+        <label htmlFor="purchase_date" className={styles.label}>
           거래일자
         </label>
         <div className={styles.dateInput}>
@@ -83,7 +83,7 @@ export default function SubForm({
             selectedDate={startDate}
             onDateChange={handleDateChange}
             disabled={isSearch}
-            inputId="sale_date"
+            inputId="purchase_date"
             maxDate={new Date(new Date().setFullYear(new Date().getFullYear() + 5, 11, 31))}
           />
         </div>
@@ -112,38 +112,38 @@ export default function SubForm({
           onClick={() => setIsSearch(true)}
           disabled={isSearch}
         />
-        {isSearch && <Address isSearch={isSearch} setIsSearch={setIsSearch} setBusinessAddress={setClientAddress} />}
-        <button type="button" className={styles.resetButton} disabled={isSearch} onClick={() => setClientAddress('')}>
+        {isSearch && <Address isSearch={isSearch} setIsSearch={setIsSearch} setBusinessAddress={setSupplierAddress} />}
+        <button type="button" className={styles.resetButton} disabled={isSearch} onClick={() => setSupplierAddress('')}>
           주소 초기화
         </button>
       </div>
 
       <div className={styles['form-row']}>
-        <label htmlFor="client_tel" className={styles.label}>
+        <label htmlFor="supplier_tel" className={styles.label}>
           전화번호
         </label>
         <input
-          id="client_tel"
-          name="client_tel"
+          id="supplier_tel"
+          name="supplier_tel"
           type="text"
           className={styles.input}
           required
           autoComplete="off"
-          value={formData.client_tel}
+          value={formData.supplier_tel}
           onChange={handleChange}
           disabled={isSearch}
         />
-        <label htmlFor="client_fax" className={styles.label} style={{ textAlign: 'center' }}>
+        <label htmlFor="supplier_fax" className={styles.label} style={{ textAlign: 'center' }}>
           팩스번호
         </label>
         <input
-          id="client_fax"
-          name="client_fax"
+          id="supplier_fax"
+          name="supplier_fax"
           type="text"
           className={styles.input}
           required
           autoComplete="off"
-          value={formData.client_fax}
+          value={formData.supplier_fax}
           onChange={handleChange}
           disabled={isSearch}
         />

@@ -5,15 +5,15 @@ import { PurchaseData } from './PurchaseListItem';
 
 interface TableRowProps {
   item: PurchaseData;
-  editRoute: (sales_id: string, isNewTab: boolean) => void;
-  addRoute: (sales_id: string, isNewTab: boolean) => void;
-  handlePrint: (sales_id: string) => void;
+  editRoute: (purchase_id: string, isNewTab: boolean) => void;
+  addRoute: (purchase_id: string, isNewTab: boolean) => void;
+  handlePrint: (purchase_id: string) => void;
 }
 
 export default function TableRow({ item, editRoute, addRoute, handlePrint }: TableRowProps) {
   const firstItemName = item.item_names[0];
   const remainingItemsCount = item.item_names.length - 1;
-  const formattedDate = formatDateWithSequence(item.sale_date, item.sequence_number);
+  const formattedDate = formatDateWithSequence(item.purchase_date, item.sequence_number);
 
   return (
     <tr key={item.purchase_id} className={styles.tableRow} title={item.description || ''}>
@@ -41,9 +41,9 @@ export default function TableRow({ item, editRoute, addRoute, handlePrint }: Tab
         onClick={(event) => {
           editRoute(item.purchase_id, event.ctrlKey || event.metaKey);
         }}
-        title={item.company_name}
+        title={item.supplier_name}
       >
-        {item.company_name}
+        {item.supplier_name}
       </td>
       <td
         className={styles.leftAlign}

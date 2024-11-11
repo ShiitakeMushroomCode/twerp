@@ -1,7 +1,7 @@
 import { numberToKorean } from '@/util/reform';
 import { Dispatch, SetStateAction } from 'react';
 import { Row } from './PurchaseForm';
-import styles from './SalesForm.module.css';
+import styles from './PurchaseForm.module.css';
 import TableRow from './TableRow';
 
 interface ProductTableProps {

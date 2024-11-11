@@ -154,10 +154,9 @@ export async function POST(request: NextRequest) {
     const dataParams = [...searchParams, pageSize, offset];
 
     const dataResult = await executeQuery(dataQuery, dataParams);
-
     // 데이터 형식을 프론트엔드에 맞게 변환
     const data = dataResult.map((row: any) => ({
-      purchase_id: Buffer.from(row.purchase_id).toString('hex'),
+      purchase_id: row.purchase_id.toString('hex'),
       supplier_name: row.supplier_name,
       item_names: row.item_names ? row.item_names.split(', ') : [],
       total_amount: row.total_amount,

@@ -1,9 +1,9 @@
 'use client';
 import DatePicker from '@/components/(회계)/(공용)/DatePicker';
-import Address from '@/components/(회계)/(판매)/(Form)/Address';
-import handleClientSearchClick from '@/components/(회계)/(판매)/(Form)/ClientSearchClick';
-import ProductSearchClick from '@/components/(회계)/(판매)/(Form)/ProductSearchClick';
-import ProductTable from '@/components/(회계)/(판매)/(Form)/ProductTable';
+import Address from '@/components/(회계)/(구매)/(Form)/Address';
+import handleClientSearchClick from '@/components/(회계)/(구매)/(Form)/ClientSearchClick';
+import ProductSearchClick from '@/components/(회계)/(구매)/(Form)/ProductSearchClick';
+import ProductTable from '@/components/(회계)/(구매)/(Form)/ProductTable';
 import { fetchClientEmail } from '@/util/Client';
 import { isEmpty } from '@/util/lo';
 import { formatPhoneNumber } from '@/util/reform';
@@ -131,7 +131,7 @@ export default function PurchaseForm({ initialData, onSubmit, isEditMode = false
       const safeInitialData = {
         ...initialData,
         company_id: initialData?.['company_id']?.toString() || '',
-        sale_date: initialData?.['purchase_date'] ? addHours(new Date(initialData['purchase_date']), 9) : new Date(),
+        sale_date: initialData?.['purchase_date'] ? new Date(initialData['purchase_date']) : new Date(),
         transaction_type: initialData?.['transaction_type'] || '카드결제',
         collection: initialData?.['collection'] || '진행중',
         client_id: initialData?.['supplier_id'] || null,
@@ -473,7 +473,7 @@ export default function PurchaseForm({ initialData, onSubmit, isEditMode = false
     if (!formData['purchase_id']) {
       await Swal.fire({
         title: '오류',
-        text: '삭제할 매출 기록의 ID가 필요합니다.',
+        text: '삭제할 매입 기록의 ID가 필요합니다.',
         icon: 'error',
         confirmButtonText: '확인',
       });
@@ -482,7 +482,7 @@ export default function PurchaseForm({ initialData, onSubmit, isEditMode = false
 
     const confirmResult = await Swal.fire({
       title: '삭제 확인',
-      text: '정말로 매출 기록을 삭제하시겠습니까?',
+      text: '정말로 매입 기록을 삭제하시겠습니까?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: '삭제',
@@ -530,7 +530,7 @@ export default function PurchaseForm({ initialData, onSubmit, isEditMode = false
         console.error('삭제 요청 중 오류 발생:', error);
         await Swal.fire({
           title: '오류',
-          text: '매출 기록 삭제 중 오류가 발생했습니다.',
+          text: '매입 기록 삭제 중 오류가 발생했습니다.',
           icon: 'error',
           confirmButtonText: '확인',
         });
@@ -641,7 +641,7 @@ export default function PurchaseForm({ initialData, onSubmit, isEditMode = false
   return (
     <form className={styles['form']} onSubmit={handleSubmit}>
       <div className={styles['title']}>
-        <span>{isEditMode ? '매출 정보 수정하기' : '매출 정보 추가하기'}</span>
+        <span>{isEditMode ? '매입 정보 수정하기' : '매입 정보 추가하기'}</span>
         {isEditMode && (
           <button
             type='button'
@@ -684,7 +684,7 @@ export default function PurchaseForm({ initialData, onSubmit, isEditMode = false
             className={styles['resetButton']}
             disabled={isSearch}
             onClick={clear}
-            title='매출 정보가 모두 초기화 됩니다.'
+            title='매입 정보가 모두 초기화 됩니다.'
           >
             모두 초기화
           </button>

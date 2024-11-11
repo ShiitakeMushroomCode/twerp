@@ -11,17 +11,17 @@ export default function TableHeader({ sortColumn, sortOrder, handleSort }: Table
     <thead className={styles.tableHeader}>
       <tr>
         <th>복사</th>
-        <th onClick={() => handleSort('sale_date')}>
+        <th onClick={() => handleSort('purchase_date')}>
           <span className={styles.headerCell} title="거래일자">
             <span className={styles.fakeLabel}>▲</span>
             거래일자
-            <span className={styles.sortArrow}>{sortColumn === 'sale_date' && (sortOrder === 'asc' ? '▲' : '▼')}</span>
+            <span className={styles.sortArrow}>{sortColumn === 'purchase_date' && (sortOrder === 'asc' ? '▲' : '▼')}</span>
           </span>
         </th>
         <th onClick={() => handleSort('company_name')}>
           <span className={styles.headerCell} title="거래처명">
             <span className={styles.fakeLabel}>▲</span>
-            거래처명
+            공급자명
             <span className={styles.sortArrow}>
               {sortColumn === 'company_name' && (sortOrder === 'asc' ? '▲' : '▼')}
             </span>

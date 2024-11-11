@@ -11,12 +11,12 @@ import TableRow from './TableRow';
 
 export interface PurchaseData {
   purchase_id: string;
-  company_name: string;
+  supplier_name: string;
   item_names: string[];
   total_amount: number;
   transaction_type: string;
   description: string | null;
-  sale_date: string;
+  purchase_date: string;
   update_at: string;
   sequence_number: number;
   collection: string;
@@ -43,7 +43,7 @@ export default function PurchaseListItem({
   const [data, setData] = useState<PurchaseData[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [sortColumn, setSortColumn] = useState<string>('sale_date');
+  const [sortColumn, setSortColumn] = useState<string>('purchase_date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [newData, setNewData] = useState<PurchaseData[] | null>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -131,7 +131,7 @@ export default function PurchaseListItem({
   }, [handleResize]);
 
   // 상세 페이지로 이동하는 함수
-  function editRoute(purchase_id: string, isNewTab: boolean) {
+  function editRoute(purchase_id: any, isNewTab: boolean) {
     if (isNewTab) {
       const width = 600;
       const height = 400;
@@ -302,7 +302,7 @@ export default function PurchaseListItem({
         </table>
       </div>
       <Pagination page={page} totalPages={totalPages} setPage={setPage} handlePageJump={handlePageJump} />
-      <iframe ref={iframeRef} style={{ display: 'none' }} title="Print Frame"></iframe>
+      <iframe ref={iframeRef} style={{ display: 'none' }} title='Print Frame'></iframe>
     </div>
   );
 }

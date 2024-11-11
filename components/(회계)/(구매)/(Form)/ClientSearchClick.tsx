@@ -110,12 +110,12 @@ export default async function handleClientSearchClick({ handleInitForm }) {
 
               MySwal.close();
               // 선택된 데이터를 formData에 설정
-              handleInitForm({ name: 'client_id', value: selected.clients_id });
-              handleInitForm({ name: 'client_name', value: selected.company_name });
-              handleInitForm({ name: 'client_address', value: selected.business_address });
+              handleInitForm({ name: 'supplier_id', value: selected.clients_id });
+              handleInitForm({ name: 'supplier_name', value: selected.company_name });
+              handleInitForm({ name: 'supplier_address', value: selected.business_address });
               handleInitForm({ name: 'business_number', value: selected.business_number });
-              handleInitForm({ name: 'client_tel', value: selected.tell_number });
-              handleInitForm({ name: 'client_fax', value: selected.fax_number });
+              handleInitForm({ name: 'supplier_tel', value: selected.tell_number });
+              handleInitForm({ name: 'supplier_fax', value: selected.fax_number });
 
               // console.log('선택된 회사:', selected);
             });

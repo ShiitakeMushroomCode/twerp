@@ -3,8 +3,7 @@ import { numberToKorean } from '@/util/reform';
 import { Dispatch, SetStateAction } from 'react';
 import { FiSearch } from 'react-icons/fi';
 import { Row } from './PurchaseForm';
-import styles from './SalesForm.module.css';
-
+import styles from './PurchaseForm.module.css';
 interface TableRowProps {
   index: number;
   row: Row;
