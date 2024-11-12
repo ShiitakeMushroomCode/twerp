@@ -113,6 +113,7 @@
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 1rem;
+  table-layout: fixed;
 
   /* 프린트 시 적용되던 스타일을 상시 적용 */
   border: 1px solid black;
@@ -121,6 +122,7 @@
 .transactionTable td {
   white-space: normal !important;
   overflow-wrap: break-word !important;
+  word-wrap: break-word !important;
 }
 
 

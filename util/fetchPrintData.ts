@@ -64,13 +64,13 @@ export async function generatePdf(id: string, companyIdData = null, option: stri
   if (option.startsWith('SendMailS')) {
     await page.setContent(generateSaleEmailHtml(await fetchSalesData(id, companyIdData)), {
       waitUntil: 'networkidle2',
-      timeout: 3000,
+      timeout: 30000,
     });
   }
   if (option.startsWith('SendMailP')) {
     await page.setContent(generatePurchaseEmailHtml(await fetchPurchasesData(id, companyIdData)), {
       waitUntil: 'networkidle2',
-      timeout: 3000,
+      timeout: 30000,
     });
   }
 
