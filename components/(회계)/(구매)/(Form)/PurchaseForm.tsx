@@ -115,6 +115,7 @@ const PurchaseForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditM
     purchase_items: initialData?.purchase_items || [],
   }));
 
+
   const initialRow: Row = {
     product_id: '',
     product_name: '',
@@ -616,8 +617,8 @@ const PurchaseForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditM
       showErrorAlert('메일보내기 실패', '현재 메일을 보낼 수 없는 기록입니다.');
       return;
     }
-
-    const clientEmail = await fetchClientEmail(formData.supplier_id);
+    
+    const supplierEmail = !isEmpty(formData.supplier_id) ? await fetchClientEmail(formData.supplier_id):'';
 
     const { value: formValues } = await Swal.fire({
       title: '거래명세표 메일 보내기',
@@ -631,7 +632,7 @@ const PurchaseForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditM
               id="swal-input-recipient" 
               type="email" 
               placeholder="example@test.com" 
-              value="${clientEmail}" 
+              value="${supplierEmail}" 
               autocomplete="off" 
               style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; transition: border-color 0.3s, box-shadow 0.3s;"
             >
@@ -690,7 +691,7 @@ const PurchaseForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditM
         subject: formValues.subject,
         to: formValues.recipient,
         text: formValues.content,
-        option: 'SalesTransactionStatement',
+        option: 'SendMailPurchaseTransactionStatement',
         id: formData.purchase_id,
         html: null,
       });

@@ -129,7 +129,11 @@ const SalesForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditMode
   };
 
   const [rows, setRows] = useState<Row[]>(() => Array(5).fill({ ...initialRow }));
-  const [totalAmounts, setTotalAmounts] = useState<{ totalSupplyAmount: number; totalSubPrice: number; totalAmount: number }>({
+  const [totalAmounts, setTotalAmounts] = useState<{
+    totalSupplyAmount: number;
+    totalSubPrice: number;
+    totalAmount: number;
+  }>({
     totalSupplyAmount: 0,
     totalSubPrice: 0,
     totalAmount: 0,
@@ -618,7 +622,7 @@ const SalesForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditMode
       return;
     }
 
-    const clientEmail = await fetchClientEmail(formData.client_id);
+    const clientEmail = !isEmpty(formData.client_id) ? await fetchClientEmail(formData.client_id) : '';
 
     const { value: formValues } = await Swal.fire({
       title: '거래명세표 메일 보내기',
@@ -691,7 +695,7 @@ const SalesForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditMode
         subject: formValues.subject,
         to: formValues.recipient,
         text: formValues.content,
-        option: 'SalesTransactionStatement',
+        option: 'SendMailSaleTransactionStatement',
         id: formData.sales_id,
         html: null,
       });
@@ -715,11 +719,11 @@ const SalesForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditMode
         <span>{isEditMode ? '매출 정보 수정하기' : '매출 정보 추가하기'}</span>
         {isEditMode && (
           <button
-            type="button"
+            type='button'
             className={styles.delButton}
             onClick={handleDelete}
             disabled={isSearch}
-            title="제품 삭제"
+            title='제품 삭제'
           >
             삭제
             <FaTrashAlt style={{ marginLeft: '0.5rem' }} />
@@ -729,40 +733,40 @@ const SalesForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditMode
       <div className={styles.subForm}>
         {/* 거래처명 */}
         <div className={styles['form-row']}>
-          <label htmlFor="client_name" className={styles.label}>
+          <label htmlFor='client_name' className={styles.label}>
             거래처명
           </label>
           <button
-            type="button"
+            type='button'
             className={styles.searchButton}
             onClick={() => handleClientSearchClick({ handleInitForm })}
           >
             <FiSearch />
           </button>
           <input
-            id="client_name"
-            name="client_name"
-            type="text"
+            id='client_name'
+            name='client_name'
+            type='text'
             className={styles.input}
             required
-            autoComplete="off"
+            autoComplete='off'
             value={formData.client_name}
             onChange={handleChange}
             disabled={isSearch}
           />
           <button
-            type="button"
+            type='button'
             className={styles.resetButton}
             disabled={isSearch}
             onClick={clear}
-            title="매출 정보가 모두 초기화 됩니다."
+            title='매출 정보가 모두 초기화 됩니다.'
           >
             모두 초기화
           </button>
         </div>
         {/* 거래일자 */}
         <div className={styles['form-row']}>
-          <label htmlFor="sale_date" className={styles.label}>
+          <label htmlFor='sale_date' className={styles.label}>
             거래일자
           </label>
           <div className={styles['dateInput']}>
@@ -770,12 +774,12 @@ const SalesForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditMode
               selectedDate={startDate}
               onDateChange={handleDateChange}
               disabled={isSearch}
-              inputId="sale_date"
+              inputId='sale_date'
               maxDate={useMemo(() => new Date(new Date().setFullYear(new Date().getFullYear() + 5, 11, 31)), [])}
             />
           </div>
           <button
-            type="button"
+            type='button'
             className={styles.resetButton}
             disabled={isSearch}
             onClick={() => setStartDate(new Date())}
@@ -785,63 +789,52 @@ const SalesForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditMode
         </div>
         {/* 주소 */}
         <div className={styles['form-row']}>
-          <label htmlFor="client_address" className={styles.label}>
+          <label htmlFor='client_address' className={styles.label}>
             주소
           </label>
           <input
-            id="client_address"
-            name="client_address"
-            type="text"
+            id='client_address'
+            name='client_address'
+            type='text'
             className={`${styles.input} ${styles.hover}`}
-            autoComplete="off"
+            autoComplete='off'
             value={clientAddress}
             title={clientAddress}
             readOnly
             onClick={() => setIsSearch(true)}
             disabled={isSearch}
           />
-          {isSearch && (
-            <Address
-              isSearch={isSearch}
-              setIsSearch={setIsSearch}
-              setBusinessAddress={setClientAddress}
-            />
-          )}
-          <button
-            type="button"
-            className={styles.resetButton}
-            disabled={isSearch}
-            onClick={() => setClientAddress('')}
-          >
+          {isSearch && <Address isSearch={isSearch} setIsSearch={setIsSearch} setBusinessAddress={setClientAddress} />}
+          <button type='button' className={styles.resetButton} disabled={isSearch} onClick={() => setClientAddress('')}>
             주소 초기화
           </button>
         </div>
         {/* 전화번호 및 팩스번호 */}
         <div className={styles['form-row']}>
-          <label htmlFor="client_tel" className={styles.label}>
+          <label htmlFor='client_tel' className={styles.label}>
             전화번호
           </label>
           <input
-            id="client_tel"
-            name="client_tel"
-            type="text"
+            id='client_tel'
+            name='client_tel'
+            type='text'
             className={styles.input}
             required
-            autoComplete="off"
+            autoComplete='off'
             value={formData.client_tel}
             onChange={handleChange}
             disabled={isSearch}
           />
-          <label htmlFor="client_fax" className={styles.label} style={{ textAlign: 'center' }}>
+          <label htmlFor='client_fax' className={styles.label} style={{ textAlign: 'center' }}>
             팩스번호
           </label>
           <input
-            id="client_fax"
-            name="client_fax"
-            type="text"
+            id='client_fax'
+            name='client_fax'
+            type='text'
             className={styles.input}
             required
-            autoComplete="off"
+            autoComplete='off'
             value={formData.client_fax}
             onChange={handleChange}
             disabled={isSearch}
@@ -849,16 +842,16 @@ const SalesForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditMode
         </div>
         {/* 설명 */}
         <div className={styles['form-row']}>
-          <label htmlFor="description" className={styles.label}>
+          <label htmlFor='description' className={styles.label}>
             설명
           </label>
           <input
-            id="description"
-            name="description"
-            type="text"
+            id='description'
+            name='description'
+            type='text'
             className={styles.input}
             required
-            autoComplete="off"
+            autoComplete='off'
             value={formData.description}
             title={formData.description}
             onChange={handleChange}
@@ -870,13 +863,10 @@ const SalesForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditMode
           <span className={styles.label}>거래유형</span>
           <div className={styles.radioGroup}>
             {(['카드결제', '현금결제', '계좌이체', '기타'] as TransactionType[]).map((type) => (
-              <label
-                key={type}
-                className={`${styles.radioLabel} ${transactionType === type ? styles.checked : ''}`}
-              >
+              <label key={type} className={`${styles.radioLabel} ${transactionType === type ? styles.checked : ''}`}>
                 <input
-                  type="radio"
-                  name="transaction_type"
+                  type='radio'
+                  name='transaction_type'
                   value={type}
                   checked={transactionType === type}
                   onChange={handleTransactionTypeChange}

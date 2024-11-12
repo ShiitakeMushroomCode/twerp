@@ -1,4 +1,4 @@
-import { generatePdfBase64 } from '@/util/fetchSalesData';
+import { generatePdfBase64 } from '@/util/fetchPrintData';
 import { generateCertificationToken, saveVerificationToken } from '@/util/token';
 import Bull from 'bull';
 import nodemailer from 'nodemailer';
@@ -8,7 +8,7 @@ interface EmailJob {
   subject: string;
   html?: string;
   text?: string;
-  option: 'MyPage' | 'SalesTransactionStatement';
+  option: 'MyPage' | 'SendMailSaleTransactionStatement' | 'SendMailPurchaseTransactionStatement';
   id?: string;
   userId?: string;
   cn?: string;
@@ -51,7 +51,7 @@ emailQueue.process(async (job) => {
         const token = await generateCertificationToken({ userId, cn });
         await saveVerificationToken(token);
       }
-    } else if (option === 'SalesTransactionStatement') {
+    } else if (option.endsWith('TransactionStatement')) {
       const mailOptions = {
         from: process.env.SEND_MAIL,
         to,
@@ -60,16 +60,18 @@ emailQueue.process(async (job) => {
         attachments: [
           {
             filename: '거래명세서.pdf',
-            content: await generatePdfBase64(id, companyIdData),
+            content: await generatePdfBase64(id, companyIdData, option),
             encoding: 'base64',
           },
         ],
       };
       await transporter.sendMail(mailOptions);
     }
+    console.log(`${to}에게 ${subject} 같은 제목과 ${text} 같은 내용으로 메일을 보냄`);
     // console.log(`Email sent to ${to}`);
   } catch (error) {
     // console.error(`Failed to send email to ${to}:`, error);
+    console.log(`${to}에게 ${subject} 같은 제목과 ${text} 같은 내용으로 메일을 못보냄`);
     throw error;
   }
 });

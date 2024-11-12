@@ -2,7 +2,6 @@ import PurchaseForm, { PurchaseFormData } from '@/components/(회계)/(구매)/(
 import { executeQuery } from '@/lib/db';
 import { getTokenUserData } from '@/util/token';
 import { ACT } from 'auth';
-import { addHours } from 'date-fns';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
@@ -31,7 +30,7 @@ async function getInitialData(id: string) {
   return {
     purchase_id: purchaseIdBuffer.toString('hex'),
     company_id: data['companyId']['data'].toString() || '',
-    purchase_date: addHours(new Date(), -9).toISOString().split('T')[0],
+    purchase_date: purchase?.['purchase_date'],
     transaction_type: purchase?.['transaction_type'] || '카드결제',
     collection: purchase?.['collection'] || '진행중',
     supplier_id: purchase?.['supplier_id'] ? purchase['supplier_id'].toString('hex') : null,

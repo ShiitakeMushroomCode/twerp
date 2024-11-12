@@ -162,13 +162,15 @@ export default function SalesPrintFormComponent({ salesFormData }: Props) {
         <tbody>
           {salesItemsResult.map((item, index) => (
             <tr key={item.sales_item_id.toString()}>
-              <td>{index + 1}</td>
-              <td>{`${item.product_name}${item.standard ? `[${item.standard}]` : ''}`}</td>
-              <td>{`${item.quantity.toLocaleString()}${item.unit ? `[${item.unit}]` : ''}`}</td>
-              <td>₩{item.price.toLocaleString()}</td>
-              <td>₩{(item.price * item.quantity).toLocaleString()}</td>
-              <td>₩{item.sub_price.toLocaleString()}</td>
-              <td>{item.description}</td>
+              <td style={{ width: '5%' }}>{index + 1}</td>
+              <td style={{ width: '17%' }}>{`${item.product_name}${item.standard ? `[${item.standard}]` : ''}`}</td>
+              <td style={{ width: '12%' }}>{`${item.quantity.toLocaleString()}${
+                item.unit ? `[${item.unit}]` : ''
+              }`}</td>
+              <td style={{ width: '12%' }}>₩{item.price.toLocaleString()}</td>
+              <td style={{ width: '20%' }}>₩{(item.price * item.quantity).toLocaleString()}</td>
+              <td style={{ width: '15%' }}>₩{item.sub_price.toLocaleString()}</td>
+              <td style={{ width: '19%', whiteSpace: 'inherit' }}>{item.description}</td>
             </tr>
           ))}
         </tbody>

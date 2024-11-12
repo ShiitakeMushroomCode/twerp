@@ -17,69 +17,72 @@ export interface CompanyResult {
   account: string;
 }
 
-export interface SalesResult {
-  sales_id: Buffer;
+export interface PurchasesResult {
+  purchase_id: Buffer;
   company_id: Buffer;
-  client_id: Buffer | null;
-  client_name: string | null;
-  client_address: string | null;
-  client_tel: string | null;
-  client_fax: string | null;
-  sale_date: string;
+  supplier_id: Buffer | null;
+  supplier_name: string | null;
+  supplier_address: string | null;
+  supplier_tel: string | null;
+  supplier_fax: string | null;
+  purchase_date: string;
   description: string | null;
   transaction_type: '카드결제' | '현금결제' | '계좌이체' | '기타';
   collection: '완료' | '진행중';
-  client_staff_name: string | null;
-  client_staff_contact_info: string | null;
   update_at: string;
 }
 
-export interface SalesItemResult {
-  sales_item_id: Buffer;
-  sales_id: Buffer;
+export interface PurchaseItemResult {
+  purchase_item_id: Buffer;
+  purchase_id: Buffer;
   product_id: string | null;
   product_name: string;
   standard: string | null;
   price: number;
-  unit: string;
   sub_price: number;
   quantity: number;
+  unit: string | null;
   description: string | null;
 }
 
-export interface SalesPrintFormData {
+export interface PurchasesPrintFormData {
   companyResult: CompanyResult;
-  salesResult: SalesResult;
-  salesItemsResult: SalesItemResult[];
+  purchasesResult: PurchasesResult;
+  purchaseItemsResult: PurchaseItemResult[];
 }
 
 interface Props {
-  salesFormData: SalesPrintFormData;
+  purchasesFormData: PurchasesPrintFormData;
 }
 
-export default function SalesPrintFormComponent({ salesFormData }: Props) {
-  const { companyResult, salesResult, salesItemsResult } = salesFormData;
+export default function PurchasesPrintFormComponent({ purchasesFormData }: Props) {
+  const { companyResult, purchasesResult, purchaseItemsResult } = purchasesFormData;
   let totalP = 0;
   let totalPrice = 0;
   let totalSub_price = 0;
   let totalQuantity = 0;
-  salesItemsResult.forEach((element) => {
+
+  purchaseItemsResult.forEach((element) => {
     totalP += element.price;
     totalPrice += element.price * element.quantity;
     totalSub_price += element.sub_price;
     totalQuantity += element.quantity;
   });
+
   let total = totalPrice + totalSub_price;
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1 className={styles.title}>거래명세서</h1>
+        <h1 className={styles.title}>구매명세서</h1>
         <table>
           <tbody>
             <tr>
               <td className={styles.LLabel}>거래일자</td>
               <td>
-                {salesResult?.sale_date ? format(new Date(salesResult.sale_date), 'yyyy년 MM월 dd일') : '날짜 없음'}
+                {purchasesResult?.purchase_date
+                  ? format(new Date(purchasesResult.purchase_date), 'yyyy년 MM월 dd일')
+                  : '날짜 없음'}
               </td>
             </tr>
           </tbody>
@@ -90,17 +93,17 @@ export default function SalesPrintFormComponent({ salesFormData }: Props) {
         <thead>
           <tr>
             <th colSpan={2} className={styles.subTitle}>
-              공급받는자 정보
+              공급자 정보
             </th>
             <th colSpan={2} className={styles.subTitle}>
-              공급자 정보
+              공급받는자 정보
             </th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td className={styles.label}>상호</td>
-            <td className={styles.value}>{salesResult.client_name}</td>
+            <td className={styles.value}>{purchasesResult.supplier_name}</td>
             <td className={styles.label}>등록번호</td>
             <td className={styles.value}>
               {companyResult.business_number.replace(/(\d{3})(\d{2})(\d{5})/, '$1-$2-$3')}
@@ -111,7 +114,7 @@ export default function SalesPrintFormComponent({ salesFormData }: Props) {
               주소
             </td>
             <td className={styles.value} rowSpan={2}>
-              {salesResult.client_address}
+              {purchasesResult.supplier_address}
             </td>
             <td className={styles.label}>상호</td>
             <td className={styles.value}>{companyResult.company_name}</td>
@@ -122,13 +125,13 @@ export default function SalesPrintFormComponent({ salesFormData }: Props) {
           </tr>
           <tr>
             <td className={styles.label}>전화번호</td>
-            <td className={styles.value}>{salesResult.client_tel}</td>
+            <td className={styles.value}>{purchasesResult.supplier_tel}</td>
             <td className={styles.label}>전화번호</td>
             <td className={styles.value}>{companyResult.tell_number}</td>
           </tr>
           <tr>
             <td className={styles.label}>팩스번호</td>
-            <td className={styles.value}>{salesResult.client_fax}</td>
+            <td className={styles.value}>{purchasesResult.supplier_fax}</td>
             <td className={styles.label}>팩스번호</td>
             <td className={styles.value}>{companyResult.fax_number}</td>
           </tr>
@@ -141,7 +144,7 @@ export default function SalesPrintFormComponent({ salesFormData }: Props) {
           <tr>
             <td className={styles.label}>적요</td>
             <td colSpan={3} className={styles.value}>
-              {salesResult.description}
+              {purchasesResult.description}
             </td>
           </tr>
         </tbody>
@@ -160,15 +163,17 @@ export default function SalesPrintFormComponent({ salesFormData }: Props) {
           </tr>
         </thead>
         <tbody>
-          {salesItemsResult.map((item, index) => (
-            <tr key={item.sales_item_id.toString()}>
-              <td>{index + 1}</td>
-              <td>{`${item.product_name}${item.standard ? `[${item.standard}]` : ''}`}</td>
-              <td>{`${item.quantity.toLocaleString()}${item.unit ? `[${item.unit}]` : ''}`}</td>
-              <td>₩{item.price.toLocaleString()}</td>
-              <td>₩{(item.price * item.quantity).toLocaleString()}</td>
-              <td>₩{item.sub_price.toLocaleString()}</td>
-              <td>{item.description}</td>
+          {purchaseItemsResult.map((item, index) => (
+            <tr key={item.purchase_item_id.toString()}>
+              <td style={{ width: '5%' }}>{index + 1}</td>
+              <td style={{ width: '17%' }}>{`${item.product_name}${item.standard ? `[${item.standard}]` : ''}`}</td>
+              <td style={{ width: '12%' }}>{`${item.quantity.toLocaleString()}${
+                item.unit ? `[${item.unit}]` : ''
+              }`}</td>
+              <td style={{ width: '12%' }}>₩{item.price.toLocaleString()}</td>
+              <td style={{ width: '20%' }}>₩{(item.price * item.quantity).toLocaleString()}</td>
+              <td style={{ width: '15%' }}>₩{item.sub_price.toLocaleString()}</td>
+              <td style={{ width: '19%', whiteSpace: 'normal' }}>{item.description}</td>
             </tr>
           ))}
         </tbody>
