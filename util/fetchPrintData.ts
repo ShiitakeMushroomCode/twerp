@@ -190,7 +190,7 @@ function generateSaleEmailHtml(data) {
         </tbody>
       </table>
 
-      <table style="width: 100%; border-collapse: collapse; margin-bottom: 1rem; border: 1px solid black; font-size: small;">
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 1rem; border: 1px solid black; font-size: small; table-layout: fixed;">
         <thead>
           <tr>
             <th style="padding-top: 3px; padding-bottom: 3px; border: 1px solid black; background-color: #f9f9f9;">번호</th>
@@ -207,24 +207,22 @@ function generateSaleEmailHtml(data) {
             .map(
               (item, index) => `
             <tr>
-              <td style="padding-top: 2px; padding-bottom: 2px; width: 5%; text-align: center; border: 1px solid black;">${
-                index + 1
+             <td style="padding: 4px; width: 5%; text-align: center; border: 1px solid black;">${index + 1}</td>
+              <td style="padding: 4px; width: 17%; text-align: center; border: 1px solid black;">${item.product_name}${
+                item.standard ? `[${item.standard}]` : ''
               }</td>
-              <td style="padding-top: 2px; padding-bottom: 2px; width: 17%; text-align: center; border: 1px solid black;">${
-                item.product_name
-              }${item.standard ? `[${item.standard}]` : ''}</td>
-              <td style="padding-top: 2px; padding-bottom: 2px; width: 12%; text-align: center; border: 1px solid black;">${item.quantity.toLocaleString()}${
+              <td style="padding: 4px; width: 12%; text-align: center; border: 1px solid black;">${item.quantity.toLocaleString()}${
                 item.unit ? `[${item.unit}]` : ''
               }</td>
-              <td style="padding-top: 2px; padding-bottom: 2px; width: 12%; text-align: right; border: 1px solid black;">₩${item.price.toLocaleString()}</td>
-              <td style="padding-top: 2px; padding-bottom: 2px; width: 20%; text-align: right; border: 1px solid black;">₩${(
+              <td style="padding: 4px; width: 12%; text-align: right; border: 1px solid black;">₩${item.price.toLocaleString()}</td>
+              <td style="padding: 4px; width: 20%; text-align: right; border: 1px solid black;">₩${(
                 item.price * item.quantity
               ).toLocaleString()}</td>
-              <td style="padding-top: 2px; padding-bottom: 2px; width: 15%; text-align: right; border: 1px solid black;">₩${item.sub_price.toLocaleString()}</td>
-              <td style="padding-top: 2px; padding-bottom: 2px; width: 19%; text-align: center; border: 1px solid black;">${
+              <td style="padding: 4px; width: 15%; text-align: right; border: 1px solid black;">₩${item.sub_price.toLocaleString()}</td>
+              <td style="padding: 4px; width: 19%; text-align: left; border: 1px solid black; white-space: normal; overflow-wrap: break-word; word-wrap: break-word;">${
                 item.description || ''
               }</td>
-            </tr>
+             </tr>
           `
             )
             .join('')}
@@ -293,7 +291,7 @@ function generatePurchaseEmailHtml(data) {
         </div>          
       </div>
 
-      <table style="width: 100%; border-collapse: collapse; margin-bottom: 1rem; border: 1px solid black;">
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 1rem; border: 1px solid black; ">
         <thead>
           <tr>
             <th colspan="2" style="font-size: 20px; font-weight: bold; padding: 8px; text-align: center; background-color: #f0f0f0; border: 1px solid black;">공급자 정보</th>
@@ -368,7 +366,7 @@ function generatePurchaseEmailHtml(data) {
         </tbody>
       </table>
 
-      <table style="width: 100%; border-collapse: collapse; margin-bottom: 1rem; border: 1px solid black; font-size: small;">
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 1rem; border: 1px solid black; font-size: small; table-layout: fixed;">
         <thead>
           <tr>
             <th style="padding-top: 3px; padding-bottom: 3px; border: 1px solid black; background-color: #f9f9f9;">번호</th>
@@ -385,24 +383,22 @@ function generatePurchaseEmailHtml(data) {
             .map(
               (item, index) => `
               <tr>
-                <td style="padding-top: 2px; padding-bottom: 2px; width: 5%; text-align: center; border: 1px solid black;">${
-                  index + 1
-                }</td>
-                <td style="padding-top: 2px; padding-bottom: 2px; width: 17%; text-align: center; border: 1px solid black;">${
-                  item.product_name
-                }${item.standard ? `[${item.standard}]` : ''}</td>
-                <td style="padding-top: 2px; padding-bottom: 2px; width: 12%; text-align: center; border: 1px solid black;">${item.quantity.toLocaleString()}${
+               <td style="padding: 4px; width: 5%; text-align: center; border: 1px solid black;">${index + 1}</td>
+              <td style="padding: 4px; width: 17%; text-align: center; border: 1px solid black;">${item.product_name}${
+                item.standard ? `[${item.standard}]` : ''
+              }</td>
+              <td style="padding: 4px; width: 12%; text-align: center; border: 1px solid black;">${item.quantity.toLocaleString()}${
                 item.unit ? `[${item.unit}]` : ''
               }</td>
-                <td style="padding-top: 2px; padding-bottom: 2px; width: 12%; text-align: right; border: 1px solid black;">₩${item.price.toLocaleString()}</td>
-                <td style="padding-top: 2px; padding-bottom: 2px; width: 20%; text-align: right; border: 1px solid black;">₩${(
-                  item.price * item.quantity
-                ).toLocaleString()}</td>
-                <td style="padding-top: 2px; padding-bottom: 2px; width: 15%; text-align: right; border: 1px solid black;">₩${item.sub_price.toLocaleString()}</td>
-                <td style="padding-top: 2px; padding-bottom: 2px; width: 19%; text-align: center; border: 1px solid black;">${
-                  item.description || ''
-                }</td>
-              </tr>
+              <td style="padding: 4px; width: 12%; text-align: right; border: 1px solid black;">₩${item.price.toLocaleString()}</td>
+              <td style="padding: 4px; width: 20%; text-align: right; border: 1px solid black;">₩${(
+                item.price * item.quantity
+              ).toLocaleString()}</td>
+              <td style="padding: 4px; width: 15%; text-align: right; border: 1px solid black;">₩${item.sub_price.toLocaleString()}</td>
+              <td style="padding: 4px; width: 19%; text-align: left; border: 1px solid black; white-space: normal; overflow-wrap: break-word; word-wrap: break-word;">${
+                item.description || ''
+              }</td>
+             </tr>
             `
             )
             .join('')}
