@@ -115,7 +115,6 @@ const PurchaseForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditM
     purchase_items: initialData?.purchase_items || [],
   }));
 
-
   const initialRow: Row = {
     product_id: '',
     product_name: '',
@@ -130,7 +129,11 @@ const PurchaseForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditM
   };
 
   const [rows, setRows] = useState<Row[]>(() => Array(5).fill({ ...initialRow }));
-  const [totalAmounts, setTotalAmounts] = useState<{ totalSupplyAmount: number; totalSubPrice: number; totalAmount: number }>({
+  const [totalAmounts, setTotalAmounts] = useState<{
+    totalSupplyAmount: number;
+    totalSubPrice: number;
+    totalAmount: number;
+  }>({
     totalSupplyAmount: 0,
     totalSubPrice: 0,
     totalAmount: 0,
@@ -363,98 +366,103 @@ const PurchaseForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditM
   /**
    * 저장 버튼 클릭 시 데이터 준비 및 저장 로직 호출
    */
-  const handleSaveButton = useCallback(async () => {
-    try {
-      const fRows = rows
-        .filter((row) => {
-          const fields = ['product_name', 'standard', 'quantity', 'unit', 'price', 'description'];
-          return fields.some((field) => !isEmpty(row[field]?.toString().trim()));
-        })
-        .filter((row) => {
-          if (isEmpty(row.product_name?.trim())) {
-            showErrorModal('제품명이 없습니다.');
-            throw new Error('제품명이 없습니다.');
-          }
-          if (isEmpty(row.quantity?.toString().trim())) {
-            showErrorModal('수량이 없습니다.');
-            throw new Error('수량이 없습니다.');
-          }
-          if (isEmpty(row.price?.toString().trim())) {
-            showErrorModal('단가가 없습니다.');
-            throw new Error('단가가 없습니다.');
-          }
-          return true;
-        })
-        .map((row) => ({
-          product_id: row.product_id?.trim() || null,
-          product_name: row.product_name?.trim(),
-          standard: row.standard?.trim(),
-          price: row.price?.toString().trim().replace(/,/g, '') || '0',
-          quantity: row.quantity?.toString().trim().replace(/,/g, '') || '0',
-          unit: row.unit?.trim(),
-          description: row.description?.trim(),
-          sub_price: row.sub_price?.toString().trim().replace(/,/g, '') || '0',
-        }));
+  const handleSaveButton = useCallback(
+    async (navigate = true) => {
+      try {
+        const fRows = rows
+          .filter((row) => {
+            const fields = ['product_name', 'standard', 'quantity', 'unit', 'price', 'description'];
+            return fields.some((field) => !isEmpty(row[field]?.toString().trim()));
+          })
+          .filter((row) => {
+            if (isEmpty(row.product_name?.trim())) {
+              showErrorModal('제품명이 없습니다.');
+              throw new Error('제품명이 없습니다.');
+            }
+            if (isEmpty(row.quantity?.toString().trim())) {
+              showErrorModal('수량이 없습니다.');
+              throw new Error('수량이 없습니다.');
+            }
+            if (isEmpty(row.price?.toString().trim())) {
+              showErrorModal('단가가 없습니다.');
+              throw new Error('단가가 없습니다.');
+            }
+            return true;
+          })
+          .map((row) => ({
+            product_id: row.product_id?.trim() || null,
+            product_name: row.product_name?.trim(),
+            standard: row.standard?.trim(),
+            price: row.price?.toString().trim().replace(/,/g, '') || '0',
+            quantity: row.quantity?.toString().trim().replace(/,/g, '') || '0',
+            unit: row.unit?.trim(),
+            description: row.description?.trim(),
+            sub_price: row.sub_price?.toString().trim().replace(/,/g, '') || '0',
+          }));
 
-      const newFormData: PurchaseFormData = {
-        ...formData,
-        supplier_address: supplierAddress,
-        purchase_date: format(startDate, 'yyyy-MM-dd'),
-        purchase_items: fRows,
-      };
+        const newFormData: PurchaseFormData = {
+          ...formData,
+          supplier_address: supplierAddress,
+          purchase_date: format(startDate, 'yyyy-MM-dd'),
+          purchase_items: fRows,
+        };
 
-      if (isEmpty(newFormData.supplier_name)) {
-        showErrorModal('거래처명이 없습니다.');
-        return;
-      }
-      if (isEmpty(newFormData.purchase_date)) {
-        showErrorModal('거래일자가 없습니다.');
-        return;
-      }
-      if (isEmpty(newFormData.transaction_type)) {
-        showErrorModal('거래유형이 없습니다.');
-        return;
-      }
-      if (newFormData.purchase_items.length === 0) {
-        showErrorModal('제품이 하나도 없습니다.');
-        return;
-      }
+        if (isEmpty(newFormData.supplier_name)) {
+          showErrorModal('거래처명이 없습니다.');
+          return;
+        }
+        if (isEmpty(newFormData.purchase_date)) {
+          showErrorModal('거래일자가 없습니다.');
+          return;
+        }
+        if (isEmpty(newFormData.transaction_type)) {
+          showErrorModal('거래유형이 없습니다.');
+          return;
+        }
+        if (newFormData.purchase_items.length === 0) {
+          showErrorModal('제품이 하나도 없습니다.');
+          return;
+        }
 
-      setFormData(newFormData);
-      setHasUnsavedChanges(false);
+        setFormData(newFormData);
+        setHasUnsavedChanges(false);
 
-      if (onSubmit) {
-        const response = await onSubmit(newFormData);
-        if (response.status === 'error') {
-          await Swal.fire({
-            title: '오류',
-            html: response.message,
-            icon: 'error',
-            confirmButtonText: '확인',
-          });
-        } else if (response.status === 'success') {
-          await Swal.fire({
-            title: '성공',
-            text: response.message,
-            icon: 'success',
-            showConfirmButton: false,
-            timer: 1500,
-          });
-          if (!isEditMode) {
-            clear();
-          }
-          localStorage.setItem('reloadPurchaseItems', new Date().toString());
-          if (window.name.startsWith('editPopup')) {
-            window.close();
-          } else {
-            router.push('/purchase-list');
+        if (onSubmit) {
+          const response = await onSubmit(newFormData);
+          if (response.status === 'error') {
+            await Swal.fire({
+              title: '오류',
+              html: response.message,
+              icon: 'error',
+              confirmButtonText: '확인',
+            });
+          } else if (response.status === 'success') {
+            await Swal.fire({
+              title: '성공',
+              text: response.message,
+              icon: 'success',
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            if (!isEditMode) {
+              clear();
+            }
+            localStorage.setItem('reloadPurchaseItems', new Date().toString());
+            if (navigate) {
+              if (window.name.startsWith('editPopup')) {
+                window.close();
+              } else {
+                router.push('/purchase-list');
+              }
+            }
           }
         }
+      } catch (error) {
+        showErrorModal('저장 중 오류가 발생했습니다.');
       }
-    } catch (error) {
-      showErrorModal('저장 중 오류가 발생했습니다.');
-    }
-  }, [rows, formData, supplierAddress, startDate, onSubmit, isEditMode, clear, router]);
+    },
+    [rows, formData, supplierAddress, startDate, onSubmit, isEditMode, clear, router]
+  );
 
   // 오류 모달 표시 함수
   const showErrorModal = useCallback((message: string) => {
@@ -613,101 +621,116 @@ const PurchaseForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditM
    * 메일보내기
    */
   const handleSendMailButton = useCallback(async () => {
-    if (isEmpty(formData.purchase_id)) {
-      showErrorAlert('메일보내기 실패', '현재 메일을 보낼 수 없는 기록입니다.');
-      return;
-    }
-    
-    const supplierEmail = !isEmpty(formData.supplier_id) ? await fetchClientEmail(formData.supplier_id):'';
-
-    const { value: formValues } = await Swal.fire({
-      title: '거래명세표 메일 보내기',
-      html: `
-        <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; align-items: center;">
-          <div style="display: flex; align-items: center; width: 100%; max-width: 500px; gap: 10px;">
-            <label for="swal-input-recipient" style="font-size: 14px; color: #333; width: 80px; text-align: right; margin: 0;">
-              받는 이
-            </label>
-            <input 
-              id="swal-input-recipient" 
-              type="email" 
-              placeholder="example@test.com" 
-              value="${supplierEmail}" 
-              autocomplete="off" 
-              style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; transition: border-color 0.3s, box-shadow 0.3s;"
-            >
-          </div>
-          <div style="display: flex; align-items: center; width: 100%; max-width: 500px; gap: 10px;">
-            <label for="swal-input-subject" style="font-size: 14px; color: #333; width: 80px; text-align: right; margin: 0;">
-              제목
-            </label>
-            <input 
-              id="swal-input-subject" 
-              type="text" 
-              placeholder="메일 제목" 
-              value="거래명세표 확인" 
-              autocomplete="off" 
-              style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; transition: border-color 0.3s, box-shadow 0.3s;"
-            >
-          </div>
-          <div style="display: flex; align-items: center; width: 100%; max-width: 500px; gap: 10px;">
-            <label for="swal-input-content" style="font-size: 14px; color: #333; width: 80px; text-align: right; margin: 0;">
-              내용
-            </label>
-            <textarea 
-              id="swal-input-content" 
-              placeholder="메일 내용을 입력하세요" 
-              autocomplete="off" 
-              rows="3" 
-              style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; transition: border-color 0.3s, box-shadow 0.3s;"
-            ></textarea>
-          </div>
-        </div>
-      `,
-      focusConfirm: false,
-      preConfirm: () => {
-        const recipient = (document.getElementById('swal-input-recipient') as HTMLInputElement).value;
-        const subject = (document.getElementById('swal-input-subject') as HTMLInputElement).value;
-        const content = (document.getElementById('swal-input-content') as HTMLTextAreaElement).value;
-
-        if (!recipient || !subject) {
-          Swal.showValidationMessage('받는 이와 제목은 필수 입력 항목입니다.');
-          return false;
-        }
-        return { recipient, subject, content };
-      },
+    const saveConfirm = await Swal.fire({
+      title: '저장 확인',
+      text: '저장 후 메일을 보낼 수 있습니다.\n저장하시겠습니까?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: '저장',
+      cancelButtonText: '취소',
     });
 
-    if (formValues) {
-      Swal.fire({
-        title: '메일 전송 중...',
-        text: '잠시만 기다려주세요.',
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
+    if (saveConfirm.isConfirmed) {
+      // navigate를 false로 설정해 저장 후 이동을 막음
+      await handleSaveButton(false);
+
+      // 이후 메일 전송 로직
+      if (isEmpty(formData.purchase_id)) {
+        showErrorAlert('메일보내기 실패', '현재 메일을 보낼 수 없는 기록입니다.');
+        return;
+      }
+
+      const supplierEmail = !isEmpty(formData.supplier_id) ? await fetchClientEmail(formData.supplier_id) : '';
+
+      const { value: formValues } = await Swal.fire({
+        title: '거래명세표 메일 보내기',
+        html: `
+          <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; align-items: center;">
+            <div style="display: flex; align-items: center; width: 100%; max-width: 500px; gap: 10px;">
+              <label for="swal-input-recipient" style="font-size: 14px; color: #333; width: 80px; text-align: right; margin: 0;">
+                받는 이
+              </label>
+              <input 
+                id="swal-input-recipient" 
+                type="email" 
+                placeholder="example@test.com" 
+                value="${supplierEmail}" 
+                autocomplete="off" 
+                style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; transition: border-color 0.3s, box-shadow 0.3s;"
+              >
+            </div>
+            <div style="display: flex; align-items: center; width: 100%; max-width: 500px; gap: 10px;">
+              <label for="swal-input-subject" style="font-size: 14px; color: #333; width: 80px; text-align: right; margin: 0;">
+                제목
+              </label>
+              <input 
+                id="swal-input-subject" 
+                type="text" 
+                placeholder="메일 제목" 
+                value="거래명세표 확인" 
+                autocomplete="off" 
+                style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; transition: border-color 0.3s, box-shadow 0.3s;"
+              >
+            </div>
+            <div style="display: flex; align-items: center; width: 100%; max-width: 500px; gap: 10px;">
+              <label for="swal-input-content" style="font-size: 14px; color: #333; width: 80px; text-align: right; margin: 0;">
+                내용
+              </label>
+              <textarea 
+                id="swal-input-content" 
+                placeholder="메일 내용을 입력하세요" 
+                autocomplete="off" 
+                rows="3" 
+                style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; transition: border-color 0.3s, box-shadow 0.3s;"
+              ></textarea>
+            </div>
+          </div>
+        `,
+        focusConfirm: false,
+        preConfirm: () => {
+          const recipient = (document.getElementById('swal-input-recipient') as HTMLInputElement).value;
+          const subject = (document.getElementById('swal-input-subject') as HTMLInputElement).value;
+          const content = (document.getElementById('swal-input-content') as HTMLTextAreaElement).value;
+
+          if (!recipient || !subject) {
+            Swal.showValidationMessage('받는 이와 제목은 필수 입력 항목입니다.');
+            return false;
+          }
+          return { recipient, subject, content };
         },
       });
-      const success = await sendMailUtil({
-        subject: formValues.subject,
-        to: formValues.recipient,
-        text: formValues.content,
-        option: 'SendMailPurchaseTransactionStatement',
-        id: formData.purchase_id,
-        html: null,
-      });
-      if (success) {
+
+      if (formValues) {
         Swal.fire({
-          icon: 'success',
-          title: '메일 전송 성공',
-          text: '메일이 성공적으로 전송되었습니다.',
-          timer: 1500,
-          showConfirmButton: false,
+          title: '메일 전송 중...',
+          text: '잠시만 기다려주세요.',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
         });
-      } else {
-        showErrorAlert('메일 보내기 실패', '메일 보내기에 실패했습니다.');
+        const success = await sendMailUtil({
+          subject: formValues.subject,
+          to: formValues.recipient,
+          text: formValues.content,
+          option: 'SendMailPurchaseTransactionStatement',
+          id: formData.purchase_id,
+          html: null,
+        });
+        if (success) {
+          Swal.fire({
+            icon: 'success',
+            title: '메일 전송 성공',
+            text: '메일이 성공적으로 전송되었습니다.',
+            timer: 1500,
+            showConfirmButton: false,
+          });
+        } else {
+          showErrorAlert('메일 보내기 실패', '메일 보내기에 실패했습니다.');
+        }
       }
     }
-  }, [formData.purchase_id, formData.supplier_id, showErrorAlert]);
+  }, [formData, handleSaveButton, showErrorAlert]);
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
@@ -715,11 +738,11 @@ const PurchaseForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditM
         <span>{isEditMode ? '매입 정보 수정하기' : '매입 정보 추가하기'}</span>
         {isEditMode && (
           <button
-            type="button"
+            type='button'
             className={styles.delButton}
             onClick={handleDelete}
             disabled={isSearch}
-            title="제품 삭제"
+            title='제품 삭제'
           >
             삭제
             <FaTrashAlt style={{ marginLeft: '0.5rem' }} />
@@ -729,40 +752,40 @@ const PurchaseForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditM
       <div className={styles.subForm}>
         {/* 거래처명 */}
         <div className={styles['form-row']}>
-          <label htmlFor="supplier_name" className={styles.label}>
+          <label htmlFor='supplier_name' className={styles.label}>
             거래처명
           </label>
           <button
-            type="button"
+            type='button'
             className={styles.searchButton}
             onClick={() => handleClientSearchClick({ handleInitForm })}
           >
             <FiSearch />
           </button>
           <input
-            id="supplier_name"
-            name="supplier_name"
-            type="text"
+            id='supplier_name'
+            name='supplier_name'
+            type='text'
             className={styles.input}
             required
-            autoComplete="off"
+            autoComplete='off'
             value={formData.supplier_name}
             onChange={handleChange}
             disabled={isSearch}
           />
           <button
-            type="button"
+            type='button'
             className={styles.resetButton}
             disabled={isSearch}
             onClick={clear}
-            title="매입 정보가 모두 초기화 됩니다."
+            title='매입 정보가 모두 초기화 됩니다.'
           >
             모두 초기화
           </button>
         </div>
         {/* 거래일자 */}
         <div className={styles['form-row']}>
-          <label htmlFor="purchase_date" className={styles.label}>
+          <label htmlFor='purchase_date' className={styles.label}>
             거래일자
           </label>
           <div className={styles.dateInput}>
@@ -770,12 +793,12 @@ const PurchaseForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditM
               selectedDate={startDate}
               onDateChange={handleDateChange}
               disabled={isSearch}
-              inputId="purchase_date"
+              inputId='purchase_date'
               maxDate={useMemo(() => new Date(new Date().setFullYear(new Date().getFullYear() + 5, 11, 31)), [])}
             />
           </div>
           <button
-            type="button"
+            type='button'
             className={styles.resetButton}
             disabled={isSearch}
             onClick={() => setStartDate(new Date())}
@@ -785,15 +808,15 @@ const PurchaseForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditM
         </div>
         {/* 주소 */}
         <div className={styles['form-row']}>
-          <label htmlFor="supplier_address" className={styles.label}>
+          <label htmlFor='supplier_address' className={styles.label}>
             주소
           </label>
           <input
-            id="supplier_address"
-            name="supplier_address"
-            type="text"
+            id='supplier_address'
+            name='supplier_address'
+            type='text'
             className={`${styles.input} ${styles.hover}`}
-            autoComplete="off"
+            autoComplete='off'
             value={supplierAddress}
             title={supplierAddress}
             readOnly
@@ -801,14 +824,10 @@ const PurchaseForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditM
             disabled={isSearch}
           />
           {isSearch && (
-            <Address
-              isSearch={isSearch}
-              setIsSearch={setIsSearch}
-              setBusinessAddress={setSupplierAddress}
-            />
+            <Address isSearch={isSearch} setIsSearch={setIsSearch} setBusinessAddress={setSupplierAddress} />
           )}
           <button
-            type="button"
+            type='button'
             className={styles.resetButton}
             disabled={isSearch}
             onClick={() => setSupplierAddress('')}
@@ -818,30 +837,30 @@ const PurchaseForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditM
         </div>
         {/* 전화번호 및 팩스번호 */}
         <div className={styles['form-row']}>
-          <label htmlFor="supplier_tel" className={styles.label}>
+          <label htmlFor='supplier_tel' className={styles.label}>
             전화번호
           </label>
           <input
-            id="supplier_tel"
-            name="supplier_tel"
-            type="text"
+            id='supplier_tel'
+            name='supplier_tel'
+            type='text'
             className={styles.input}
             required
-            autoComplete="off"
+            autoComplete='off'
             value={formData.supplier_tel}
             onChange={handleChange}
             disabled={isSearch}
           />
-          <label htmlFor="supplier_fax" className={styles.label} style={{ textAlign: 'center' }}>
+          <label htmlFor='supplier_fax' className={styles.label} style={{ textAlign: 'center' }}>
             팩스번호
           </label>
           <input
-            id="supplier_fax"
-            name="supplier_fax"
-            type="text"
+            id='supplier_fax'
+            name='supplier_fax'
+            type='text'
             className={styles.input}
             required
-            autoComplete="off"
+            autoComplete='off'
             value={formData.supplier_fax}
             onChange={handleChange}
             disabled={isSearch}
@@ -849,16 +868,16 @@ const PurchaseForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditM
         </div>
         {/* 설명 */}
         <div className={styles['form-row']}>
-          <label htmlFor="description" className={styles.label}>
+          <label htmlFor='description' className={styles.label}>
             설명
           </label>
           <input
-            id="description"
-            name="description"
-            type="text"
+            id='description'
+            name='description'
+            type='text'
             className={styles.input}
             required
-            autoComplete="off"
+            autoComplete='off'
             value={formData.description}
             title={formData.description}
             onChange={handleChange}
@@ -870,13 +889,10 @@ const PurchaseForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditM
           <span className={styles.label}>거래유형</span>
           <div className={styles.radioGroup}>
             {(['카드결제', '현금결제', '계좌이체', '기타'] as TransactionType[]).map((type) => (
-              <label
-                key={type}
-                className={`${styles.radioLabel} ${transactionType === type ? styles.checked : ''}`}
-              >
+              <label key={type} className={`${styles.radioLabel} ${transactionType === type ? styles.checked : ''}`}>
                 <input
-                  type="radio"
-                  name="transaction_type"
+                  type='radio'
+                  name='transaction_type'
                   value={type}
                   checked={transactionType === type}
                   onChange={handleTransactionTypeChange}

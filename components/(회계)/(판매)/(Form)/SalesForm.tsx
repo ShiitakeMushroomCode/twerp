@@ -367,98 +367,103 @@ const SalesForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditMode
   /**
    * 저장 버튼 클릭 시 데이터 준비 및 저장 로직 호출
    */
-  const handleSaveButton = useCallback(async () => {
-    try {
-      const fRows = rows
-        .filter((row) => {
-          const fields = ['product_name', 'standard', 'quantity', 'unit', 'price', 'description'];
-          return fields.some((field) => !isEmpty(row[field]?.toString().trim()));
-        })
-        .filter((row) => {
-          if (isEmpty(row.product_name?.trim())) {
-            showErrorModal('제품명이 없습니다.');
-            throw new Error('제품명이 없습니다.');
-          }
-          if (isEmpty(row.quantity?.toString().trim())) {
-            showErrorModal('수량이 없습니다.');
-            throw new Error('수량이 없습니다.');
-          }
-          if (isEmpty(row.price?.toString().trim())) {
-            showErrorModal('단가가 없습니다.');
-            throw new Error('단가가 없습니다.');
-          }
-          return true;
-        })
-        .map((row) => ({
-          product_id: row.product_id?.trim() || null,
-          product_name: row.product_name?.trim(),
-          standard: row.standard?.trim(),
-          price: row.price?.toString().trim().replace(/,/g, '') || '0',
-          quantity: row.quantity?.toString().trim().replace(/,/g, '') || '0',
-          unit: row.unit?.trim(),
-          description: row.description?.trim(),
-          sub_price: row.sub_price?.toString().trim().replace(/,/g, '') || '0',
-        }));
+  const handleSaveButton = useCallback(
+    async (navigate = true) => {
+      try {
+        const fRows = rows
+          .filter((row) => {
+            const fields = ['product_name', 'standard', 'quantity', 'unit', 'price', 'description'];
+            return fields.some((field) => !isEmpty(row[field]?.toString().trim()));
+          })
+          .filter((row) => {
+            if (isEmpty(row.product_name?.trim())) {
+              showErrorModal('제품명이 없습니다.');
+              throw new Error('제품명이 없습니다.');
+            }
+            if (isEmpty(row.quantity?.toString().trim())) {
+              showErrorModal('수량이 없습니다.');
+              throw new Error('수량이 없습니다.');
+            }
+            if (isEmpty(row.price?.toString().trim())) {
+              showErrorModal('단가가 없습니다.');
+              throw new Error('단가가 없습니다.');
+            }
+            return true;
+          })
+          .map((row) => ({
+            product_id: row.product_id?.trim() || null,
+            product_name: row.product_name?.trim(),
+            standard: row.standard?.trim(),
+            price: row.price?.toString().trim().replace(/,/g, '') || '0',
+            quantity: row.quantity?.toString().trim().replace(/,/g, '') || '0',
+            unit: row.unit?.trim(),
+            description: row.description?.trim(),
+            sub_price: row.sub_price?.toString().trim().replace(/,/g, '') || '0',
+          }));
 
-      const newFormData: SalesFormData = {
-        ...formData,
-        client_address: clientAddress,
-        sale_date: format(startDate, 'yyyy-MM-dd'),
-        sales_items: fRows,
-      };
+        const newFormData: SalesFormData = {
+          ...formData,
+          client_address: clientAddress,
+          sale_date: format(startDate, 'yyyy-MM-dd'),
+          sales_items: fRows,
+        };
 
-      if (isEmpty(newFormData.client_name)) {
-        showErrorModal('거래처명이 없습니다.');
-        return;
-      }
-      if (isEmpty(newFormData.sale_date)) {
-        showErrorModal('거래일자가 없습니다.');
-        return;
-      }
-      if (isEmpty(newFormData.transaction_type)) {
-        showErrorModal('거래유형이 없습니다.');
-        return;
-      }
-      if (newFormData.sales_items.length === 0) {
-        showErrorModal('제품이 하나도 없습니다.');
-        return;
-      }
+        if (isEmpty(newFormData.client_name)) {
+          showErrorModal('거래처명이 없습니다.');
+          return;
+        }
+        if (isEmpty(newFormData.sale_date)) {
+          showErrorModal('거래일자가 없습니다.');
+          return;
+        }
+        if (isEmpty(newFormData.transaction_type)) {
+          showErrorModal('거래유형이 없습니다.');
+          return;
+        }
+        if (newFormData.sales_items.length === 0) {
+          showErrorModal('제품이 하나도 없습니다.');
+          return;
+        }
 
-      setFormData(newFormData);
-      setHasUnsavedChanges(false);
+        setFormData(newFormData);
+        setHasUnsavedChanges(false);
 
-      if (onSubmit) {
-        const response = await onSubmit(newFormData);
-        if (response.status === 'error') {
-          await Swal.fire({
-            title: '오류',
-            html: response.message,
-            icon: 'error',
-            confirmButtonText: '확인',
-          });
-        } else if (response.status === 'success') {
-          await Swal.fire({
-            title: '성공',
-            text: response.message,
-            icon: 'success',
-            showConfirmButton: false,
-            timer: 1500,
-          });
-          if (!isEditMode) {
-            clear();
-          }
-          localStorage.setItem('reloadSalesItems', new Date().toString());
-          if (window.name.startsWith('editPopup')) {
-            window.close();
-          } else {
-            router.push('/sales-list');
+        if (onSubmit) {
+          const response = await onSubmit(newFormData);
+          if (response.status === 'error') {
+            await Swal.fire({
+              title: '오류',
+              html: response.message,
+              icon: 'error',
+              confirmButtonText: '확인',
+            });
+          } else if (response.status === 'success') {
+            await Swal.fire({
+              title: '성공',
+              text: response.message,
+              icon: 'success',
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            if (!isEditMode) {
+              clear();
+            }
+            localStorage.setItem('reloadSalesItems', new Date().toString());
+            if (navigate) {
+              if (window.name.startsWith('editPopup')) {
+                window.close();
+              } else {
+                router.push('/sales-list');
+              }
+            }
           }
         }
+      } catch (error) {
+        showErrorModal('저장 중 오류가 발생했습니다.');
       }
-    } catch (error) {
-      showErrorModal('저장 중 오류가 발생했습니다.');
-    }
-  }, [rows, formData, clientAddress, startDate, onSubmit, isEditMode, clear, router]);
+    },
+    [rows, formData, clientAddress, startDate, onSubmit, isEditMode, clear, router]
+  );
 
   // 오류 모달 표시 함수
   const showErrorModal = useCallback((message: string) => {
@@ -617,16 +622,30 @@ const SalesForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditMode
    * 메일보내기
    */
   const handleSendMailButton = useCallback(async () => {
-    if (isEmpty(formData.sales_id)) {
-      showErrorAlert('메일보내기 실패', '현재 메일을 보낼 수 없는 기록입니다.');
-      return;
-    }
+    const saveConfirm = await Swal.fire({
+      title: '저장 확인',
+      text: '저장 후 메일을 보낼 수 있습니다.\n저장하시겠습니까?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: '저장',
+      cancelButtonText: '취소',
+    });
 
-    const clientEmail = !isEmpty(formData.client_id) ? await fetchClientEmail(formData.client_id) : '';
+    if (saveConfirm.isConfirmed) {
+      // navigate를 false로 설정해 저장 후 이동을 막음
+      await handleSaveButton(false);
 
-    const { value: formValues } = await Swal.fire({
-      title: '거래명세표 메일 보내기',
-      html: `
+      // 이후 메일 전송 로직
+      if (isEmpty(formData.sales_id)) {
+        showErrorAlert('메일보내기 실패', '현재 메일을 보낼 수 없는 기록입니다.');
+        return;
+      }
+
+      const clientEmail = !isEmpty(formData.client_id) ? await fetchClientEmail(formData.client_id) : '';
+
+      const { value: formValues } = await Swal.fire({
+        title: '거래명세표 메일 보내기',
+        html: `
         <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; align-items: center;">
           <div style="display: flex; align-items: center; width: 100%; max-width: 500px; gap: 10px;">
             <label for="swal-input-recipient" style="font-size: 14px; color: #333; width: 80px; text-align: right; margin: 0;">
@@ -668,50 +687,51 @@ const SalesForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditMode
           </div>
         </div>
       `,
-      focusConfirm: false,
-      preConfirm: () => {
-        const recipient = (document.getElementById('swal-input-recipient') as HTMLInputElement).value;
-        const subject = (document.getElementById('swal-input-subject') as HTMLInputElement).value;
-        const content = (document.getElementById('swal-input-content') as HTMLTextAreaElement).value;
+        focusConfirm: false,
+        preConfirm: () => {
+          const recipient = (document.getElementById('swal-input-recipient') as HTMLInputElement).value;
+          const subject = (document.getElementById('swal-input-subject') as HTMLInputElement).value;
+          const content = (document.getElementById('swal-input-content') as HTMLTextAreaElement).value;
 
-        if (!recipient || !subject) {
-          Swal.showValidationMessage('받는 이와 제목은 필수 입력 항목입니다.');
-          return false;
-        }
-        return { recipient, subject, content };
-      },
-    });
-
-    if (formValues) {
-      Swal.fire({
-        title: '메일 전송 중...',
-        text: '잠시만 기다려주세요.',
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
+          if (!recipient || !subject) {
+            Swal.showValidationMessage('받는 이와 제목은 필수 입력 항목입니다.');
+            return false;
+          }
+          return { recipient, subject, content };
         },
       });
-      const success = await sendMailUtil({
-        subject: formValues.subject,
-        to: formValues.recipient,
-        text: formValues.content,
-        option: 'SendMailSaleTransactionStatement',
-        id: formData.sales_id,
-        html: null,
-      });
-      if (success) {
+
+      if (formValues) {
         Swal.fire({
-          icon: 'success',
-          title: '메일 전송 성공',
-          text: '메일이 성공적으로 전송되었습니다.',
-          timer: 1500,
-          showConfirmButton: false,
+          title: '메일 전송 중...',
+          text: '잠시만 기다려주세요.',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
         });
-      } else {
-        showErrorAlert('메일 보내기 실패', '메일 보내기에 실패했습니다.');
+        const success = await sendMailUtil({
+          subject: formValues.subject,
+          to: formValues.recipient,
+          text: formValues.content,
+          option: 'SendMailSaleTransactionStatement',
+          id: formData.sales_id,
+          html: null,
+        });
+        if (success) {
+          Swal.fire({
+            icon: 'success',
+            title: '메일 전송 성공',
+            text: '메일이 성공적으로 전송되었습니다.',
+            timer: 1500,
+            showConfirmButton: false,
+          });
+        } else {
+          showErrorAlert('메일 보내기 실패', '메일 보내기에 실패했습니다.');
+        }
       }
     }
-  }, [formData.sales_id, formData.client_id, showErrorAlert]);
+  }, [formData, handleSaveButton, showErrorAlert]);
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
