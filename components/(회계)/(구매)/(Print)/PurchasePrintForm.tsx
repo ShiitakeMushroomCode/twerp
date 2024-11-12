@@ -172,16 +172,18 @@ export default function PurchasesPrintFormComponent({ purchasesFormData }: Props
               <td
                 style={{ width: '12%', whiteSpace: 'normal', overflowWrap: 'break-word' }}
               >{`${item.quantity.toLocaleString()}${item.unit ? `[${item.unit}]` : ''}`}</td>
-              <td style={{ width: '12%', whiteSpace: 'normal', overflowWrap: 'break-word' }}>
+              <td style={{ width: '12%', whiteSpace: 'normal', overflowWrap: 'break-word', textAlign: 'right' }}>
                 ₩{item.price.toLocaleString()}
               </td>
-              <td style={{ width: '20%', whiteSpace: 'normal', overflowWrap: 'break-word' }}>
+              <td style={{ width: '20%', whiteSpace: 'normal', overflowWrap: 'break-word', textAlign: 'right' }}>
                 ₩{(item.price * item.quantity).toLocaleString()}
               </td>
-              <td style={{ width: '15%', whiteSpace: 'normal', overflowWrap: 'break-word' }}>
+              <td style={{ width: '15%', whiteSpace: 'normal', overflowWrap: 'break-word', textAlign: 'right' }}>
                 ₩{item.sub_price.toLocaleString()}
               </td>
-              <td style={{ width: '19%', whiteSpace: 'normal', overflowWrap: 'break-word' }}>{item.description}</td>
+              <td style={{ width: '19%', whiteSpace: 'normal', overflowWrap: 'break-word', textAlign: 'left' }}>
+                {item.description}
+              </td>
             </tr>
           ))}
         </tbody>

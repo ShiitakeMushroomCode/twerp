@@ -162,15 +162,25 @@ export default function SalesPrintFormComponent({ salesFormData }: Props) {
         <tbody>
           {salesItemsResult.map((item, index) => (
             <tr key={item.sales_item_id.toString()}>
-              <td style={{ width: '5%' }}>{index + 1}</td>
-              <td style={{ width: '17%' }}>{`${item.product_name}${item.standard ? `[${item.standard}]` : ''}`}</td>
-              <td style={{ width: '12%' }}>{`${item.quantity.toLocaleString()}${
-                item.unit ? `[${item.unit}]` : ''
+              <td style={{ width: '5%', whiteSpace: 'normal', overflowWrap: 'break-word' }}>{index + 1}</td>
+              <td style={{ width: '17%', whiteSpace: 'normal', overflowWrap: 'break-word' }}>{`${item.product_name}${
+                item.standard ? `[${item.standard}]` : ''
               }`}</td>
-              <td style={{ width: '12%' }}>₩{item.price.toLocaleString()}</td>
-              <td style={{ width: '20%' }}>₩{(item.price * item.quantity).toLocaleString()}</td>
-              <td style={{ width: '15%' }}>₩{item.sub_price.toLocaleString()}</td>
-              <td style={{ width: '19%', whiteSpace: 'inherit' }}>{item.description}</td>
+              <td
+                style={{ width: '12%', whiteSpace: 'normal', overflowWrap: 'break-word' }}
+              >{`${item.quantity.toLocaleString()}${item.unit ? `[${item.unit}]` : ''}`}</td>
+              <td style={{ width: '12%', whiteSpace: 'normal', overflowWrap: 'break-word', textAlign: 'right' }}>
+                ₩{item.price.toLocaleString()}
+              </td>
+              <td style={{ width: '20%', whiteSpace: 'normal', overflowWrap: 'break-word', textAlign: 'right' }}>
+                ₩{(item.price * item.quantity).toLocaleString()}
+              </td>
+              <td style={{ width: '15%', whiteSpace: 'normal', overflowWrap: 'break-word', textAlign: 'right' }}>
+                ₩{item.sub_price.toLocaleString()}
+              </td>
+              <td style={{ width: '19%', whiteSpace: 'normal', overflowWrap: 'break-word', textAlign: 'left' }}>
+                {item.description}
+              </td>
             </tr>
           ))}
         </tbody>
