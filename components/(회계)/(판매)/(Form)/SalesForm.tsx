@@ -6,7 +6,7 @@ import ProductSearchClick from '@/components/(회계)/(판매)/(Form)/ProductSea
 import ProductTable from '@/components/(회계)/(판매)/(Form)/ProductTable';
 import { fetchClientEmail } from '@/util/Client';
 import { isEmpty } from '@/util/lo';
-import { formatPhoneNumber } from '@/util/reform';
+import { formatPhoneNumber, isValidEmail } from '@/util/reform';
 import { sendMailUtil } from '@/util/sendmail';
 import { showErrorAlert } from '@/util/swalHelpers';
 import { useUnsavedChangesWarning } from '@/util/useUnsavedChangesWarning';
@@ -692,7 +692,10 @@ const SalesForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditMode
           const recipient = (document.getElementById('swal-input-recipient') as HTMLInputElement).value;
           const subject = (document.getElementById('swal-input-subject') as HTMLInputElement).value;
           const content = (document.getElementById('swal-input-content') as HTMLTextAreaElement).value;
-
+          if (!isValidEmail(recipient)) {
+            Swal.showValidationMessage('잘못된 이메일 형식입니다.');
+            return false;
+          }
           if (!recipient || !subject) {
             Swal.showValidationMessage('받는 이와 제목은 필수 입력 항목입니다.');
             return false;

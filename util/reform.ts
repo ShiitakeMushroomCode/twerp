@@ -16,6 +16,11 @@ export function formatPhoneNumber(value: string): string {
   }
 }
 
+export function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
 export function formatPrice(value: number) {
   // 소수점이 있는지 확인 후 처리
   if (value <= 0) {
