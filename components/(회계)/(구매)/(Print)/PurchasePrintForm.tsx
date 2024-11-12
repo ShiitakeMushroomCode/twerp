@@ -74,7 +74,7 @@ export default function PurchasesPrintFormComponent({ purchasesFormData }: Props
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1 className={styles.title}>구매명세서</h1>
+        <h1 className={styles.title}>거래명세서</h1>
         <table>
           <tbody>
             <tr>

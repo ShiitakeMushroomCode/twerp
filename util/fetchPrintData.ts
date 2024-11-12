@@ -282,7 +282,7 @@ function generatePurchaseEmailHtml(data) {
   return `
     <div style="display: flex; flex-direction: column; padding: 16px; width: 100%; max-width: 1078px; margin: 0 auto; background-color: #ffffff; font-size: small; box-sizing: border-box;">
       <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid black; padding-bottom: 5px; margin-bottom: 16px;">
-        <h1 style="margin-left: 1rem; font-size: 28px; font-weight: bold; margin-bottom: 10px;">구매명세서</h1>
+        <h1 style="margin-left: 1rem; font-size: 28px; font-weight: bold; margin-bottom: 10px;">거래명세서</h1>
         <div style="width: 50%; text-align: right; font-size:1rem;">
             <span style="padding-right: 1rem; font-weight: bold;">거래일자</span>
             <span>${

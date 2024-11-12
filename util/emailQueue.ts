@@ -68,9 +68,7 @@ emailQueue.process(async (job) => {
       await transporter.sendMail(mailOptions);
     }
     console.log(`${to}에게 ${subject} 같은 제목과 ${text} 같은 내용으로 메일을 보냄`);
-    // console.log(`Email sent to ${to}`);
   } catch (error) {
-    // console.error(`Failed to send email to ${to}:`, error);
     console.log(`${to}에게 ${subject} 같은 제목과 ${text} 같은 내용으로 메일을 못보냄`);
     throw error;
   }
