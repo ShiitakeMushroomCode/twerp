@@ -3,7 +3,7 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
 export const metadata = {
-  title: '제품 추가하기',
+  title: '제품 정보 추가',
 };
 
 async function addProduct(formData: ProductFormData): Promise<{ status: string; message: string }> {

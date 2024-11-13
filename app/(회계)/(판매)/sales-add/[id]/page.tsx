@@ -7,7 +7,7 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
 export const metadata = {
-  title: '매출 정보 수정',
+  title: '매출 정보 입력',
 };
 
 interface PageProps {

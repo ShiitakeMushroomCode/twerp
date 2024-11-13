@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
 export const metadata = {
-  title: '제품 수정하기',
+  title: '제품 정보 수정',
 };
 
 // 동적 렌더링을 강제

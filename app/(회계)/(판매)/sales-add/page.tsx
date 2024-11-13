@@ -3,7 +3,7 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
 export const metadata = {
-  title: '매출 입력',
+  title: '매출 정보 입력',
 };
 
 async function onSubmit(formData: SalesFormData) {

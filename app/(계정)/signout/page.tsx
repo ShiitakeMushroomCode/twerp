@@ -11,8 +11,8 @@ async function SignOut() {
   cookies().delete('accessToken');
   if (cookies().has('refreshToken')) {
     removeRefreshTokenFromDB(cookies().get('refreshToken')?.value);
-    cookies().delete('refreshToken');
   }
+  cookies().delete('refreshToken');
   redirect(`${process.env.SITE_URL}/signin`);
 }
 export default async function SignOutPage() {
