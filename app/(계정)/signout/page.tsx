@@ -8,11 +8,11 @@ export const metadata = {
 };
 async function SignOut() {
   'use server';
-  cookies().delete('accessToken');
+  cookies().set('accessToken', '', { maxAge: 0, path: '/', domain:'werp.p-e.kr' });
   if (cookies().has('refreshToken')) {
     removeRefreshTokenFromDB(cookies().get('refreshToken')?.value);
+    cookies().set('refreshToken', '', { maxAge: 0, path: '/', domain:'werp.p-e.kr' });
   }
-  cookies().delete('refreshToken');
   redirect(`${process.env.SITE_URL}/signin`);
 }
 export default async function SignOutPage() {

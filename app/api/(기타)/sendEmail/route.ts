@@ -5,20 +5,20 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   const { userId, to, subject, cn, html, option, id, text } = await request.json();
-  const companyIdData = ((await getTokenUserData()) as ACT)['companyId']['data'];
+  const TokenData = (await getTokenUserData()) as ACT;
 
   try {
     // Bull 큐에 작업 추가
     await emailQueue.add({
-      to,
+      to: option === 'MyPage' ? TokenData['email'] : to,
       subject,
       html,
       text,
       option,
       id,
-      userId,
+      userId: option === 'MyPage' ? TokenData['userId'] : userId,
       cn,
-      companyIdData,
+      companyIdData: TokenData['companyId']['data'],
     });
 
     return NextResponse.json({ message: '이메일 전송 작업이 큐에 추가되었습니다.' }, { status: 200 });

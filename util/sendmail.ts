@@ -2,7 +2,15 @@
 
 import { cookies } from 'next/headers';
 
-export async function sendMailUtil({ to, subject, html, option, text, id }): Promise<boolean> {
+export async function sendMailUtil({
+  to = null,
+  subject = null,
+  html = null,
+  option = null,
+  text = null,
+  id = null,
+  cn = null,
+}): Promise<boolean> {
   const response = await fetch(`${process.env.API_URL}/sendEmail`, {
     method: 'POST',
     headers: {
@@ -16,6 +24,7 @@ export async function sendMailUtil({ to, subject, html, option, text, id }): Pro
       option: option,
       text: text,
       id: id,
+      cn: cn,
     }),
   });
   if (response.ok) {

@@ -117,6 +117,8 @@ export async function removeRefreshTokenFromDB(refreshToken: string) {
 
   try {
     await executeQuery('UPDATE employee SET ref_token = NULL WHERE ref_token = ?', [refreshToken]);
+    console.log('리프레시 토큰 db에서 삭제 성공');
+    return true;
   } catch (error) {
     console.error('리프레시 토큰 삭제 실패:', error.message);
     // throw error;

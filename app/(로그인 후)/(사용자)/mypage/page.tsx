@@ -1,9 +1,9 @@
 import ReForm from '@/components/MyPage/reForm';
 import styles from '@/styles/MyPage.module.css';
+import { sendMailUtil } from '@/util/sendmail';
 import { getTokenUserData } from '@/util/token';
 import { ACT } from 'auth';
 import { randomInt } from 'crypto';
-import { cookies } from 'next/headers';
 
 export const metadata = {
   title: '마이페이지',
@@ -14,7 +14,6 @@ async function getUserData() {
 }
 async function sendMail(formData): Promise<void> {
   'use server';
-  const data = (await getTokenUserData()) as ACT;
 
   const cn = String(randomInt(0, 1000000)).padStart(6, '0');
   const html = `
@@ -51,23 +50,14 @@ async function sendMail(formData): Promise<void> {
 </body>
 </html>
 `;
-  const response = await fetch(`${process.env.API_URL}/sendEmail`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Cookie: cookies().toString(),
-    },
-    body: JSON.stringify({
-      userId: data.userId,
-      to: data.email,
-      subject: 'WERP 인증번호입니다.',
-      html: html,
-      cn: cn,
-      type: 'reFormEmail',
-      option: 'MyPage'
-    }),
+
+  const response = await sendMailUtil({
+    subject: 'WERP 인증번호입니다.',
+    html: html,
+    option: 'MyPage',
+    cn: cn
   });
-  if (response.ok) {
+  if (response) {
     console.log('인증 메일 보냈다.');
   }
 }
