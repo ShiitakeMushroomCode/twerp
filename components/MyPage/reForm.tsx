@@ -59,7 +59,7 @@ export default function ReForm({ sendMail }: ReFormProps) {
         setNewPassword('');
         setTimeout(() => router.refresh(), 1000);
       } else {
-        throw new Error((await res.json()).message || '알 수 없는 오류가 발생했습니다.');
+        throw new Error((await res.json()).error || '알 수 없는 오류가 발생했습니다.');
       }
     } catch (error: any) {
       await Swal.fire({

@@ -1,5 +1,6 @@
 import { generatePdfBase64 } from '@/util/fetchPrintData';
 import { generateCertificationToken, saveVerificationToken } from '@/util/token';
+import { ACT } from 'auth';
 import Bull from 'bull';
 import nodemailer from 'nodemailer';
 
@@ -12,7 +13,7 @@ interface EmailJob {
   id?: string;
   userId?: string;
   cn?: string;
-  companyIdData?: any;
+  TokenData?: ACT;
 }
 
 // Bull 큐 생성
@@ -36,20 +37,21 @@ const transporter = nodemailer.createTransport({
 
 // 큐의 작업 처리
 emailQueue.process(async (job) => {
-  const { to, subject, html, text, option, id, userId, cn, companyIdData } = job.data;
-
+  let { to, subject, html, text, option, id, userId, cn, TokenData } = job.data;
   try {
     if (option === 'MyPage') {
+      to = TokenData['email'];
       const mailOptions = {
         from: process.env.SEND_MAIL,
-        to,
+        to: to,
         subject,
         html,
       };
       await transporter.sendMail(mailOptions);
-      if (userId && cn) {
-        const token = await generateCertificationToken({ userId, cn });
-        await saveVerificationToken(token);
+      if (cn) {
+        const employee_id = TokenData['employee_id']['data'];
+        const token = await generateCertificationToken({ employee_id, cn });
+        await saveVerificationToken(employee_id, token);
       }
     } else if (option.endsWith('TransactionStatement')) {
       const mailOptions = {
@@ -60,7 +62,7 @@ emailQueue.process(async (job) => {
         attachments: [
           {
             filename: '거래명세서.pdf',
-            content: await generatePdfBase64(id, companyIdData, option),
+            content: await generatePdfBase64(id, TokenData['companyId']['data'], option),
             encoding: 'base64',
           },
         ],
@@ -69,7 +71,7 @@ emailQueue.process(async (job) => {
     }
     console.log(`${to}에게 ${subject} 같은 제목과 ${text} 같은 내용으로 메일을 보냄`);
   } catch (error) {
-    console.log(`${to}에게 ${subject} 같은 제목과 ${text} 같은 내용으로 메일을 못보냄`);
+    console.log(`${to}에게 ${subject} 같은 제목과 ${text} 같은 내용으로 메일을 못보냄 \n이유 => ${error}`);
     throw error;
   }
 });

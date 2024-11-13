@@ -1,3 +1,4 @@
+'use server';
 import { executeQuery } from '@/lib/db';
 import { isEmpty } from '@/util/lo';
 import { hashPassword } from '@/util/password';
@@ -78,14 +79,17 @@ export async function generateAccessToken(data: ACT) {
 }
 
 export async function generateRefreshToken(userId: any) {
-  const employee_id = (
-    await executeQuery('SELECT employee_id FROM employee WHERE phone_number = ?', [userId])
-  )[0].employee_id.toString('hex');
-  return new SignJWT({ employee_id })
+  return new SignJWT({ employee_id: await employeeId(userId) })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(process.env.REFRESH_TOKEN_EXPIRATION) // Refresh token 30일동안 지속
     .sign(secret);
+}
+
+export async function employeeId(userId) {
+  return (
+    await executeQuery('SELECT employee_id FROM employee WHERE phone_number = ?', [userId])
+  )[0].employee_id.toString('hex');
 }
 
 export async function getInnerData(data) {
@@ -126,8 +130,8 @@ export async function removeRefreshTokenFromDB(refreshToken: string) {
   }
 }
 
-export async function generateCertificationToken({ userId, cn }) {
-  return new SignJWT({ userId, cn })
+export async function generateCertificationToken({ employee_id, cn }) {
+  return new SignJWT({ employee_id: Buffer.from(employee_id, 'hex'), cn })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('5m')
@@ -195,7 +199,7 @@ export async function updatePassword(newPassword: string): Promise<boolean> {
 }
 
 // 인증 토큰 저장 함수
-export async function saveVerificationToken(token: string): Promise<boolean> {
+export async function saveVerificationToken(employee_id, token: string): Promise<boolean> {
   // 값 검증
   if (isEmpty(token)) {
     console.error('유효하지 않은 token 값입니다.');
@@ -204,7 +208,10 @@ export async function saveVerificationToken(token: string): Promise<boolean> {
 
   try {
     // 데이터베이스에 토큰 저장
-    await executeQuery('UPDATE employee SET cer_code = ? WHERE employee_id = ?;', [token, await getEmployeeId()]);
+    await executeQuery('UPDATE employee SET cer_code = ? WHERE employee_id = ?;', [
+      token,
+      Buffer.from(employee_id, 'hex'),
+    ]);
     return true;
   } catch (error) {
     console.error(error.message);
@@ -213,13 +220,7 @@ export async function saveVerificationToken(token: string): Promise<boolean> {
 }
 
 // 인증 토큰 가져오기 함수
-export async function getVerificationToken(userId: string): Promise<string | null> {
-  // 값 검증
-  if (isEmpty(userId)) {
-    console.error('유효하지 않은 userId 값입니다.');
-    return null;
-  }
-
+export async function getVerificationToken(): Promise<string | null> {
   try {
     // 데이터베이스에서 토큰 가져오기
     const result = await executeQuery('SELECT cer_code FROM employee WHERE employee_id = ?', [await getEmployeeId()]);
@@ -232,13 +233,7 @@ export async function getVerificationToken(userId: string): Promise<string | nul
 }
 
 // 인증 토큰 삭제 함수
-export async function deleteVerificationToken(userId: string): Promise<boolean> {
-  // 값 검증
-  if (isEmpty(userId)) {
-    console.error('유효하지 않은 userId 값입니다.');
-    return false;
-  }
-
+export async function deleteVerificationToken(): Promise<boolean> {
   try {
     // 데이터베이스에서 토큰 삭제
     await executeQuery('UPDATE employee SET cer_code = NULL WHERE employee_id = ?', [await getEmployeeId()]);

@@ -10,15 +10,15 @@ export async function POST(request: NextRequest) {
   try {
     // Bull 큐에 작업 추가
     await emailQueue.add({
-      to: option === 'MyPage' ? TokenData['email'] : to,
+      to,
       subject,
       html,
       text,
       option,
       id,
-      userId: option === 'MyPage' ? TokenData['userId'] : userId,
+      userId,
       cn,
-      companyIdData: TokenData['companyId']['data'],
+      TokenData: TokenData,
     });
 
     return NextResponse.json({ message: '이메일 전송 작업이 큐에 추가되었습니다.' }, { status: 200 });

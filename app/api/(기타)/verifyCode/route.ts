@@ -1,13 +1,11 @@
 import { isEmpty } from '@/util/lo';
 import {
   deleteVerificationToken,
-  getTokenUserData,
   getVerificationToken,
   updateEmail,
   updatePassword,
   updatePhoneNumber,
 } from '@/util/token';
-import { ACT } from 'auth';
 import { jwtVerify } from 'jose';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
@@ -18,7 +16,7 @@ const secretKey = new TextEncoder().encode(process.env.JWT_SECRET!);
 export async function POST(request: NextRequest) {
   try {
     const { inputCode, newData, type } = await request.json();
-    const userId = ((await getTokenUserData()) as ACT).userId;
+    // const userId = ((await getTokenUserData()) as ACT).userId;
     // console.log(userId, inputCode, newEmail);
 
     if (isEmpty(inputCode)) {
@@ -27,15 +25,12 @@ export async function POST(request: NextRequest) {
     if (isEmpty(newData)) {
       return NextResponse.json({ error: '변경할 이메일이 유효하지 않습니다.' }, { status: 400 });
     }
-    if (isEmpty(userId)) {
-      return NextResponse.json({ error: 'userId가 입력되지 않았습니다.' }, { status: 400 });
-    }
     if (isEmpty(type)) {
       return NextResponse.json({ error: '잘못된 입력입니다.' }, { status: 400 });
     }
 
     // 데이터베이스에서 JWT 가져오기
-    const token = await getVerificationToken(userId);
+    const token = await getVerificationToken();
     if (!token) {
       return NextResponse.json({ error: '인증 토큰이 존재하지 않습니다.' }, { status: 400 });
     }
@@ -59,8 +54,8 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ error: '잘못된 입력입니다.' }, { status: 400 });
       }
       // 사용된 토큰 삭제
-      await deleteVerificationToken(userId);
-      cookies().delete('accessToken');
+      await deleteVerificationToken();
+      cookies().set('accessToken', '', { maxAge: 0, path: '/', domain: 'werp.p-e.kr' });
       revalidatePath('/mypage');
       switch (type) {
         case '이메일':
