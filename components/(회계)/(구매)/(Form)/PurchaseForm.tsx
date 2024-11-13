@@ -265,23 +265,30 @@ const PurchaseForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditM
               standard: selectedProduct.standard || '',
               price: selectedProduct.price?.toString() || '',
               unit: selectedProduct.unit || '',
-              sub_price: selectedProduct.sub_price?.toString() || '',
               description: selectedProduct.description || '',
+              sub_price:
+                selectedProduct.price && updatedRows[index].quantity
+                  ? (
+                      (parseInt(selectedProduct.price.toString(), 10) *
+                        parseInt(updatedRows[index].quantity.toString(), 10)) /
+                      10
+                    ).toString()
+                  : '',
+              supply_amount:
+                selectedProduct.price && updatedRows[index].quantity
+                  ? (
+                      parseInt(selectedProduct.price.toString(), 10) *
+                      parseInt(updatedRows[index].quantity.toString(), 10)
+                    ).toString()
+                  : '',
             };
             updatedRows[index] = updatedRow;
             return updatedRows;
           });
-
-          // 공급 금액과 부가세 계산
-          updateRowAmounts(index, {
-            ...rows[index],
-            price: selectedProduct.price?.toString() || '',
-            quantity: rows[index].quantity.toString(),
-          });
         },
       });
     },
-    [updateRowAmounts, rows]
+    [rows]
   );
 
   /**

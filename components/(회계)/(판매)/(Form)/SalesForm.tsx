@@ -230,18 +230,22 @@ const SalesForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditMode
       const price = parseInt(updatedRow.price, 10);
       const quantity = parseInt(updatedRow.quantity, 10);
 
+      let supply_amount = '';
+      let sub_price = '';
+
       if (!isNaN(price) && !isNaN(quantity)) {
-        const { supply_amount, sub_price } = calculateAmounts(price, quantity);
-        updatedRow.supply_amount = supply_amount;
-        updatedRow.sub_price = sub_price;
-      } else {
-        updatedRow.supply_amount = '';
-        updatedRow.sub_price = '';
+        const amounts = calculateAmounts(price, quantity);
+        supply_amount = amounts.supply_amount;
+        sub_price = amounts.sub_price;
       }
 
       setRows((prevRows) => {
         const updatedRows = [...prevRows];
-        updatedRows[index] = updatedRow;
+        updatedRows[index] = {
+          ...updatedRow,
+          supply_amount,
+          sub_price,
+        };
         return updatedRows;
       });
     },
@@ -265,24 +269,30 @@ const SalesForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditMode
               standard: selectedProduct.standard || '',
               price: selectedProduct.price?.toString() || '',
               unit: selectedProduct.unit || '',
-              sub_price: selectedProduct.sub_price?.toString() || '',
               description: selectedProduct.description || '',
+              sub_price:
+                selectedProduct.price && updatedRows[index].quantity
+                  ? (
+                      (parseInt(selectedProduct.price.toString(), 10) *
+                        parseInt(updatedRows[index].quantity.toString(), 10)) /
+                      10
+                    ).toString()
+                  : '',
+              supply_amount:
+                selectedProduct.price && updatedRows[index].quantity
+                  ? (
+                      parseInt(selectedProduct.price.toString(), 10) *
+                      parseInt(updatedRows[index].quantity.toString(), 10)
+                    ).toString()
+                  : '',
             };
             updatedRows[index] = updatedRow;
             return updatedRows;
           });
-
-          // 공급 금액과 부가세 계산
-          const currentRow = rows[index];
-          updateRowAmounts(index, {
-            ...rows[index],
-            price: selectedProduct.price?.toString() || '',
-            quantity: currentRow.quantity.toString(),
-          });
         },
       });
     },
-    [updateRowAmounts, rows]
+    [rows]
   );
 
   /**
