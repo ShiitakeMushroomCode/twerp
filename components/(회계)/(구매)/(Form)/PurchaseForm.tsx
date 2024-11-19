@@ -455,6 +455,7 @@ const PurchaseForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditM
               clear();
             }
             localStorage.setItem('reloadPurchaseItems', new Date().toString());
+            localStorage.setItem('reloadProductItems', new Date().toString());
             if (navigate) {
               if (window.name.startsWith('editPopup')) {
                 window.close();
@@ -599,6 +600,7 @@ const PurchaseForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditM
           });
 
           localStorage.setItem('reloadPurchaseItems', new Date().toString());
+          localStorage.setItem('reloadProductItems', new Date().toString());
           if (window.name.startsWith('editPopup')) {
             window.close();
           } else {

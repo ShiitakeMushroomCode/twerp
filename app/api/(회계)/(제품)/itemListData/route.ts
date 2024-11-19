@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     const formattedSearchTerm = `%${searchTerm.trim()}%`;
 
     // 허용된 정렬 컬럼인지 검증
-    const allowedSortColumns = ['product_name', 'category', 'price', 'manufacturer', 'is_use'];
+    const allowedSortColumns = ['product_name', 'category', 'price', 'manufacturer', 'is_use', 'count'];
     if (!allowedSortColumns.includes(sortColumn)) {
       throw new Error('Invalid sort column');
     }
@@ -77,6 +77,7 @@ export async function POST(request: NextRequest) {
           price,
           manufacturer,
           is_use,
+          count,
           description
         FROM product
         WHERE company_id = ?
@@ -95,7 +96,7 @@ export async function POST(request: NextRequest) {
           product_name LIKE ? 
           OR category LIKE ? 
           OR manufacturer LIKE ?
-          OR is_use LIKE ?
+          OR is_use LIKE ? OR count LIKE ?
         )
       `;
 
@@ -107,6 +108,7 @@ export async function POST(request: NextRequest) {
           price,
           manufacturer,
           is_use,
+          count,
           description
         FROM product
         WHERE company_id = ? 
@@ -114,7 +116,7 @@ export async function POST(request: NextRequest) {
           product_name LIKE ? 
           OR category LIKE ? 
           OR manufacturer LIKE ?
-          OR is_use LIKE ?
+          OR is_use LIKE ? OR count LIKE ?
         )
         ${orderByClause}
         LIMIT ${safeLimit} OFFSET ${safeOffset}

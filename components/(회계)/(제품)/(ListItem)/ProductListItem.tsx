@@ -11,6 +11,7 @@ import TableHeader from './TableHeader';
 import TableRow from './TableRow';
 
 export interface Product {
+  count: number;
   product_id?: string; // 선택적 속성으로 변경
   product_name: string;
   category: string;
@@ -278,11 +279,12 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
       <div className={styles.tableContainer}>
         <table className={styles.table}>
           <colgroup>
-            <col style={{ width: '22%' }} />
-            <col style={{ width: '24%' }} />
-            <col style={{ width: '18%' }} />
             <col style={{ width: '20%' }} />
+            <col style={{ width: '22%' }} />
+            <col style={{ width: '10%' }} />
             <col style={{ width: '16%' }} />
+            <col style={{ width: '18%' }} />
+            <col style={{ width: '14%' }} />
           </colgroup>
           <TableHeader sortColumn={sortColumn} sortOrder={sortOrder} handleSort={handleSort} />
           <tbody>

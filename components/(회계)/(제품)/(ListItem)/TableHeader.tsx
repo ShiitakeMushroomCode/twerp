@@ -26,6 +26,13 @@ export default function TableHeader({ sortColumn, sortOrder, handleSort }: Table
             <span className={styles.sortArrow}>{sortColumn === 'category' && (sortOrder === 'asc' ? '▲' : '▼')}</span>
           </span>
         </th>
+        <th onClick={() => handleSort('count')}>
+          <span className={styles.headerCell}>
+            <span className={styles.fakeLabel}>▲</span>
+            재고 수량
+            <span className={styles.sortArrow}>{sortColumn === 'count' && (sortOrder === 'asc' ? '▲' : '▼')}</span>
+          </span>
+        </th>
         <th onClick={() => handleSort('price')}>
           <span className={styles.headerCell}>
             <span className={styles.fakeLabel}>▲</span>

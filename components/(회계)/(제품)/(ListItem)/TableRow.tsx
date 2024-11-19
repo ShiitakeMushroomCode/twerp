@@ -31,6 +31,15 @@ export default function TableRow({ item, editRoute, handleToggle }: TableRowProp
         {item.category || '없음'}
       </td>
       <td
+        className={styles.centerAlign}
+        title={`${formatPrice(item.count)}`}
+        onClick={(event) => {
+          editRoute(item.product_id, event.ctrlKey || event.metaKey);
+        }}
+      >
+        {item.count <= 0 ? item.count : formatPrice(item.count)}
+      </td>
+      <td
         className={styles.rightAlign}
         onClick={(event) => {
           editRoute(item.product_id, event.ctrlKey || event.metaKey);
@@ -54,10 +63,10 @@ export default function TableRow({ item, editRoute, handleToggle }: TableRowProp
           checked={item.is_use === '사용'}
           uncheckedIcon={false}
           checkedIcon={false}
-          onColor="#499eff"
-          offColor="#ccc"
+          onColor='#499eff'
+          offColor='#ccc'
           id={`${item.product_id}-switch`}
-          name="switch"
+          name='switch'
         />
       </td>
     </tr>

@@ -459,6 +459,7 @@ const SalesForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditMode
               clear();
             }
             localStorage.setItem('reloadSalesItems', new Date().toString());
+            localStorage.setItem('reloadProductItems', new Date().toString());
             if (navigate) {
               if (window.name.startsWith('editPopup')) {
                 window.close();
@@ -603,6 +604,7 @@ const SalesForm: React.FC<SalesFormProps> = ({ initialData, onSubmit, isEditMode
           });
 
           localStorage.setItem('reloadSalesItems', new Date().toString());
+          localStorage.setItem('reloadProductItems', new Date().toString());
           if (window.name.startsWith('editPopup')) {
             window.close();
           } else {

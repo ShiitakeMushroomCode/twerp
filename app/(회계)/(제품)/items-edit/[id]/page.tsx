@@ -30,17 +30,20 @@ async function fetchProductData(id: string): Promise<ProductFormData> {
   if (!productData) {
     throw new Error('제품 데이터를 찾을 수 없습니다.');
   }
-
   const formattedData: ProductFormData = {
     product_id: id,
     product_name: productData.product_name,
     category: productData.category,
     price: productData.price,
     manufacturer: productData.manufacturer,
+    standard: productData.standard || '',
+    unit: productData.unit || '',
     start_date: productData.start_date ? productData.start_date.toISOString().split('T')[0] : '',
     is_use: productData.is_use,
+    count: productData.count || 0,
     description: productData.description,
   };
+  
 
   return formattedData;
 }

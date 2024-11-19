@@ -1,4 +1,5 @@
 'use client';
+import { formatPrice, numberToKorean } from '@/util/reform';
 import { useUnsavedChangesWarning } from '@/util/useUnsavedChangesWarning';
 import { FormControlLabel, Radio, RadioGroup } from '@mui/material';
 import { format } from 'date-fns';
@@ -12,12 +13,15 @@ import styles from './ProductForm.module.css';
 export interface ProductFormData {
   product_id?: string;
   product_name: string;
-  category: string;
-  price: number;
-  manufacturer: string;
+  category?: string;
+  price?: number;
+  manufacturer?: string;
+  standard?: string; 
+  unit?: string; 
   start_date: string;
   is_use: string;
-  description: string;
+  description?: string;
+  count: number;
 }
 
 interface FormErrors {
@@ -39,9 +43,12 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
     category: initialData?.category || '',
     price: initialData?.price || 0,
     manufacturer: initialData?.manufacturer || '',
+    standard: initialData?.standard || '',
+    unit: initialData?.unit || '',
     start_date: initialData?.start_date || '',
     is_use: initialData?.is_use || '사용',
     description: initialData?.description || '',
+    count: initialData?.count || 0,
   }));
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -133,28 +140,10 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
     const { name } = e.target;
     const value = e.target.value.trim();
 
-    if (name === 'price') {
-      // 음수 16자리, 양수 15자리 정규식
-      const regex1 = /^-?\d*\.?\d*$/; // 숫자와 소수점만 허용
-      const isNegative = value.startsWith('-'); // 음수인지 확인
-      const maxLength = isNegative ? 17 : 16; // 음수는 17자리, 양수는 16자리 제한
-
-      // 입력된 값이 유효할 때만 처리
-      if (regex1.test(value) && value.replace(/[^0-9]/g, '').length <= maxLength) {
-        // 쉼표를 제거한 순수 숫자 값
-        const numericValue = value.replace(/,/g, '');
-
-        setFormData((prev) => ({
-          ...prev,
-          price: numericValue === '' || numericValue === '-' ? 0 : parseFloat(numericValue),
-        }));
-      }
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value.trim(),
-      }));
-    }
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -209,9 +198,12 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
       category: '',
       price: 0,
       manufacturer: '',
+      standard: '',
+      unit: '',
       start_date: '',
       is_use: '사용',
       description: '',
+      count: 0,
     });
     setStartDate(null);
     setErrors({});
@@ -222,7 +214,7 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
       <div className={styles.title}>
         <span>{isEditMode ? '제품 수정하기' : '제품 추가하기'}</span>{' '}
         {isEditMode && (
-          <button type="button" className={styles.delButton} onClick={handleDelete} title="제품 삭제">
+          <button type='button' className={styles.delButton} onClick={handleDelete} title='제품 삭제'>
             삭제
             <FaTrashAlt style={{ marginLeft: '0.5rem' }} />
           </button>
@@ -230,16 +222,16 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
       </div>
 
       <div className={styles['form-row']}>
-        <label htmlFor="product_name" className={styles.label}>
+        <label htmlFor='product_name' className={styles.label}>
           제품명
         </label>
         <input
-          id="product_name"
-          name="product_name"
-          type="text"
+          id='product_name'
+          name='product_name'
+          type='text'
           className={styles.input}
           required
-          autoComplete="off"
+          autoComplete='off'
           value={formData.product_name}
           title={formData.product_name}
           onChange={handleChange}
@@ -247,15 +239,31 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
       </div>
 
       <div className={styles['form-row']}>
-        <label htmlFor="category" className={styles.label}>
+        <label htmlFor='standard' className={styles.label}>
+          규격
+        </label>
+        <input
+          id='standard'
+          name='standard'
+          type='text'
+          className={styles.input}
+          autoComplete='off'
+          value={formData.standard}
+          onChange={handleChange}
+          placeholder='제품의 규격 입력(장측*단측*높이, 10L 등)'
+        />
+      </div>
+
+      <div className={styles['form-row']}>
+        <label htmlFor='category' className={styles.label}>
           카테고리
         </label>
         <input
-          id="category"
-          name="category"
-          type="text"
+          id='category'
+          name='category'
+          type='text'
           className={styles.input}
-          autoComplete="off"
+          autoComplete='off'
           value={formData.category}
           title={formData.category}
           onChange={handleChange}
@@ -263,34 +271,66 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
       </div>
 
       <div className={styles['form-row']}>
-        <label htmlFor="price" className={styles.label}>
+        <label htmlFor='count' className={styles.label}>
+          재고 수량
+        </label>
+        <input
+          id='count'
+          name='count'
+          type='number'
+          className={styles.input}
+          autoComplete='off'
+          value={formData.count === 0 ? '' : formData.count.toString()}
+          title={`${formatPrice(formData.count).toString()}\n${numberToKorean(formData.count)}`}
+          onChange={handleChange}
+          placeholder='재고 수량 입력'
+        />
+      </div>
+
+      <div className={styles['form-row']}>
+        <label htmlFor='unit' className={styles.label}>
+          단위
+        </label>
+        <input
+          id='unit'
+          name='unit'
+          type='text'
+          className={styles.input}
+          autoComplete='off'
+          value={formData.unit}
+          onChange={handleChange}
+          placeholder='제품을 세는 단위 입력(개, 장, L 등)'
+        />
+      </div>
+      <div className={styles['form-row']}>
+        <label htmlFor='price' className={styles.label}>
           가격
         </label>
         <input
-          id="price"
-          name="price"
-          type="text"
-          inputMode="numeric"
-          pattern="^-?\d*$"
+          id='price'
+          name='price'
+          type='text'
+          inputMode='numeric'
+          pattern='^-?\d*$'
           className={styles.input}
-          autoComplete="off"
+          autoComplete='off'
           value={formData.price === 0 ? '' : formData.price.toString()}
-          title={formData.price.toString()}
+          title={`${formatPrice(formData.price).toString()}\n${numberToKorean(formData.price)}원정`}
           onChange={handleChange}
           placeholder="숫자와 '-'만 입력 가능합니다."
         />
       </div>
 
       <div className={styles['form-row']}>
-        <label htmlFor="manufacturer" className={styles.label}>
+        <label htmlFor='manufacturer' className={styles.label}>
           제조업체
         </label>
         <input
-          id="manufacturer"
-          name="manufacturer"
-          type="text"
+          id='manufacturer'
+          name='manufacturer'
+          type='text'
           className={styles.input}
-          autoComplete="off"
+          autoComplete='off'
           value={formData.manufacturer}
           title={formData.manufacturer}
           onChange={handleChange}
@@ -298,11 +338,11 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
       </div>
 
       <div className={styles['form-row']}>
-        <label htmlFor="start_date" className={styles.label}>
+        <label htmlFor='start_date' className={styles.label}>
           시작일자
         </label>
         <div className={styles.dateInput}>
-          <DatePicker selectedDate={startDate} onDateChange={handleDateChange} inputId="start_date" />
+          <DatePicker selectedDate={startDate} onDateChange={handleDateChange} inputId='start_date' />
         </div>
       </div>
 
@@ -310,27 +350,27 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
         <span className={styles.label}>사용 여부</span>
         <RadioGroup
           row
-          id="is_use"
-          aria-label="is_use"
-          name="is_use"
+          id='is_use'
+          aria-label='is_use'
+          name='is_use'
           value={formData.is_use}
           onChange={handleChange}
           className={styles.radioGroup}
         >
-          <FormControlLabel value="사용" control={<Radio />} label="사용" />
-          <FormControlLabel value="중지" control={<Radio />} label="중지" />
+          <FormControlLabel value='사용' control={<Radio />} label='사용' />
+          <FormControlLabel value='중지' control={<Radio />} label='중지' />
         </RadioGroup>
       </div>
 
       <div className={styles['form-row']}>
-        <label htmlFor="description" className={styles.label}>
+        <label htmlFor='description' className={styles.label}>
           설명
         </label>
         <textarea
-          id="description"
-          name="description"
+          id='description'
+          name='description'
           className={styles.textarea}
-          autoComplete="off"
+          autoComplete='off'
           value={formData.description}
           title={formData.description}
           onChange={handleChange}
@@ -343,7 +383,7 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
       </div>
 
       <div className={styles['form-row']}>
-        <button type="submit" className={styles.button}>
+        <button type='submit' className={styles.button}>
           {isEditMode ? '수정' : '등록'}
         </button>
       </div>
