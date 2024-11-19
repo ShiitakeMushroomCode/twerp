@@ -20,10 +20,10 @@ export async function POST(request: NextRequest) {
 
   const data = await executeQuery('SELECT * FROM employee WHERE employee_id = ?;', [employeeId]);
   // DB에서 리프레시 토큰 유효성 확인
-  // const isStored = await checkRefreshTokenInDB(refPayload?.userId.toString(), await refreshToken.toString());
+  // const isStored = await checkRefreshTokenInDB(data[0]?.ref_token, refreshToken);
 
   // DB에 있는 리프레시 토큰이여야 함
-  if (!data[0]?.ref_token) {
+  if (data[0]?.ref_token !== refreshToken) {
     return NextResponse.json({ error: 'DB에 없는 리프레시 토큰 인듯' }, { status: 401 });
   }
 
