@@ -84,18 +84,18 @@ export default async function ProductSearchClick({ handleSelectProduct = null })
                   data-id="${product.product_id}" 
                   data-name="${product.product_name}" 
                   data-category="${product.category}" 
-                  data-price="${product.price}" 
-                  data-standard="${product.standard}"
-                  data-unit="${product.unit}"
+                  data-price="${product.cost_price}" 
+                  data-standard="${product.standard === null ? '' : product.standard}"
+                  data-unit="${product.unit === null ? '' : product.unit}"
                   data-description="${product.description}"
                   data-manufacturer="${product.manufacturer}"
                   title="${product.product_name}">
                   <td title="${product.product_name}">${product.product_name}</td>
                   <td title="${product.category}">${product.category}</td>
                   <td title="${product.manufacturer}">${product.manufacturer}</td>
-                  <td title="\\${product.price.toLocaleString()}\n${numberToKorean(
-                product.price
-              )}원정" style="text-align: right;">\\${product.price.toLocaleString()}</td>
+                  <td title="${
+                    product.cost_price === 0 || null ? '' : product.cost_price.toLocaleString()
+                  }\n${product.cost_price === 0 || null ? '' : numberToKorean(product.cost_price)+'원정'}" style="text-align: right;">\\${product.cost_price.toLocaleString()}</td>
                 </tr>
               `
             )

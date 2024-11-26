@@ -35,6 +35,7 @@ async function fetchProductData(id: string): Promise<ProductFormData> {
     product_name: productData.product_name,
     category: productData.category,
     price: productData.price,
+    cost_price: productData.cost_price,
     manufacturer: productData.manufacturer,
     standard: productData.standard || '',
     unit: productData.unit || '',

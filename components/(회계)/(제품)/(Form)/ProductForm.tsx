@@ -15,9 +15,10 @@ export interface ProductFormData {
   product_name: string;
   category?: string;
   price?: number;
+  cost_price?: number;
   manufacturer?: string;
-  standard?: string; 
-  unit?: string; 
+  standard?: string;
+  unit?: string;
   start_date: string;
   is_use: string;
   description?: string;
@@ -42,6 +43,7 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
     product_name: initialData?.product_name || '',
     category: initialData?.category || '',
     price: initialData?.price || 0,
+    cost_price: initialData?.cost_price || 0,
     manufacturer: initialData?.manufacturer || '',
     standard: initialData?.standard || '',
     unit: initialData?.unit || '',
@@ -140,6 +142,20 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
     const { name } = e.target;
     const value = e.target.value.trim();
 
+    if (name === 'price' || name === 'cost_price') {
+      if (value === '' || value === '-') {
+        setFormData((prev) => ({
+          ...prev,
+          [name]: value,
+        }));
+        return;
+      }
+      const regex = /^-?\d*$/; 
+      if (!regex.test(value)) {
+        return;
+      }
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -150,8 +166,13 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
     e.preventDefault();
     const newErrors: FormErrors = {};
     if (!formData.product_name) newErrors.product_name = '제품명은 필수입니다.';
-    if (formData.price === null || formData.price === undefined || isNaN(formData.price))
+    if (formData.price === null || formData.price === undefined || isNaN(formData.price)) {
       newErrors.price = '가격은 숫자여야 합니다.';
+    }
+
+    if (formData.cost_price === null || formData.cost_price === undefined || isNaN(formData.cost_price)) {
+      newErrors.cost_price = '구매 단가는 숫자여야 합니다.';
+    }
 
     if (Object.keys(newErrors).length) {
       setErrors(newErrors);
@@ -302,9 +323,10 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
           placeholder='제품을 세는 단위 입력(개, 장, L 등)'
         />
       </div>
+
       <div className={styles['form-row']}>
         <label htmlFor='price' className={styles.label}>
-          가격
+          판매 단가
         </label>
         <input
           id='price'
@@ -316,6 +338,25 @@ export default function ProductForm({ initialData, onSubmit, isEditMode = false 
           autoComplete='off'
           value={formData.price === 0 ? '' : formData.price.toString()}
           title={`${formatPrice(formData.price).toString()}\n${numberToKorean(formData.price)}원정`}
+          onChange={handleChange}
+          placeholder="숫자와 '-'만 입력 가능합니다."
+        />
+      </div>
+
+      <div className={styles['form-row']}>
+        <label htmlFor='cost_price' className={styles.label}>
+          구매 단가
+        </label>
+        <input
+          id='cost_price'
+          name='cost_price'
+          type='text'
+          inputMode='numeric'
+          pattern='^-?\d*$'
+          className={styles.input}
+          autoComplete='off'
+          value={formData.cost_price === 0 ? '' : formData.cost_price.toString()}
+          title={`${formatPrice(formData.cost_price).toString()}\n${numberToKorean(formData.cost_price)}원정`}
           onChange={handleChange}
           placeholder="숫자와 '-'만 입력 가능합니다."
         />

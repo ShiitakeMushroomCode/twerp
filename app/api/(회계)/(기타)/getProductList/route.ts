@@ -43,13 +43,7 @@ export async function GET(request: Request): Promise<Response> {
   // 데이터 쿼리
   const dataSql = `
     SELECT
-      product_id,
-      product_name,
-      IFNULL(category, '') AS category,
-      price,
-      IFNULL(standard, '') AS standard,
-      IFNULL(unit, '') AS unit,
-      manufacturer
+      *
     ${baseSql}
     ORDER BY product_name
     LIMIT ?

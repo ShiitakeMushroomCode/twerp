@@ -8,6 +8,7 @@ export interface ProductData {
   product_name: string; // 필수
   category?: string; // 기본값 '없음'
   price?: number; // 기본값 0
+  cost_price?: number; // 기본값 0
   standard?: string; // 규격
   unit?: string; // 단위
   description?: string; // 설명
@@ -94,6 +95,7 @@ export async function insertProduct(productData: ProductData): Promise<boolean> 
         product_name,
         category,
         price,
+        cost_price,
         standard,
         unit,
         description,
@@ -104,7 +106,7 @@ export async function insertProduct(productData: ProductData): Promise<boolean> 
         image_url
       ) VALUES (
         unhex(replace(uuid(),'-','')),
-        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
       )
     `;
 
@@ -113,6 +115,7 @@ export async function insertProduct(productData: ProductData): Promise<boolean> 
       productData.product_name,
       productData.category || '없음',
       productData.price || 0,
+      productData.cost_price || 0,
       productData.standard || null,
       productData.unit || null,
       productData.description || null,
@@ -163,6 +166,10 @@ export async function updateProduct(productData: ProductData): Promise<boolean> 
     if (productData.price !== undefined) {
       fields.push('price = ?');
       params.push(productData.price || 0);
+    }
+    if (productData.cost_price !== undefined) {
+      fields.push('cost_price = ?');
+      params.push(productData.cost_price || 0);
     }
     if (productData.standard !== undefined) {
       fields.push('standard = ?');

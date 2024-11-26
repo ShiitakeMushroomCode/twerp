@@ -86,8 +86,8 @@ export default async function ProductSearchClick({ handleSelectProduct = null })
                   data-name="${product.product_name}" 
                   data-category="${product.category}" 
                   data-price="${product.price}" 
-                  data-standard="${product.standard}"
-                  data-unit="${product.unit}"
+                  data-standard="${product.standard === null ? '' : product.standard}"
+                  data-unit="${product.unit === null ? '' : product.unit}"
                   data-description="${product.description}"
                   data-manufacturer="${product.manufacturer}"
                   title="${product.product_name}">
