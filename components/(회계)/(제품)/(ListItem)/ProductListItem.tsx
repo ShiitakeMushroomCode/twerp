@@ -155,6 +155,7 @@ export default function ProductListItem({ searchTerm, page, setPage, triggerSear
         step: '1',
         max: currentTotalPages.toString(),
         placeholder: `페이지 번호는 1에서 ${currentTotalPages} 사이여야 합니다.`,
+        autocomplete: 'off'
       },
       showCancelButton: true,
       confirmButtonText: '이동',
