@@ -4,6 +4,6 @@ export const erpMenuItems = [
   // { src: '/Storage.png', alt: '재고', title: '재고정보', href: '/inventory-list' },
   { src: '/Sales.png', alt: '판매', title: '판매 정보', href: '/sales-list' },
   { src: '/Purchase.png', alt: '구매', title: '구매 정보', href: '/purchase-list' },
-  { src: '/Documents.png', alt: '문서', title: '문서 관리', href: '/documents-list' },
+  // { src: '/Documents.png', alt: '문서', title: '문서 관리', href: '/documents-list' },
   // { src: '/Invoice.png', alt: '세금계산서', title: '세금 계산서', href: '/invoice-list' },
 ];

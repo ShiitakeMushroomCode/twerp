@@ -122,13 +122,14 @@ export async function POST(request: NextRequest) {
         LIMIT ${safeLimit} OFFSET ${safeOffset}
       `;
 
-      // 검색 파라미터에 'is_use' 추가
+      // **매개변수 배열 수정 (6개)**
       countParams = [
         companyIdBuffer,
         formattedSearchTerm,
         formattedSearchTerm,
         formattedSearchTerm,
         formattedSearchTerm,
+        formattedSearchTerm, // 추가된 매개변수
       ];
       selectParams = [
         companyIdBuffer,
@@ -136,6 +137,7 @@ export async function POST(request: NextRequest) {
         formattedSearchTerm,
         formattedSearchTerm,
         formattedSearchTerm,
+        formattedSearchTerm, // 추가된 매개변수
       ];
     }
 
